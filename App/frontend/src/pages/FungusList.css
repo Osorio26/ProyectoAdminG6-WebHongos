@@ -1,0 +1,96 @@
+.fungus-container {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 50px 80px;
+  font-family: "Inter", system-ui, sans-serif;
+  color: #333;
+}
+
+.fungus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+.fungus-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1b1b1b;
+}
+
+.add-button {
+  background-color: #f0f4f0;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  color: #2c2c2c;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.add-button:hover {
+  background-color: #e0e8e0;
+}
+
+.search-bar {
+  background-color: #f4f7f3;
+  border-radius: 10px;
+  padding: 12px 20px;
+  margin-bottom: 25px;
+}
+
+.search-bar input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: #333;
+  outline: none;
+}
+
+.fungus-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.fungus-table thead {
+  background-color: #f8f9f7;
+  color: #4a4a4a;
+  font-weight: 600;
+}
+
+.fungus-table th,
+.fungus-table td {
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 0.95rem;
+}
+
+.name-cell {
+  color: #4d704d;
+  font-weight: 500;
+}
+
+.details-button {
+  background: none;
+  border: none;
+  color: #4d704d;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.details-button:hover {
+  text-decoration: underline;
+  color: #3c5f3c;
+}
+
+.fungus-table tr:hover {
+  background-color: #fafafa;
+}

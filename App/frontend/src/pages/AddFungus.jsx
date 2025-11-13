@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddFungus.css";
+import FileDropdown from "../components/FileDropdown/fileDropdown";
 
 const AddFungus = () => {
   const navigate = useNavigate();
@@ -104,6 +105,8 @@ const AddFungus = () => {
             <div className="button-container">
               <button className="submit-button" type="button" onClick={nextStep}>Siguiente</button>
             </div>
+            {/*Prueba dropdown de archivo */}
+            <FileDropdown text="Select an option..."/>
           </>
         )}
 

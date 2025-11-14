@@ -76,10 +76,28 @@ const FungusList = () => {
               .filter((fungus) => {
                 if (!search.trim()) return true;
                 const term = search.toLowerCase();
-                return (
-                  fungus.code?.toLowerCase().includes(term) ||
-                  fungus.name?.toLowerCase().includes(term) ||
-                  fungus.genus?.toLowerCase().includes(term)
+
+                // Buscar en todos los atributos relevantes del hongo
+                const fieldsToSearch = [
+                  fungus.code,
+                  fungus.name,
+                  fungus.quantity,
+                  fungus.collector,
+                  fungus.collectionNumber,
+                  fungus.location,
+                  fungus.protectedArea,
+                  fungus.exactSite,
+                  fungus.genus,
+                  fungus.kingdom,
+                  fungus.temperature,
+                  fungus.class,
+                  fungus.species,
+                  fungus.order,
+                  fungus.family,
+                ];
+
+                return fieldsToSearch.some((value) =>
+                  value?.toString().toLowerCase().includes(term)
                 );
               })
               .map((fungus, idx) => (

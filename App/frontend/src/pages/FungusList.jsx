@@ -47,10 +47,13 @@ const FungusList = () => {
         </button>
       </div>
 
+      <p className="search-label">
+        Buscar por código, nombre, cantidad, ubicación, taxonomía, etc. (puedes separar varios términos con coma)
+      </p>
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Buscar por código, nombre o género"
+          placeholder="Ej: GC-2022510226, 50 lbs, Ganoderma"
           className="search-input"
           value={search}
           onChange={(e) => setSearch(e.target.value)}

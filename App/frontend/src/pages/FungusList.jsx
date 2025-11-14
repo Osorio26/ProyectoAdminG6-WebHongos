@@ -48,12 +48,12 @@ const FungusList = () => {
       </div>
 
       <p className="search-label">
-        Buscar por código, nombre, cantidad, ubicación, taxonomía, etc. (puedes separar varios términos con coma)
+        Buscar por nombre, clase, ubicación, familia, o cualquier atributo. (puedes separar varios términos con punto y coma ";")
       </p>
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Ej: GC-2022510226, 50 lbs, Ganoderma"
+          placeholder="Ej: Pleurotus ostreatus; Agaricomycetes; Alajuela; Agaricaceae"
           className="search-input"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -82,9 +82,9 @@ const FungusList = () => {
               .filter((fungus) => {
                 if (!search.trim()) return true;
 
-                // Permitir múltiples términos separados por coma
+                // Permitir múltiples términos separados por punto y coma
                 const terms = search
-                  .split(",")
+                  .split(";")
                   .map((t) => t.trim().toLowerCase())
                   .filter(Boolean);
 

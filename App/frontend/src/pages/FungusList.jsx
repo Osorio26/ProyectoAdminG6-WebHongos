@@ -75,9 +75,15 @@ const FungusList = () => {
             fungi
               .filter((fungus) => {
                 if (!search.trim()) return true;
-                const term = search.toLowerCase();
 
-                // Buscar en todos los atributos relevantes del hongo
+                // Permitir múltiples términos separados por coma
+                const terms = search
+                  .split(",")
+                  .map((t) => t.trim().toLowerCase())
+                  .filter(Boolean);
+
+                if (terms.length === 0) return true;
+
                 const fieldsToSearch = [
                   fungus.code,
                   fungus.name,
@@ -94,10 +100,11 @@ const FungusList = () => {
                   fungus.species,
                   fungus.order,
                   fungus.family,
-                ];
+                ].map((v) => v?.toString().toLowerCase() || "");
 
-                return fieldsToSearch.some((value) =>
-                  value?.toString().toLowerCase().includes(term)
+                // El registro pasa si TODOS los términos aparecen en algún campo
+                return terms.every((term) =>
+                  fieldsToSearch.some((field) => field.includes(term))
                 );
               })
               .map((fungus, idx) => (

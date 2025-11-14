@@ -6,6 +6,7 @@ import { getFungi } from "../api/FungusApi";
 const FungusList = () => {
   const navigate = useNavigate();
   const [fungi, setFungi] = useState([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -49,8 +50,10 @@ const FungusList = () => {
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Buscar por tipo o nombre"
+          placeholder="Buscar por código, nombre o género"
           className="search-input"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
@@ -67,7 +70,19 @@ const FungusList = () => {
           </tr>
         </thead>
         <tbody>
-          {!loading && !error && fungi.map((fungus, idx) => (
+          {!loading &&
+            !error &&
+            fungi
+              .filter((fungus) => {
+                if (!search.trim()) return true;
+                const term = search.toLowerCase();
+                return (
+                  fungus.code?.toLowerCase().includes(term) ||
+                  fungus.name?.toLowerCase().includes(term) ||
+                  fungus.genus?.toLowerCase().includes(term)
+                );
+              })
+              .map((fungus, idx) => (
             <tr key={idx}>
               <td>{fungus.code}</td>
               <td className="name-cell">{fungus.name}</td>

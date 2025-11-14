@@ -1,17 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FungusList.css";
+import { getFungi } from "../api/FungusApi";
 
 const FungusList = () => {
   const navigate = useNavigate();
+  const [fungi, setFungi] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const fungi = [
-    { code: "GC-2022510226", name: "Pleurotus ostreatus", quantity: "150 lbs" },
-    { code: "BD-2022523226", name: "Lentinula edodes", quantity: "200 lbs" },
-    { code: "AA-2022510286", name: "Hericium erinaceus", quantity: "100 lbs" },
-    { code: "GC-2022510225", name: "Ganoderma lucidum", quantity: "50 lbs" },
-    { code: "BR-202258293", name: "Inonotus obliquus", quantity: "75 lbs" },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const data = await getFungi();
+        if (isMounted) {
+          setFungi(data);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error(error);
+          setError("No se pudo cargar el inventario de hongos");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="fungus-container">
@@ -33,6 +54,9 @@ const FungusList = () => {
         />
       </div>
 
+      {loading && <p>Cargando inventario...</p>}
+      {error && !loading && <p className="error-message">{error}</p>}
+
       <table className="fungus-table">
         <thead>
           <tr>
@@ -43,7 +67,7 @@ const FungusList = () => {
           </tr>
         </thead>
         <tbody>
-          {fungi.map((fungus, idx) => (
+          {!loading && !error && fungi.map((fungus, idx) => (
             <tr key={idx}>
               <td>{fungus.code}</td>
               <td className="name-cell">{fungus.name}</td>

@@ -1,28 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./FungusDetails.css";
+import { getFungusByCode } from "../api/FungusApi";
 
 const FungusDetails = () => {
   const { code } = useParams();
   const navigate = useNavigate();
 
-  // Datos simulados (luego puedes cargarlos de localStorage o API)
-  const fungus = {
-    code,
-    collector: "Golden Chanterelle",
-    collectionNumber: "1243A",
-    quantity: "15 lbs",
-    location: "Alajuela, Poás",
-    protectedArea: "Parque Nacional Volcán Poás",
-    exactSite: "Al lado de las faldas del volcán",
-    genus: "Cantharellus",
-    kingdom: "Fungi",
-    temperature: "14°C",
-    class: "Agaricomycetes",
-    species: "Agaricus rhizopus",
-    order: "Rhizopus",
-    family: "Agaricaceae",
-  };
+  const [fungus, setFungus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    (async () => {
+      try {
+        const data = await getFungusByCode(code);
+        if (isMounted) {
+          setFungus(data);
+        }
+      } catch (error) {
+        console.error(error);
+        if (isMounted) {
+          setError("No se pudieron cargar los detalles de la muestra");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [code]);
+
+  if (loading) {
+    return <p className="fungus-details-loading">Cargando detalles de la muestra...</p>;
+  }
+
+  if (error) {
+    return <p className="fungus-details-error">{error}</p>;
+  }
+
+  if (!fungus) {
+    return <p className="fungus-details-error">Muestra no encontrada.</p>;
+  }
 
   return (
     <div className="fungus-details-container">

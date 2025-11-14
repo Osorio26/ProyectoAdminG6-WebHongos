@@ -66,9 +66,12 @@ const FungusList = () => {
       <table className="fungus-table">
         <thead>
           <tr>
-            <th>Código</th>
             <th>Nombre</th>
-            <th>Cantidad</th>
+            <th>Género</th>
+            <th>Reino</th>
+            <th>Clase</th>
+            <th>Especie</th>
+            <th>Familia</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -116,9 +119,12 @@ const FungusList = () => {
               })
               .map((fungus, idx) => (
             <tr key={idx}>
-              <td>{fungus.code}</td>
               <td className="name-cell">{fungus.name}</td>
-              <td>{fungus.quantity}</td>
+              <td>{fungus.genus}</td>
+              <td>{fungus.kingdom}</td>
+              <td>{fungus.class}</td>
+              <td>{fungus.species}</td>
+              <td>{fungus.family}</td>
               <td>
                  <button
                   className="details-button"

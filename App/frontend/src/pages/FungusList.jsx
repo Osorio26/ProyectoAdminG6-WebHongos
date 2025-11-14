@@ -102,9 +102,13 @@ const FungusList = () => {
                   fungus.family,
                 ].map((v) => v?.toString().toLowerCase() || "");
 
-                // El registro pasa si TODOS los términos aparecen en algún campo
+                // El registro pasa si TODOS los términos aparecen en algún campo.
+                // Si el término contiene espacios, se hace coincidencia exacta del campo completo
+                // (para evitar que "50 lbs" coincida con "150 lbs").
                 return terms.every((term) =>
-                  fieldsToSearch.some((field) => field.includes(term))
+                  fieldsToSearch.some((field) =>
+                    term.includes(" ") ? field === term : field.includes(term)
+                  )
                 );
               })
               .map((fungus, idx) => (

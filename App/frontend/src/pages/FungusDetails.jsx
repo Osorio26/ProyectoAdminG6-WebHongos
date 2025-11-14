@@ -125,7 +125,10 @@ const FungusDetails = () => {
       </section>
 
       <div className="button-container">
-        <button className="edit-button" onClick={() => navigate("/editar")}>
+        <button
+          className="edit-button"
+          onClick={() => navigate(`/editar/${fungus.code}`)}
+        >
           Editar Muestra
         </button>
       </div>

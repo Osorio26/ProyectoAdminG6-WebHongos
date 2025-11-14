@@ -16,3 +16,35 @@ export async function getFungusByCode(code) {
 	return res.json();
 }
 
+export async function createFungus(fungus) {
+	const res = await fetch(`${API_BASE_URL}/hongos`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(fungus),
+	});
+
+	if (!res.ok) {
+		throw new Error("Error creating fungus");
+	}
+
+	return res.json();
+}
+
+export async function updateFungus(code, updates) {
+	const res = await fetch(`${API_BASE_URL}/hongos/${code}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(updates),
+	});
+
+	if (!res.ok) {
+		throw new Error("Error updating fungus");
+	}
+
+	return res.json();
+}
+

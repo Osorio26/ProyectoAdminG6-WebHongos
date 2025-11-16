@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddFungus.css";
 import FileDropdown from "../components/FileDropdown/fileDropdown";
+import { createFungus } from "../api/FungusApi";
 
 const AddFungus = () => {
   const navigate = useNavigate();
@@ -75,9 +76,35 @@ const AddFungus = () => {
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Hongo agregado:\n" + JSON.stringify(formData, null, 2));
+
+    try {
+      // Mapear datos mínimos al modelo del backend
+      const newFungus = {
+        code: formData.codigoColecta || `GEN-${Date.now()}`,
+        name: formData.especie || "Hongo sin especie",
+        quantity: formData.cantidad || "0",
+        collector: formData.colector,
+        collectionNumber: formData.codigoColecta,
+        location: formData.ubicacionColecta,
+        protectedArea: formData.ubicacion,
+        exactSite: formData.observacionesColecta,
+        genus: formData.genero,
+        kingdom: formData.reino || "Fungi",
+        temperature: formData.condiciones,
+        class: formData.clase,
+        species: formData.especie,
+        order: formData.orden,
+        family: formData.familia,
+      };
+
+      await createFungus(newFungus);
+      navigate("/inventario");
+    } catch (error) {
+      console.error(error);
+      alert("Ocurrió un error al guardar el hongo");
+    }
   };
 
   return (

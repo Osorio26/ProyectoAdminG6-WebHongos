@@ -132,7 +132,7 @@ const AddFungus = () => {
               <button className="submit-button" type="button" onClick={nextStep}>Siguiente</button>
             </div>
             {/*Prueba dropdown de archivo */}
-            <CategoryFileReader/>
+            <CategoryFileReader />
           </>
         )}
 

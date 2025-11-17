@@ -1,12 +1,16 @@
 import { ChangeEvent, useState } from "react";
-import Select from "react-select";
 import CategoryDropdown from "../categoryDropdown/categoryDropdown";
+import { useNavigate } from "react-router-dom";
+import { createCategory, verifyFileUpdate } from "../../api/CategoryApi";
 
 const CategoryFileReader = () => {
   const [file, setFile] = useState(null);
   const [lines, setLines] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedOption, setSelectedOption] = useState({});
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [fileLoadCounter, setFileLoadCounter] = useState(0);
+
+  const navigate = useNavigate();
 
   // Valores de texto de categoria
   const category_delimiter = '-----';
@@ -15,12 +19,12 @@ const CategoryFileReader = () => {
 
   function handleFileChange(event) {
    
-    if (event.target.files) {
+    if (event.target.files && event.target.files.length > 0) {
       // debug: selected option
       console.log('Selected option:', selectedOption);
 
-      const selectedFile = event.target.files?.[0]
-      setFile(selectedFile)
+      const selectedFile = event.target.files[0];
+      setFile(selectedFile);
 
       const reader = new FileReader();
       
@@ -63,12 +67,39 @@ const CategoryFileReader = () => {
           }
         });
 
-        // Se agrega la ultima categoria (de existir))
+        // Se agrega la ultima categoria (de existir)
         if (currentCategory) {
           tempCategories.push(currentCategory);
         }
 
         setCategories(tempCategories);
+
+        // Reset selected option when file loads
+        setSelectedOption(null);
+        
+        // Increment counter to force dropdown remount
+        setFileLoadCounter(prev => prev + 1);
+
+        // Guardar todas las categorías y esperar a que terminen
+        console.log(`Starting to save ${tempCategories.length} categories...`);
+        Promise.all(tempCategories.map(cat => saveCategory(cat)))
+          .then(async (results) => {
+            console.log(`✓ All ${results.length} categories saved successfully!`);
+            console.log('Categories saved:', results);
+            
+            // Verify the file was actually written
+            try {
+              const verification = await verifyFileUpdate();
+              console.log(`✓ File verified! Total categories in file: ${verification.totalCategories}`);
+              console.log(`✓ Last modified: ${new Date(verification.lastModified).toLocaleTimeString()}`);
+              console.log('Updated file contents:', verification.data);
+            } catch (verifyErr) {
+              console.error('Could not verify file update:', verifyErr);
+            }
+          })
+          .catch(err => {
+            console.error('Error saving categories:', err);
+          });
 
         // debug: mostrar categorias en la consola
         console.log('Parsed categories:', tempCategories);
@@ -77,41 +108,55 @@ const CategoryFileReader = () => {
     }
   }
 
-  function handleOptionSelect(option, index) {
+  function handleOptionSelect(option) {
     if (option) {
-      setSelectedOption(previous_option => ({
-        ...previous_option,
-        [index]: option
-      }));
+      setSelectedOption(option);
     }
   }
 
+  const saveCategory = async (categoryData) => {
+    try {
+      // Mapear datos mínimos al modelo del backend
+      const newCategory = {
+        code: categoryData.title.toLowerCase().replace(/\s+/g, '-'),
+        title: categoryData.title,
+        content: categoryData.content
+      };
+
+      console.log('Saving category:', newCategory);
+      const response = await createCategory(newCategory);
+      console.log(`Categoría "${categoryData.title}" guardada/actualizada correctamente:`, response);
+      return response;
+    } catch (error) {
+      console.error(`Error saving category "${categoryData.title}":`, error);
+      throw error;
+    }
+  };
+
   return (
-  <div>
-  <input 
-    type="file" 
-    accept=".txt"  
-    onChange={handleFileChange}
-    style={{ paddingBottom: "1rem" }}
-  />
+    <div>
+    <input 
+      type="file" 
+      accept=".txt"  
+      onChange={handleFileChange}
+      style={{ paddingBottom: "1rem" }}
+    />
 
-  {file && categories.length > 0 && (
-    <div className="mb-4 text-sm">
-      {categories.map((cat, index) => (
-        <div key={index} style={{ marginBottom: "1rem" }}>
-          <CategoryDropdown 
-            category_object={cat}
-            placeholder_text="Seleccione una opcion." 
-            handleOptionSelect={handleOptionSelect} 
-            index={index} />
-          {selectedOption[index] && (
-            <p>Selected Option: "{selectedOption[index].label}"</p>
-          )}
-        </div>
-      ))}
-
-    </div>
-    )}
+    {file && categories.length > 0 && (
+      <div className="mb-4 text-sm">
+            <CategoryDropdown
+              key={fileLoadCounter}
+              categoryName={"medio-del-cultivo"}
+              category_object={categories.find(cat => cat.title === "medio del cultivo") || categories[0]}
+              placeholder_text="Seleccione una opcion." 
+              handleOptionSelect={handleOptionSelect} 
+            />
+            {selectedOption && (
+              <p>Selected Option: "{selectedOption.label}"</p>
+            )}
+          </div>
+        )
+    }
   </div>
   );
 };

@@ -8,8 +8,8 @@ export async function getCategory() {
 	return res.json();
 }
 
-export async function getCategoryByCode(code) {
-	const res = await fetch(`${API_BASE_URL}/categorias/${code}`);
+export async function getCategoryByCode(title) {
+	const res = await fetch(`${API_BASE_URL}/categorias/${encodeURIComponent(title)}`);
 	if (!res.ok) {
 		throw new Error("Error fetching category details!");
 	}
@@ -29,24 +29,22 @@ export async function getCategoryByTitle(title) {
 	return category;
 }
 
-export async function getCategoryByName(nameOrCode) {
+export async function getCategoryByName(name) {
 	const res = await fetch(`${API_BASE_URL}/categorias`);
 	if (!res.ok) {
 		throw new Error("Error fetching categories");
 	}
 	const categories = await res.json();
-	// Buscar por code primero, luego por title
-	let category = categories.find(cat => cat.code.toLowerCase() === nameOrCode.toLowerCase());
+
+	// Buscar por title
+	let	category = categories.find(cat => (cat.title && cat.title.toLowerCase() === name.toLowerCase()));
+    
 	if (!category) {
-		category = categories.find(cat => cat.title.toLowerCase() === nameOrCode.toLowerCase());
-	}
-	if (!category) {
-		throw new Error(`Category "${nameOrCode}" not found`);
+		throw new Error(`Category "${name}" not found`);
 	}
 	return category;
 }
 
-// No estoy seguro de si voy a mantener esto
 export async function createCategory(category) {
 	const res = await fetch(`${API_BASE_URL}/categorias`, {
 		method: "POST",
@@ -58,11 +56,11 @@ export async function createCategory(category) {
 
 	if (!res.ok) {
 		if (res.status === 409) {
-			// Si ya existe, actualizar en lugar de crear
-			console.log(`Category exists (409), updating: ${category.code}`);
+			// Si ya existe, actualizar en lugar de crear (usar title como identificador)
+			console.log(`Category exists (409), updating: ${category.title}`);
 			try {
-				const result = await updateCategory(category.code, category);
-				console.log(`Successfully updated category ${category.code}`);
+				const result = await updateCategory(category.title, category);
+				console.log(`Successfully updated category ${category.title}`);
 				return result;
 			} catch (err) {
 				console.error(`Error updating category on 409:`, err);
@@ -75,8 +73,8 @@ export async function createCategory(category) {
 	return res.json();
 }
 
-export async function updateCategory(code, updates) {
-	const res = await fetch(`${API_BASE_URL}/categorias/${code}`, {
+export async function updateCategory(title, updates) {
+	const res = await fetch(`${API_BASE_URL}/categorias/${encodeURIComponent(title)}`, {
 		method: "PUT",
 		headers: {
 			"Content-Type": "application/json",
@@ -90,13 +88,3 @@ export async function updateCategory(code, updates) {
 
 	return res.json();
 }
-
-// Optional verification helper — returns the file metadata from backend
-export async function verifyFileUpdate() {
-    const res = await fetch(`${API_BASE_URL}/categorias/verify/latest`);
-    if (!res.ok) {
-        throw new Error("Error verifying file update!");
-    }
-    return res.json();
-}
-

@@ -1,28 +1,24 @@
 import { ChangeEvent, useState } from "react";
 import CategoryDropdown from "../categoryDropdown/categoryDropdown";
-import { useNavigate } from "react-router-dom";
 import { createCategory } from "../../api/CategoryApi";
 
 const CategoryFileReader = () => {
   const [file, setFile] = useState(null);
-  const [lines, setLines] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
   const [fileLoadCounter, setFileLoadCounter] = useState(0);
-
-  const navigate = useNavigate();
 
   // Valores de texto de categoria
   const category_delimiter = '-----';
   const category_text_indicator_open = ('(');
   const category_text_indicator_close = (')');
 
+  // Titulo del archivo
+  const expected_file_title = "categorias_hongos.txt";
+
   function handleFileChange(event) {
    
     if (event.target.files && event.target.files.length > 0) {
-      // debug: selected option
-      console.log('Selected option:', selectedOption);
-
       const selectedFile = event.target.files[0];
       setFile(selectedFile);
 
@@ -32,8 +28,12 @@ const CategoryFileReader = () => {
       reader.onload = (e) => {
         const content = e.target.result;
         const allLines = content.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-        setLines(allLines);
 
+        if (selectedFile.name !== expected_file_title) {
+          alert(`El archivo seleccionado no es el correcto. Por favor seleccione uno de título "${expected_file_title}".`);
+          return;
+        }
+        
         // Procesar lineas para categorias
         let tempCategories = [];
         let currentCategory = null;
@@ -74,23 +74,24 @@ const CategoryFileReader = () => {
 
         setCategories(tempCategories);
 
-        // Reset selected option when file loads
+        // Se reseta la opcion seleccionada al cargar el archivo
         setSelectedOption(null);
-        
-        // Increment counter to force dropdown remount
-        setFileLoadCounter(prev => prev + 1);
 
         // Guardar todas las categorías y esperar a que terminen
         Promise.all(tempCategories.map(cat => saveCategory(cat)))
           .then(() => {
+            // El dropdown se remonta para reflejar los nuevos datos
+            setFileLoadCounter(prev => prev + 1);
+
+            // Se reinicia el input del archivo para que seleccionar el mismo archivo de nuevo ejectute onChange
+            if (event && event.target) event.target.value = "";
             console.log('All categories saved successfully');
           })
           .catch(err => {
             console.error('Error saving categories:', err);
           });
 
-        // debug: mostrar categorias en la consola
-        console.log('Parsed categories:', tempCategories);
++         alert("Archivo leído y categorías guardadas correctamente!");
       };
       reader.readAsText(selectedFile);
     }

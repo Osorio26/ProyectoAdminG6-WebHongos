@@ -1,6 +1,6 @@
 import Select from 'react-select';
 import { useState, useEffect } from 'react';
-import { getCategoryByName } from '../../api/CategoryApi';
+import { getCategoryByTitle } from '../../api/CategoryApi';
 
 const CategoryDropdown = ({
   categoryName,
@@ -19,7 +19,7 @@ const CategoryDropdown = ({
         }
 
         setLoading(true);
-        getCategoryByName(categoryName)
+        getCategoryByTitle(categoryName)
             .then(category => {
                 const opts = (category.content || []).map(item => ({ value: item, label: item }));
                 setOptions(opts);

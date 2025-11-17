@@ -1,15 +1,16 @@
+
 const API_BASE_URL = "http://localhost:3000";
 
 export async function getCategory() {
-	const res = await fetch(`${API_BASE_URL}/categorias`);
+	const res = await fetch(`${API_BASE_URL}/categories`);
 	if (!res.ok) {
-		throw new Error("Error fetching fungi list");
+		throw new Error("Error fetching category list");
 	}
 	return res.json();
 }
 
 export async function getCategoryByCode(title) {
-	const res = await fetch(`${API_BASE_URL}/categorias/${encodeURIComponent(title)}`);
+	const res = await fetch(`${API_BASE_URL}/categories/${encodeURIComponent(title)}`);
 	if (!res.ok) {
 		throw new Error("Error fetching category details!");
 	}
@@ -17,7 +18,7 @@ export async function getCategoryByCode(title) {
 }
 
 export async function getCategoryByTitle(title) {
-	const res = await fetch(`${API_BASE_URL}/categorias`);
+	const res = await fetch(`${API_BASE_URL}/categories`);
 	if (!res.ok) {
 		throw new Error("Error fetching categories");
 	}
@@ -29,24 +30,9 @@ export async function getCategoryByTitle(title) {
 	return category;
 }
 
-export async function getCategoryByName(name) {
-	const res = await fetch(`${API_BASE_URL}/categorias`);
-	if (!res.ok) {
-		throw new Error("Error fetching categories");
-	}
-	const categories = await res.json();
-
-	// Buscar por title
-	let	category = categories.find(cat => (cat.title && cat.title.toLowerCase() === name.toLowerCase()));
-    
-	if (!category) {
-		throw new Error(`Category "${name}" not found`);
-	}
-	return category;
-}
 
 export async function createCategory(category) {
-	const res = await fetch(`${API_BASE_URL}/categorias`, {
+	const res = await fetch(`${API_BASE_URL}/categories`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -74,7 +60,7 @@ export async function createCategory(category) {
 }
 
 export async function updateCategory(title, updates) {
-	const res = await fetch(`${API_BASE_URL}/categorias/${encodeURIComponent(title)}`, {
+	const res = await fetch(`${API_BASE_URL}/categories/${encodeURIComponent(title)}`, {
 		method: "PUT",
 		headers: {
 			"Content-Type": "application/json",

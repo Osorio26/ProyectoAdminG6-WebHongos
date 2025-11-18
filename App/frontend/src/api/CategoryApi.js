@@ -30,7 +30,6 @@ export async function getCategoryByTitle(title) {
 	return category;
 }
 
-
 export async function createCategory(category) {
 	const res = await fetch(`${API_BASE_URL}/categories`, {
 		method: "POST",

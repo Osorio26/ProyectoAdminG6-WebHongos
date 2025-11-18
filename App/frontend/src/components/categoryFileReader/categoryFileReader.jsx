@@ -1,6 +1,8 @@
 import { ChangeEvent, useState } from "react";
-import CategoryDropdown from "../categoryDropdown/categoryDropdown";
 import { createCategory } from "../../api/CategoryApi";
+
+import FileUploadButton from "../fileUploadButton/fileUploadButton";
+import CategoryDropdown from "../categoryDropdown/categoryDropdown";
 
 const CategoryFileReader = () => {
   const [file, setFile] = useState(null);
@@ -123,26 +125,24 @@ const CategoryFileReader = () => {
 
   return (
     <div>
-    <input 
-      type="file" 
-      accept=".txt"  
-      onChange={handleFileChange}
-      style={{ paddingBottom: "1rem" }}
-    />
+      <FileUploadButton
+        handleChange={handleFileChange}
+        label="Subir archivo"
+      />
 
-    {file && categories.length > 0 && (
-      <div className="mb-4 text-sm">
-            <CategoryDropdown
-              key={fileLoadCounter}
-              categoryName={"medio del cultivo"}
-              placeholder_text="Seleccione una opcion." 
-              handleOptionSelect={handleOptionSelect} 
-            />
-            {selectedOption && (
-              <p>Selected Option: "{selectedOption.label}"</p>
-            )}
-          </div>
-        )
+      {file && categories.length > 0 && (
+        <div className="mb-4 text-sm">
+              <CategoryDropdown
+                key={fileLoadCounter}
+                categoryName={"medio del cultivo"}
+                placeholder_text="Seleccione una opcion." 
+                handleOptionSelect={handleOptionSelect} 
+              />
+              {selectedOption && (
+                <p>Selected Option: "{selectedOption.label}"</p>
+              )}
+            </div>
+          )
     }
   </div>
   );

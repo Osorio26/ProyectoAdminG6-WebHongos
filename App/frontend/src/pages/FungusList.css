@@ -1,9 +1,11 @@
 .fungus-container {
   min-height: 100vh;
-  background-color: #ffffff;
-  padding: 50px 80px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 50px;
+  background-color: #f5f7f4; 
   font-family: "Inter", system-ui, sans-serif;
-  color: #333;
 }
 
 .fungus-header {
@@ -17,6 +19,15 @@
   font-size: 2rem;
   font-weight: 700;
   color: #1b1b1b;
+}
+
+.fungus-window {
+  background: white;
+  width: 90%;
+  max-width: 1200px;
+  padding: 40px 50px;
+  border-radius: 20px;
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.08);
 }
 
 .add-button {

@@ -1,0 +1,112 @@
+/* === CONTENEDOR GENERAL === */
+.edit-fungus-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  background-color: #f6f8f4;
+  min-height: calc(100vh - 80px);
+  box-sizing: border-box;
+}
+
+/* === VENTANA FLOTANTE === */
+.edit-fungus-window {
+  width: 90%;
+  max-width: 1100px;
+  background-color: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin-top: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+/* === PESTAÑAS SUPERIORES === */
+.edit-tabs-container {
+  display: flex;
+  gap: 0;
+  width: 100%;
+}
+
+.edit-tab-button {
+  flex: 1;
+  padding: 12px 16px;
+  text-align: center;
+  background-color: #eef1eb;
+  border: 1px solid #dde2d9;
+  border-bottom: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.edit-tab-button.active {
+  background-color: white;
+  border-bottom: 2px solid white;
+}
+
+/* === TITULOS Y DETALLES === */
+.edit-back-button {
+  margin-top: 10px;
+  color: #48623b;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-title {
+  margin-top: 10px;
+  font-size: 28px;
+}
+
+.edit-subtitle {
+  color: #607d3b;
+}
+
+/* === TAB CONTENT (EDITABLE FIELDS) === */
+.edit-tab-content {
+  background-color: #f9faf7;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.edit-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.edit-row:last-child {
+  border-bottom: none;
+}
+
+.edit-label {
+  flex: 2;
+  font-weight: 500;
+  color: #355235;
+}
+
+.edit-input-field {
+  flex: 5;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #c8d1c0;
+  background-color: white;
+}
+
+/* === BOTONES === */
+.edit-button-container {
+  text-align: right;
+  margin-top: 25px;
+}
+
+.save-button {
+  background-color: #607d3b;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}

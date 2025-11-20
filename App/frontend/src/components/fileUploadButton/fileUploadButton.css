@@ -1,0 +1,26 @@
+/* Esconder el input file nativo */
+.file-input-hidden {
+  display: none;
+}
+
+/* Este es el boton visible */
+.file-upload-button {
+    font-family: "Inter", sans-serif;
+    font-weight: none;
+    font-size: 0.9rem;
+
+    background-color: #33a000;
+    color: #ffffff;
+    border: none;
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+/* Para cuando se hace hover */
+.file-upload-button:hover {
+    background-color: #2a8c00;
+}

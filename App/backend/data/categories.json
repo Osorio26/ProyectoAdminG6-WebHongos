@@ -1,0 +1,26 @@
+[
+  {
+    "title": "nombre del responsable",
+    "content": [
+      "mario arguedas",
+      "juan jimenez",
+      "joe vargas"
+    ]
+  },
+  {
+    "title": "medio del cultivo",
+    "content": [
+      "natural",
+      "fertilizante",
+      "laboratorio"
+    ]
+  },
+  {
+    "title": "tipo de marcador",
+    "content": [
+      "externo",
+      "interno",
+      "temporal"
+    ]
+  }
+]

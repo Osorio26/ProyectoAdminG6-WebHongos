@@ -1,80 +1,186 @@
+/* Variables de color para fácil mantenimiento y estilo científico/moderno */
+:root {
+  --color-primary: #388e3c; 
+  --color-text-dark: #212529; 
+  --color-text-medium: #495057; 
+  --color-background-light: #f8f9fa; 
+  --color-border-subtle: #dee2e6; 
+  --color-surface-white: #ffffff;
+  --color-focus-ring: #a2d2a4; 
+  --color-icon-subtle: #868e96; 
+}
+
 /* === CONTENEDOR GENERAL === */
 .edit-fungus-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 40px 20px;
-  background-color: #f6f8f4;
-  min-height: calc(100vh - 80px);
+  padding: 60px 20px;
+  background-color: var(--color-background-light);
+  min-height: 100vh;
   box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+  line-height: 1.5;
 }
 
 /* === VENTANA FLOTANTE === */
 .edit-fungus-window {
   width: 90%;
   max-width: 1100px;
-  background-color: white;
+  background-color: var(--color-surface-white);
   border-radius: 12px;
-  padding: 30px;
+  padding: 40px; 
   margin-top: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
+  /* Eliminamos overflow: hidden aquí para que el wrapper pueda usarlo */
 }
 
-/* === PESTAÑAS SUPERIORES === */
+/* === NUEVOS ESTILOS PARA INDICADOR DE DESPLAZAMIENTO (UX) === */
+.tabs-scroll-wrapper {
+    position: relative; /* Contenedor para posicionar el icono */
+    /* El wrapper hereda el borde inferior de la separación, NO el edit-tabs-container */
+    border-bottom: 2px solid var(--color-border-subtle); 
+    margin-bottom: 20px;
+}
+
+.scroll-indicator {
+    position: absolute;
+    top: 0;
+    right: 40px; /* Alineado con el padding derecho del contenido */
+    height: 100%;
+    width: 30px; /* Pequeño ancho para el icono */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-medium);
+    font-size: 1.5rem;
+    font-weight: 900;
+    pointer-events: none; /* No interfiere con el clic en el tab */
+    
+    /* Efecto de degradado/sombra para indicar que el contenido 'desaparece' */
+    box-shadow: -15px 0 15px -10px var(--color-surface-white); 
+    /* El fondo del icono debe coincidir con el fondo de la pestaña */
+    background: var(--color-surface-white); 
+    z-index: 10;
+}
+
+/* === PESTAÑAS SUPERIORES (Modernizadas) === */
 .edit-tabs-container {
   display: flex;
   gap: 0;
   width: 100%;
+  padding: 0 40px; /* Mantiene padding para alineación */
+  box-sizing: border-box;
+  /* Habilitar desplazamiento horizontal */
+  overflow-x: auto; 
+  /* Ocultar barra nativa */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  /* Eliminamos el border-bottom: 2px solid var(--color-border-subtle); de aquí */
+}
+
+.edit-tabs-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .edit-tab-button {
   flex: 1;
-  padding: 12px 16px;
+  padding: 14px 16px;
   text-align: center;
-  background-color: #eef1eb;
-  border: 1px solid #dde2d9;
-  border-bottom: none;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1rem;
+  color: var(--color-text-medium);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  /* Importante para el desplazamiento: evita que se encojan */
+  flex-shrink: 0; 
 }
 
 .edit-tab-button.active {
-  background-color: white;
-  border-bottom: 2px solid white;
+  background-color: transparent;
+  color: var(--color-text-dark);
+  font-weight: 600;
+  border-bottom: 3px solid var(--color-primary); 
+  z-index: 2;
+}
+
+.edit-tab-button:hover:not(.active) {
+  background-color: var(--color-background-light);
 }
 
 /* === TITULOS Y DETALLES === */
-.edit-back-button {
-  margin-top: 10px;
-  color: #48623b;
-  background: none;
+.edit-back-button.pill {
+  padding: 10px 20px;
+
+  /* MÁS ESPACIO ARRIBA Y ABAJO */
+  margin: 20px 0;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  background: #1e1e1e;
   border: none;
+  border-radius: 40px;
+
+  color: #f0f0f0;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+
+  /* Animación suave */
+  transition: 
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* HOVER ANIMADO */
+.edit-back-button.pill:hover {
+  background: #2e7d32;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  transform: translateX(-2px) scale(1.03);
+}
+
+/* CLICK */
+.edit-back-button.pill:active {
+  transform: translateX(-1px) scale(0.98);
 }
 
 .edit-title {
-  margin-top: 10px;
-  font-size: 28px;
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--color-text-dark);
 }
 
 .edit-subtitle {
-  color: #607d3b;
+  color: var(--color-text-medium);
+  margin-bottom: 30px;
+  font-size: 1.1rem;
 }
 
 /* === TAB CONTENT (EDITABLE FIELDS) === */
 .edit-tab-content {
-  background-color: #f9faf7;
-  padding: 20px;
-  border-radius: 8px;
-  margin-top: 15px;
+  background-color: var(--color-surface-white); 
+  padding: 0;
+  border-radius: 0; 
+  margin-top: 0;
 }
 
 .edit-row {
   display: flex;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #e6e6e6;
+  padding: 15px 0; 
+  border-bottom: 1px solid var(--color-border-subtle);
+  gap: 20px;
 }
 
 .edit-row:last-child {
@@ -82,31 +188,76 @@
 }
 
 .edit-label {
-  flex: 2;
-  font-weight: 500;
-  color: #355235;
+  flex: 1;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  font-size: 0.95rem;
+}
+
+/* --- WRAPPER Y ICONO --- */
+
+.edit-input-wrapper {
+  flex: 3; 
+  position: relative; 
+  width: 100%; 
 }
 
 .edit-input-field {
-  flex: 5;
   width: 100%;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #c8d1c0;
-  background-color: white;
+  padding: 10px 12px;
+  /* Espacio para el icono */
+  padding-right: 35px; 
+  border-radius: 8px; 
+  border: 1px solid var(--color-border-subtle);
+  background-color: var(--color-surface-white);
+  font-size: 1rem;
+  color: var(--color-text-dark);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.edit-input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring); 
+}
+
+.edit-icon {
+  position: absolute;
+  right: 12px; 
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  color: var(--color-icon-subtle);
+  font-size: 0.9rem;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+/* UX: El icono se vuelve de color primario al enfocar */
+.edit-input-field:focus + .edit-icon {
+    color: var(--color-primary);
 }
 
 /* === BOTONES === */
 .edit-button-container {
   text-align: right;
-  margin-top: 25px;
+  margin-top: 40px; 
 }
 
 .save-button {
-  background-color: #607d3b;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 6px;
+  background-color: var(--color-primary);
+  color: var(--color-surface-white);
+  padding: 12px 25px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 10px rgba(56, 142, 60, 0.25);
+}
+
+.save-button:hover {
+  background-color: #2e7d32;
+  transform: translateY(-1px);
 }

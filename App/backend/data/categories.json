@@ -1,26 +1,80 @@
 [
   {
-    "title": "nombre del responsable",
+    "title": "medio de cultivo",
     "content": [
-      "mario arguedas",
-      "juan jimenez",
-      "joe vargas"
+      "PDA (Potato Dextrose Agar)",
+      "MEA (Malt Extract Agar)",
+      "Sabouraud Dextrose Agar (SDA)",
+      "WA (Water Agar)",
+      "CZ (Czapek-Dox Agar)"
     ]
   },
   {
-    "title": "medio del cultivo",
+    "title": "tipo de ensayo",
     "content": [
-      "natural",
-      "fertilizante",
-      "laboratorio"
+      "externo",
+      "interno",
+      "temporal"
+    ]
+  },
+  {
+    "title": "forma",
+    "content": [
+      "externo",
+      "interno",
+      "temporal"
+    ]
+  },
+  {
+    "title": "forma del borde",
+    "content": [
+      "externo",
+      "interno",
+      "temporal"
+    ]
+  },
+  {
+    "title": "color de borde",
+    "content": [
+      "externo",
+      "interno",
+      "temporal"
+    ]
+  },
+  {
+    "title": "método de siembra",
+    "content": [
+      "Estría simple",
+      "Estría por agotamiento",
+      "Dilución en placa",
+      "Transferencia de bloque de agar",
+      "Inoculación directa"
+    ]
+  },
+  {
+    "title": "estado",
+    "content": [
+      "Activo y en Colección",
+      "Subcultivo reciente",
+      "Criopreservado",
+      "Inactivo (requiere reactivación)",
+      "Contaminado (Eliminado)"
+    ]
+  },
+  {
+    "title": "tipo de crecimiento",
+    "content": [
+      "Filamentoso",
+      "Levaduriforme",
+      "Levaduriforme-filamentoso"
     ]
   },
   {
     "title": "tipo de marcador",
     "content": [
-      "externo",
-      "interno",
-      "temporal"
+      "Filamentoso",
+      "Levaduriforme",
+      "Levaduriforme-filamentoso"
     ]
   }
 ]

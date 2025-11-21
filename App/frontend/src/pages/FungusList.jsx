@@ -47,7 +47,7 @@ const FungusList = () => {
           <h1>Inventario de Hongos</h1>
           <button
             className="add-button"
-            onClick={() => navigate("/agregar")}
+            onClick={() => navigate("/add-menu")}
           >
             Agregar
           </button>

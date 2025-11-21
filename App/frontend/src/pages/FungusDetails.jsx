@@ -116,21 +116,28 @@ const FungusDetails = () => {
   return (
     <div className="fungus-details-container">
       <div className="fungus-details-window">
-        <div className="tabs-container">
-          {TABS.map((tab, index) => (
-            <button
-              key={index}
-              className={`tab-button ${activeTab === index ? "active" : ""}`}
-              onClick={() => setActiveTab(index)}
-            >
-              {tab}
-            </button>
-          ))}
+        <div className="tabs-wrapper"> 
+          <span className="scroll-indicator left-indicator"></span> {/* Indicador Izquierdo */}
+          <div className="tabs-container">
+            {TABS.map((tab, index) => (
+              <button
+                key={index}
+                className={`tab-button ${activeTab === index ? "active" : ""}`}
+                onClick={() => setActiveTab(index)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          <span className="scroll-indicator right-indicator"></span> {/* Indicador Derecho */}
         </div>
+        
         <div className="details-content">
-          <button className="back-button" onClick={() => navigate(-1)}>
-            ← Regresar
+          <button className="edit-back-button pill" onClick={() => navigate(-1)}>
+            <span className="arrow">←</span>
+            <span>Regresar</span>
           </button>
+
 
           <h1>{fungus.name}</h1>
           <p className="subtitle">Detalles de la muestra</p>

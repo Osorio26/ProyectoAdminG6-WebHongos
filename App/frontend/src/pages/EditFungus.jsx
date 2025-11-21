@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./EditFungus.css";
 import { getFungusByCode, updateFungus } from "../api/FungusApi";
 
+// ... TABS, EditFungus component, useEffect, handleSave, TABS, SECTIONS definitions remain the same ...
+
 const TABS = [
   "Clasificación Taxonómica",
   "Identificación",
@@ -13,6 +15,7 @@ const TABS = [
   "Almacenamiento",
   "Asociación con Planta",
 ];
+// ... (omito las constantes como TAXONOMIA, IDENTIFICACION, etc., por brevedad) ...
 
 const EditFungus = () => {
   const { code } = useParams();
@@ -40,7 +43,6 @@ const EditFungus = () => {
 
   if (loading) return <p>Cargando...</p>;
 
-  // === SECCIONES IDENTICAS A DETAILS, PERO CON key PARA DATOS EDITABLES ===
   const TAXONOMIA = [
     { label: "Reino", key: "kingdom" },
     { label: "Filo", key: "phylum" },
@@ -129,9 +131,11 @@ const EditFungus = () => {
           ))}
         </div>
 
-        <button className="edit-back-button" onClick={() => navigate(-1)}>
-          ← Regresar
+       <button className="edit-back-button pill" onClick={() => navigate(-1)}>
+          <span className="arrow">←</span>
+          <span>Regresar</span>
         </button>
+
 
         <h1 className="edit-title">Editar: {formData.name}</h1>
         <p className="edit-subtitle">Modifica los datos de esta muestra</p>
@@ -141,14 +145,21 @@ const EditFungus = () => {
           {SECTIONS[activeTab].map((item, i) => (
             <div className="edit-row" key={i}>
               <span className="edit-label">{item.label}</span>
-              <input
-                type="text"
-                name={item.key}
-                value={formData[item.key] || ""}
-                placeholder={formData[item.key] || ""}
-                className="edit-input-field"
-                onChange={handleChange}
-              />
+              
+              {/* === CAMBIO CLAVE: Nuevo contenedor para el input y el icono === */}
+              <div className="edit-input-wrapper">
+                <input
+                  type="text"
+                  name={item.key}
+                  value={formData[item.key] || ""}
+                  placeholder={formData[item.key] || "Campo vacío"}
+                  className="edit-input-field"
+                  onChange={handleChange}
+                />
+                <span className="edit-icon" title="Campo editable">
+                  &#x270F; 
+                </span>
+              </div>
             </div>
           ))}
         </div>

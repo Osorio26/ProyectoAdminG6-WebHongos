@@ -3,7 +3,7 @@ import "./fileUploadButton.css";
 const FileUploadButton = ({ handleChange, label = "Subir archivo" }) => {
 
   return (
-    <div style={{ paddingBottom: "1rem" }}>
+    <div className="file-upload-container">
       <input
         id="fileInput"
         type="file"

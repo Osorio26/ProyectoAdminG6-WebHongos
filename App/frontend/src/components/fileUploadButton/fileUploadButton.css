@@ -3,6 +3,12 @@
   display: none;
 }
 
+.file-upload-container {
+  display: flex;
+  padding: 1rem;
+}
+
+
 /* Este es el boton visible */
 .file-upload-button {
     font-family: "Inter", sans-serif;

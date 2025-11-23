@@ -1,8 +1,8 @@
-const Modal = ({ onClose }) => {
+const FileInfoModal = ({ onClose }) => {
     
   return (
     <div className="modal-backdrop">
-      <div className="modal-content" style={{width: "650px"}}>
+      <div className="modal-content" style={{width: "650px", textAlign: "left", height: "60vh"}}>
         <button className="modal-close" onClick={onClose}>
           ✕
         </button>
@@ -16,7 +16,7 @@ const Modal = ({ onClose }) => {
       <ol className="consideraciones-list">
         <li>
             <p>
-                El nombre del archivo debe ser 'categorias_hongos.txt'.
+                El nombre del archivo debe ser '<strong>categorias_hongos.txt</strong>'.
             </p>
         </li>
         <li>
@@ -25,28 +25,27 @@ const Modal = ({ onClose }) => {
                 interpreta como <strong>título para una categoría</strong> dada.
             </p>
             <p className="ejemplo-inline">
-                <strong>Ejemplo:</strong> <em>(Tipos de Hongo)</em> → Esto se toma como
+                Ejemplo: <em>(Tipos de Hongo)</em> → Esto se toma como
                 un título.
             </p>
         </li>
 
         <li>
           <p>
-            El símbolo "-----"" (con 5 'dash') indica una separación
-            entre una categoría y otra.
+            El símbolo "-----"" (con 5 'dash') indica una <strong> separación entre una categoría y otra. </strong>
           </p>
         </li>
 
         <li>
           <p>
-            Los elementos se leen línea por línea; cada línea representa un
+            <strong>Los elementos se leen línea por línea</strong>; cada línea representa un
             elemento que se quiere agregar a las posibles opciones.
           </p>
         </li>
 
         <li>
           <p>
-            Los espacios en blanco se ignoran, aunque por temas de orden es
+             <strong>Los espacios en blanco se ignoran</strong>, aunque por temas de orden es
             recomendable evitarlos.
           </p>
         </li>
@@ -79,4 +78,4 @@ const Modal = ({ onClose }) => {
   );
 };
 
-export default Modal;
+export default FileInfoModal;

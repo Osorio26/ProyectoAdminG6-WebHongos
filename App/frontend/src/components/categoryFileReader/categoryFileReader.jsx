@@ -1,125 +1,136 @@
-import { ChangeEvent, useState } from "react";
+import { useState, useCallback, useRef } from "react";
+import { useDropzone } from "react-dropzone";
 import { createCategory } from "../../api/CategoryApi";
+import upload_file_image from "../../assets/upload_file_image.png";
+import FileFormatModal from "../fileFormatInfomodal/fileFormatModal.jsx";
+import "./categoryFileReader.css";
 
-import FileUploadButton from "../fileUploadButton/fileUploadButton";
-import CategoryDropdown from "../categoryDropdown/categoryDropdown";
+const CategoryFileReader = ({ onClose }) => {
+  const category_title_open = "("; 
+  const category_title_close = ")"; 
+  const expected_file_title = "categorias_hongos.txt"; 
+  const category_delimiter = "-----";
 
-const CategoryFileReader = () => {
-  const [file, setFile] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [fileLoadCounter, setFileLoadCounter] = useState(0);
+  const inputRef = useRef(null);
+  const [showSecondModal, setShowSecondModal] = useState(false);
 
-  // Valores de texto de categoria
-  const category_delimiter = '-----';
-  const category_text_indicator_open = ('(');
-  const category_text_indicator_close = (')');
+  const processFile = (file) => {
+    if (!file) return;
 
-  // Titulo del archivo
-  const expected_file_title = "categorias_hongos.txt";
+    if (file.name !== expected_file_title) {
+      alert(`El archivo debe llamarse "${expected_file_title}".`);
+      return;
+    }
 
-  function handleFileChange(event) {
-   
-    if (event.target.files && event.target.files.length > 0) {
-      const selectedFile = event.target.files[0];
-      setFile(selectedFile);
+    const reader = new FileReader();
 
-      const reader = new FileReader();
-      
-      // Leer el contenido del archivo
-      reader.onload = (e) => {
-        const content = e.target.result;
-        const allLines = content.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    reader.onload = async (e) => {
+      const content = e.target.result;
 
-        if (selectedFile.name !== expected_file_title) {
-          alert(`El archivo seleccionado no es el correcto. Por favor seleccione uno de título "${expected_file_title}".`);
-          return;
-        }
-        
-        // Procesar lineas para categorias
-        let tempCategories = [];
-        let currentCategory = null;
+      const allLines = content
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
 
-        allLines.forEach(line => {
-          if (line === category_delimiter) {
+      let categories = [];
+      let current = null;
 
-            // Si se encuentra un delimitador y hay una categoria en curso, se guarda y se limpia la variable
-            if (currentCategory) {
-              tempCategories.push(currentCategory);
-              currentCategory = null;
-            }
-          } else if (line.startsWith(category_text_indicator_open) &&
-              line.endsWith(category_text_indicator_close)) {
-
-            // Si la linea es un titulo de categoria
-            if (currentCategory) {
-              tempCategories.push(currentCategory);
-            }
-            
-            // Se crea una nueva categoria
-            currentCategory = {
-              title: line.slice(1, -1).trim(), // se asigna el titulo
-              content: []
-            };
-          } else {
-            // Si es una linea de contenido, la agregamos a la categoria actual
-            if (currentCategory) {
-              currentCategory.content.push(line); // se asigna cada linea como parte del arreglo de contenido
-            }
+      allLines.forEach((line) => {
+        if (line === category_delimiter) {
+          if (current) {
+            categories.push(current);
+            current = null;
           }
-        });
-
-        // Se agrega la ultima categoria (de existir)
-        if (currentCategory) {
-          tempCategories.push(currentCategory);
+        } else if (line.startsWith(category_title_open) && line.endsWith(category_title_close)) {
+          if (current) categories.push(current);
+          current = { title: line.slice(1, -1), content: [] };
+        } else if (current) {
+          current.content.push(line);
         }
+      });
 
-        setCategories(tempCategories);
+      if (current) categories.push(current);
 
-        // Guardar todas las categorías y esperar a que terminen
-        Promise.all(tempCategories.map(cat => saveCategory(cat)))
-          .then(() => {
-            // El dropdown se remonta para reflejar los nuevos datos
-            setFileLoadCounter(prev => prev + 1);
+      // guardar los cambios detectados al backend
+      for (const cat of categories) {
+        await createCategory(cat);
+      }
 
-            // Se reinicia el input del archivo para que seleccionar el mismo archivo de nuevo ejectute onChange
-            if (event && event.target) event.target.value = "";
-            console.log('All categories saved successfully');
-          })
-          .catch(err => {
-            console.error('Error saving categories:', err);
-          });
+      alert("Archivo leído y categorías guardadas correctamente!");
 
-+         alert("Archivo leído y categorías guardadas correctamente!");
-      };
-      reader.readAsText(selectedFile);
-    }
-  }
 
-  const saveCategory = async (categoryData) => {
-    try {
-      // Mapear datos mínimos al modelo del backend
-      const newCategory = {
-        title: categoryData.title,
-        content: categoryData.content
-      };
+      // Cerrar el modal después de procesar el archivo
+      if (onClose) onClose();
+    };
 
-      console.log('Saving category:', newCategory);
-      const response = await createCategory(newCategory);
-      console.log(`Categoría "${categoryData.title}" guardada/actualizada correctamente:`, response);
-      return response;
-    } catch (error) {
-      console.error(`Error saving category "${categoryData.title}":`, error);
-      throw error;
-    }
+    reader.readAsText(file);
+  };
+
+  const onDrop = useCallback((acceptedFiles) => {
+    const file = acceptedFiles[0];
+    processFile(file);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    multiple: false,
+    noClick: true,
+    noKeyboard: true
+  });
+
+  const openFileDialog = () => {
+    if (inputRef.current) inputRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    processFile(file);
+    e.target.value = "";
   };
 
   return (
-    <div>
-      <FileUploadButton
-        handleChange={handleFileChange}
-        label="Subir archivo"
-      />
-  </div>
+    <div className="w-full flex flex-col items-center justify-center text-center gap-4">
+
+      <div {...getRootProps()} className="dropzone">
+        
+        <input
+          {...getInputProps({ refKey: "ref" })}
+          ref={inputRef}
+          onChange={handleFileChange}
+        />
+
+        {isDragActive ? (
+          <p>Suelte el archivo aquí...</p>
+        ) : (
+          <div className="file-browser-container">
+            <div className="file-image-container" onClick={openFileDialog}>
+              <img
+                src={upload_file_image}
+                alt="file-image"
+                className="file-image"
+              />
+            </div>
+
+            <p style={{ margin: 0, fontSize: 14, paddingBottom: "1rem" }}>
+              Presione la imagen para seleccionar un archivo o arrástrelo aquí
+            </p>
+          </div>
+        )}
+      </div>
+
+      {!isDragActive && (
+        <button
+          className="open-second-modal-button mt-8"
+          onClick={() => setShowSecondModal(true)}
+        >
+          Ayuda
+        </button>
+      )}
+
+      {showSecondModal && (
+        <FileFormatModal onClose={() => setShowSecondModal(false)} />
+      )}
+    </div>
   );
 };
 

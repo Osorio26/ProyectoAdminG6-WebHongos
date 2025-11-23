@@ -1,6 +1,6 @@
 import "./fileUploadButton.css";
 
-const FileUploadButton = ({ handleChange, label = "Subir archivo" }) => {
+const FileUploadButton = ({ handleChange, label = "Buscar archivo" }) => {
 
   return (
     <div className="file-upload-container">

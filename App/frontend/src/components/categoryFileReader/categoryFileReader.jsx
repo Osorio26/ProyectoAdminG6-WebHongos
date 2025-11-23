@@ -7,7 +7,6 @@ import CategoryDropdown from "../categoryDropdown/categoryDropdown";
 const CategoryFileReader = () => {
   const [file, setFile] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
   const [fileLoadCounter, setFileLoadCounter] = useState(0);
 
   // Valores de texto de categoria
@@ -76,9 +75,6 @@ const CategoryFileReader = () => {
 
         setCategories(tempCategories);
 
-        // Se reseta la opcion seleccionada al cargar el archivo
-        setSelectedOption(null);
-
         // Guardar todas las categorías y esperar a que terminen
         Promise.all(tempCategories.map(cat => saveCategory(cat)))
           .then(() => {
@@ -96,12 +92,6 @@ const CategoryFileReader = () => {
 +         alert("Archivo leído y categorías guardadas correctamente!");
       };
       reader.readAsText(selectedFile);
-    }
-  }
-
-  function handleOptionSelect(option) {
-    if (option) {
-      setSelectedOption(option);
     }
   }
 
@@ -129,21 +119,6 @@ const CategoryFileReader = () => {
         handleChange={handleFileChange}
         label="Subir archivo"
       />
-
-      {file && categories.length > 0 && (
-        <div className="mb-4 text-sm">
-              <CategoryDropdown
-                key={fileLoadCounter}
-                categoryName={"medio del cultivo"}
-                placeholder_text="Seleccione una opcion." 
-                handleOptionSelect={handleOptionSelect} 
-              />
-              {selectedOption && (
-                <p>Selected Option: "{selectedOption.label}"</p>
-              )}
-            </div>
-          )
-    }
   </div>
   );
 };

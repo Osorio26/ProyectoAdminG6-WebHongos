@@ -1,0 +1,1 @@
+export interface UpdateColectaDto extends Partial<CreateColectaDto> {}

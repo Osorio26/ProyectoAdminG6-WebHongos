@@ -175,11 +175,6 @@ const AddColectaPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Lógica de envío (se mantiene igual)
-    if (!formData.idHeredado) {
-      alert("El código de colecta es obligatorio.");
-      return;
-    }
 
     const dataToSend = {
       idHeredado: formData.idHeredado,
@@ -231,14 +226,13 @@ const AddColectaPage = () => {
         {/* --- 1. Identificación y Logística --- */}
         <h2>1. Identificación y Logística</h2>
         <div className="form-group">
-          <label><strong>Código de Colecta (ID Único)</strong> <span style={{color: 'red'}}>*</span></label>
+          <label><strong>Código de Colecta (ID Único)</strong></label>
           <input
             type="text"
             name="idHeredado"
             placeholder="Ej: COL-2024-Amazonas-05"
             value={formData.idHeredado}
             onChange={handleChange}
-            required
           />
         </div>
 
@@ -293,7 +287,7 @@ const AddColectaPage = () => {
 
         {/* Formulario de Sitio */}
         <div className={`expandable-section ${formData.registrarSitio ? "show" : ""}`}>
-          <OrganismoForm formData={formData} handleChange={handleChange} />
+          <SitioForm formData={formData} handleChange={handleChange} />
         </div>
 
         {/* Toggle Coordenadas */}
@@ -312,7 +306,7 @@ const AddColectaPage = () => {
 
         {/* Formulario de Coordenadas */}
         <div className={`expandable-section ${formData.tieneCoordenadas ? "show" : ""}`}>
-          <OrganismoForm formData={formData} handleChange={handleChange} />
+          <CoordenadasForm formData={formData} handleChange={handleChange} />
         </div>
 
         {/* Toggle Organismo/Planta */}

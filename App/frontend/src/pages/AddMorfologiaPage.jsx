@@ -24,22 +24,12 @@ const MorfologiaForm = ({ morfologiaData, handleChange, handleSelectChange }) =>
             
             <div className="form-group">
                 <label>Forma</label>
-                <CategoryDropdown
-                  categoryName="forma"
-                  placeholder_text="Ej: Circular, Irregular"
-                  handleOptionSelect={handleSelectChange('forma')}
-                  value={morfologiaData.forma ? { value: morfologiaData.forma, label: morfologiaData.forma } : null}
-                />
+                <input type="text" name="forma" placeholder="Ej: Circular, irregular, etc" value={morfologiaData.forma} onChange={handleChange}/>
             </div>
 
             <div className="form-group">
                 <label>Forma del Borde</label>
-                <CategoryDropdown
-                  categoryName="forma del borde" 
-                  placeholder_text="Ej: Entero, Ondulado, Lobulado"
-                  handleOptionSelect={handleSelectChange('formaBorde')}
-                  value={morfologiaData.formaBorde ? { value: morfologiaData.formaBorde, label: morfologiaData.formaBorde } : null} 
-                />
+                  <input type="text" name="formaBorde" placeholder="Ej: Ondulado" value={morfologiaData.formaBorde} onChange={handleChange}/>
             </div>
 
             <div className="form-group">
@@ -53,12 +43,7 @@ const MorfologiaForm = ({ morfologiaData, handleChange, handleSelectChange }) =>
             
             <div className="form-group">
                 <label>Color del Borde</label>
-                <CategoryDropdown
-                  categoryName="color de borde" 
-                  placeholder_text="Ej: Amarillo, Blanco, Rojo"
-                  handleOptionSelect={handleSelectChange('colorBorde')}
-                  value={morfologiaData.colorBorde ? { value: morfologiaData.colorBorde, label: morfologiaData.colorBorde } : null} 
-                />
+                <input type="text" name="colorBorde" placeholder="Ej: Rojo tenue" value={morfologiaData.colorBorde} onChange={handleChange}/>
             </div>
         </div>
 

@@ -46,10 +46,11 @@ El proyecto utiliza **MariaDB** como base de datos, gestionada a través de Dock
     ```
     *Esto creará las tablas necesarias en tu base de datos local.*
 
-6.  (Opcional) Si existen datos semilla (`seed.js`), puedes poblarlos con:
+6.  (Opcional) Poblar la base de datos con datos de prueba:
     ```bash
     npx prisma db seed
     ```
+    *Nota: Esto ejecutará `prisma/seed.js`, el cual carga los datos desde `data/hongos.json`.*
 
 ---
 

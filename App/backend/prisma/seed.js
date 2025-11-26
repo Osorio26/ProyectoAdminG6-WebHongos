@@ -13,6 +13,19 @@ async function main() {
   console.log('Start seeding...');
 
   try {
+    // 0. Limpiar tablas (Orden inverso para respetar Foreign Keys)
+    // Esto permite que el seed sea idempotente (se pueda correr varias veces)
+    await prisma.ensayosBiologicos.deleteMany();
+    await prisma.morfologias.deleteMany();
+    await prisma.aislamientos.deleteMany();
+    await prisma.marcadores.deleteMany();
+    await prisma.hongos.deleteMany();
+    await prisma.colectas.deleteMany();
+    await prisma.organismos.deleteMany();
+    await prisma.sitios.deleteMany();
+    await prisma.coordenadas.deleteMany();
+    console.log('Database cleaned.');
+
     const raw = fs.readFileSync(dataPath, 'utf-8');
     const hongosData = JSON.parse(raw);
 

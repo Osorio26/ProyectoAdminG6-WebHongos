@@ -25,26 +25,13 @@ Para facilitar el desarrollo, utilizamos una base de datos MariaDB en un contene
     npx prisma migrate dev --name init
     ```
 
-4.  **Poblar la base de datos (Opción SQL):**
-    Hemos generado un archivo SQL con los datos iniciales para no depender de los JSON.
-    
-    Copia el archivo `App/backend/data/init_db.sql` a la raíz de `App/backend` (si no está ahí) y ejecuta:
+4.  **Poblar la base de datos:**
+    Para insertar los datos iniciales de prueba (Sitios, Organismos, Colectas, etc.), utilice el comando estándar de Prisma:
 
-    **En Bash / CMD:**
     ```bash
-    docker exec -i backend-db-1 mariadb -u root -prootpassword hongos_db < data/init_db.sql
+    npx prisma db seed
     ```
-
-    **En PowerShell:**
-    ```powershell
-    Get-Content data/init_db.sql | docker exec -i backend-db-1 mariadb -u root -prootpassword hongos_db
-    ```
-    *(Esto insertará los datos directamente en las tablas).*
-
-    **Opción Legacy (Seed JS):**
-    ```bash
-    node prisma/seed.js
-    ```
+    *(Esto ejecutará el script `prisma/seed.js` que carga los datos desde `data/hongos.json`).*
 
 ### Solución de problemas
 - Si la aplicación no puede conectarse a la base de datos, asegúrate de que el contenedor esté corriendo con `docker ps`.

@@ -43,61 +43,61 @@ const FungusDetails = () => {
 
   // SECCIONES (igual que antes)
   const TAXONOMIA = [
-    { label: "Reino", value: fungus.kingdom },
-    { label: "Filo", value: fungus.phylum || fungus.filo },
-    { label: "Clase", value: fungus.class },
-    { label: "Orden", value: fungus.order },
-    { label: "Familia", value: fungus.family },
-    { label: "Género", value: fungus.genus },
-    { label: "Especie", value: fungus.species },
+    { label: "Reino", value: fungus.Organismo?.Reino },
+    { label: "Filo", value: fungus.Organismo?.Filo },
+    { label: "Clase", value: fungus.Organismo?.Clase },
+    { label: "Orden", value: fungus.Organismo?.Orden },
+    { label: "Familia", value: fungus.Organismo?.Familia },
+    { label: "Género", value: fungus.Organismo?.Genero },
+    { label: "Especie", value: fungus.Organismo?.Especie },
   ];
 
   const IDENTIFICACION = [
-    { label: "Método", value: fungus.metodoIdentificacion },
-    { label: "Código GenBank", value: fungus.codigoGenBank },
-    { label: "Responsable", value: fungus.responsable },
+    { label: "Método", value: fungus.Organismo?.Hongo?.MetodoIdentificacion },
+    { label: "Código GenBank", value: fungus.Organismo?.Hongo?.CodigoAccesoGenBank },
+    { label: "Responsable", value: fungus.Organismo?.Hongo?.IdentificadorResponsable },
   ];
 
   const COLECTA = [
-    { label: "Código de Colecta", value: fungus.collectionNumber },
-    { label: "Fecha", value: fungus.fechaColecta },
-    { label: "Ubicación Geográfica", value: fungus.location },
-    { label: "Colector", value: fungus.collector },
-    { label: "Observaciones", value: fungus.exactSite },
+    { label: "Código de Colecta", value: fungus.Colecta?.idHeredado },
+    { label: "Fecha", value: fungus.Colecta?.Fecha },
+    { label: "Ubicación Geográfica", value: fungus.Colecta?.Sitio?.Nombre },
+    { label: "Colector", value: fungus.Colecta?.Colector },
+    { label: "Observaciones", value: fungus.Colecta?.Sitio?.ReferenciasAdicionales },
   ];
 
   const AISLAMIENTO = [
-    { label: "Medio de Cultivo", value: fungus.medioCultivo },
-    { label: "Fecha de Aislamiento", value: fungus.fechaAislamiento },
-    { label: "Responsable", value: fungus.responsableAislamiento },
-    { label: "Condiciones", value: fungus.temperature },
+    { label: "Medio de Cultivo", value: fungus.MedioCultivo },
+    { label: "Fecha de Aislamiento", value: fungus.FechaAislamiento },
+    { label: "Responsable", value: fungus.Colecta?.Colector }, // Asumiendo mismo responsable si no hay campo específico
+    { label: "Condiciones", value: fungus.Colecta?.Temperatura ? `${fungus.Colecta.Temperatura} °C` : "N/A" },
   ];
 
   const MORFOLOGIA = [
-    { label: "Descripción Macroscópica", value: fungus.descripcionMacro },
-    { label: "Descripción Microscópica", value: fungus.descripcionMicro },
-    { label: "Color", value: fungus.color },
-    { label: "Textura", value: fungus.textura },
-    { label: "Notas", value: fungus.notasMorfologia },
+    { label: "Descripción Macroscópica", value: fungus.Morfologias?.[0]?.Observaciones },
+    { label: "Descripción Microscópica", value: "N/A" }, // No hay campo directo en el modelo actual
+    { label: "Color", value: fungus.Morfologias?.[0]?.ColorAnverso },
+    { label: "Textura", value: fungus.Morfologias?.[0]?.Forma },
+    { label: "Notas", value: fungus.Comentarios },
   ];
 
   const MARCADORES = [
-    { label: "Tipo", value: fungus.marcadorTipo },
-    { label: "Secuencia", value: fungus.secuencia },
+    { label: "Tipo", value: fungus.Organismo?.Hongo?.Marcadores?.[0]?.Tipo },
+    { label: "Secuencia", value: fungus.Organismo?.Hongo?.Marcadores?.[0]?.Secuencia },
   ];
 
   const ALMACENAMIENTO = [
-    { label: "Cantidad", value: fungus.quantity },
-    { label: "Ubicación", value: fungus.protectedArea },
+    { label: "Cantidad", value: fungus.CantidadExistencias },
+    { label: "Ubicación", value: fungus.Colecta?.Sitio?.NombreAreaProtegida },
   ];
 
   const PLANTA = [
-    { label: "Reino", value: fungus.planta?.reino },
-    { label: "Filo", value: fungus.planta?.filo },
-    { label: "Clase", value: fungus.planta?.clase },
-    { label: "Orden", value: fungus.planta?.orden },
-    { label: "Familia", value: fungus.planta?.familia },
-    { label: "Género", value: fungus.planta?.genero },
+    { label: "Reino", value: fungus.Colecta?.Planta?.Reino },
+    { label: "Filo", value: fungus.Colecta?.Planta?.Filo },
+    { label: "Clase", value: fungus.Colecta?.Planta?.Clase },
+    { label: "Orden", value: fungus.Colecta?.Planta?.Orden },
+    { label: "Familia", value: fungus.Colecta?.Planta?.Familia },
+    { label: "Género", value: fungus.Colecta?.Planta?.Genero },
     { label: "Especie", value: fungus.planta?.especie },
     { label: "Observaciones", value: fungus.planta?.observaciones },
   ];

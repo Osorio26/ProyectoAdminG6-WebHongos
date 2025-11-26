@@ -59,6 +59,7 @@ model Organismos {
   // RELACIONES
   Hongo        Hongos?
   Colectas     Colectas[]     @relation("PlantaFromOrganismo")
+  Aislamientos Aislamientos[]
 }
 
 model Hongos {
@@ -115,9 +116,11 @@ model Aislamientos {
   CantidadExistencias Int?
   EstaEnColeccion     Boolean      @default(false) @db.TinyInt
   idColecta          String?       @db.Char(36)
+  idOrganismo        String?       @db.Char(36)
 
   // RELACIONES
   Colecta      Colectas?           @relation(fields: [idColecta], references: [id])
+  Organismo    Organismos?         @relation(fields: [idOrganismo], references: [id])
 
   Ensayos      EnsayosBiologicos[]
   Morfologias  Morfologias[]

@@ -19,8 +19,6 @@ const FungusList = () => {
         const data = await getFungi();
         if (isMounted) {
           setFungi(data);
-        }else{
-          setFungi(DUMMY_FUNGUS);
         }
       } catch (error) {
         if (isMounted) {
@@ -54,12 +52,12 @@ const FungusList = () => {
         </div>
 
         <p className="search-label">
-          Buscar por nombre, clase, ubicación, familia, o cualquier atributo. (puedes separar varios términos con punto y coma ";")
+          Buscar por código heredado, nombre, ubicación, familia, o cualquier atributo. (puedes separar varios términos con punto y coma ";")
         </p>
         <div className="search-bar">
           <input
             type="text"
-            placeholder="Ej: Pleurotus ostreatus; Agaricomycetes; Alajuela; Agaricaceae"
+            placeholder="Ej: BD-2022523226; Agaricales; Cartago"
             className="search-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -72,12 +70,12 @@ const FungusList = () => {
         <table className="fungus-table">
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Género</th>
-              <th>Reino</th>
-              <th>Clase</th>
+              <th>Código</th>
               <th>Especie</th>
+              <th>Género</th>
               <th>Familia</th>
+              <th>Ubicación</th>
+              <th>Fecha Colecta</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -97,21 +95,21 @@ const FungusList = () => {
                   if (terms.length === 0) return true;
 
                   const fieldsToSearch = [
-                    fungus.code,
-                    fungus.name,
-                    fungus.quantity,
-                    fungus.collector,
-                    fungus.collectionNumber,
-                    fungus.location,
-                    fungus.protectedArea,
-                    fungus.exactSite,
-                    fungus.genus,
-                    fungus.kingdom,
-                    fungus.temperature,
-                    fungus.class,
-                    fungus.species,
-                    fungus.order,
-                    fungus.family,
+                    fungus.idHeredado,
+                    fungus.Organismo?.Especie,
+                    fungus.CantidadExistencias,
+                    fungus.Colecta?.Colector,
+                    fungus.Colecta?.idHeredado,
+                    fungus.Colecta?.Sitio?.Nombre,
+                    fungus.Colecta?.Sitio?.NombreAreaProtegida,
+                    fungus.Colecta?.Sitio?.ReferenciasAdicionales,
+                    fungus.Organismo?.Genero,
+                    fungus.Organismo?.Reino,
+                    fungus.Colecta?.Temperatura,
+                    fungus.Organismo?.Clase,
+                    fungus.Organismo?.Orden,
+                    fungus.Organismo?.Familia,
+                    fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "",
                   ].map((v) => v?.toString().toLowerCase() || "");
 
                   return terms.every((term) =>
@@ -122,16 +120,16 @@ const FungusList = () => {
                 })
                 .map((fungus, idx) => (
                   <tr key={idx}>
-                    <td className="name-cell">{fungus.name}</td>
-                    <td>{fungus.genus}</td>
-                    <td>{fungus.kingdom}</td>
-                    <td>{fungus.class}</td>
-                    <td>{fungus.species}</td>
-                    <td>{fungus.family}</td>
+                    <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
+                    <td className="name-cell"><i>{fungus.Organismo?.Especie || "Sin identificación"}</i></td>
+                    <td><i>{fungus.Organismo?.Genero}</i></td>
+                    <td>{fungus.Organismo?.Familia}</td>
+                    <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
+                    <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
                     <td>
                       <button
                         className="details-button"
-                        onClick={() => navigate(`/detalle/${fungus.code}`)}
+                        onClick={() => navigate(`/detalle/${fungus.idHeredado}`)}
                       >
                         Ver detalles
                       </button>

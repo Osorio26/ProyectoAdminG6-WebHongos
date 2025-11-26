@@ -1,135 +1,100 @@
 /*****************************************************
  *  CONTENEDOR GENERAL
  *****************************************************/
-.addfungus-container {
-  min-height: 100vh;
-  width: 100%;
-  padding: 40px 20px 120px;
-  font-family: "Inter", sans-serif;
-  background: #fafafa;
+.addfungus-container,
+.add-fungus-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-/*****************************************************
- *  ENCABEZADO
- *****************************************************/
-.header-section {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  justify-content: flex-start;
-  max-width: 900px;
-  margin-bottom: 25px;
-}
-
-.header-section h1 {
-  flex-grow: 1;
-  text-align: center;
-  font-size: 2.1rem;
-  font-weight: 700;
-  color: #1b1b1b;
-}
-
-/*****************************************************
- *  CONTENEDOR GENERAL (REDEFINIDO)
- *****************************************************/
-.addfungus-container {
+  padding: 40px 0;
+  background-color: var(--color-background-light);
   min-height: 100vh;
-  width: 100%;
-  padding: 40px 20px 120px;
+  box-sizing: border-box;
   font-family: "Inter", sans-serif;
-  background: #f4f5f7;
+}
+
+/*****************************************************
+ *  VENTANA GENERAL
+ *****************************************************/
+.add-fungus-window {
+  width: 90%;
+  max-width: 1200px;
+  background-color: var(--color-surface-white);
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: row;
+  min-height: 600px;
+  overflow: hidden;
+}
+
+/*****************************************************
+ *  MENÚ LATERAL
+ *****************************************************/
+.sidebar-nav {
+  width: 280px;
+  background-color: #f8f9fa;
+  border-right: 1px solid var(--color-border-subtle);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  padding: 30px 0;
+  flex-shrink: 0;
 }
 
-/*****************************************************
- *  ENCABEZADO
- *****************************************************/
-.header-section {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 900px;
-  margin-bottom: 25px;
-}
-
-.header-section h1 {
-  flex-grow: 1;
-  text-align: center;
-  font-size: 2.1rem;
+.sidebar-title {
+  padding: 0 25px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-medium);
   font-weight: 700;
-  color: #1b1b1b;
 }
 
-/* Botón "Salir" estilo moderno */
-.back-button {
-  background: #ffffffcc;
+.sidebar-button {
+  background: none;
   border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  color: #333;
-  backdrop-filter: blur(6px);
-  box-shadow: 
-    0 4px 10px rgba(0, 0, 0, 0.06),
-    inset 0 0 0 rgba(255, 255, 255, 0);
-  transition: all 0.25s;
-}
-
-.back-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 
-    0 8px 20px rgba(0, 0, 0, 0.12),
-    inset 0 0 0 rgba(255, 255, 255, 0.3);
-}
-
-/*****************************************************
- *  MENÚ PRINCIPAL – CARDS MODERNAS
- *****************************************************/
-.menu-grid {
-  max-width: 900px;
-  width: 100%;
-  padding: 10px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 28px;
-}
-
-.menu-item {
-  background: #ffffffcc;
-  backdrop-filter: blur(10px);
-  border: none;
-  border-radius: 16px;
-  padding: 24px 22px;
   text-align: left;
-  cursor: pointer;
-  transition: 0.3s ease;
-  box-shadow: 0 6px 16px #317f1061;
-}
-
-.menu-item:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba#2f9b00;
-}
-
-.menu-item-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #111;
-}
-
-.menu-item-description {
+  padding: 15px 25px;
   font-size: 0.95rem;
-  color: #555;
-  line-height: 1.4;
+  color: var(--color-text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+  font-weight: 500;
+}
+
+.sidebar-button:hover {
+  background-color: #e9ecef;
+  color: var(--color-text-dark);
+}
+
+.sidebar-button.active {
+  background-color: #e8f5e9;
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+  font-weight: 600;
+}
+
+/*****************************************************
+ *  CONTENIDO
+ *****************************************************/
+.form-content {
+  flex: 1;
+  padding: 50px 60px;
+  overflow-y: auto;
+}
+
+/*****************************************************
+ *  TÍTULOS DE SECCIÓN
+ *****************************************************/
+.section-title {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  margin-bottom: 30px;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 10px;
 }
 
 /*****************************************************
@@ -161,29 +126,33 @@
 }
 
 .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--color-text-medium);
   font-size: 0.9rem;
-  font-weight: 500;
-  color: #444;
-  margin-bottom: 6px;
 }
 
 .form-group input,
+.form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 14px 16px;
-  background: #f5f7f5;
-  border: 1px solid #d8ddd7;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 8px;
-  font-size: 0.95rem;
-  color: #333;
-  transition: 0.25s;
+  font-size: 1rem;
+  color: var(--color-text-dark);
+  transition: border-color 0.2s;
+  background-color: #fff;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
+.form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  background: #eef3ee;
-  border-color: #2a8c00;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(56, 142, 60, 0.1);
 }
 
 textarea {
@@ -348,4 +317,176 @@ h2 {
   max-height: 1000px; 
   opacity: 1;
   transform: translateY(0);
+}
+
+/* --- Header Styles (Copied from FungusDetails.css for consistency) --- */
+.details-header-area {
+  width: 90%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+  padding: 0;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background-color: white;
+  color: var(--color-text-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.back-icon-button:hover {
+  background-color: var(--color-primary);
+  color: white;
+  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(56, 142, 60, 0.25);
+}
+
+.header-info h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.header-info .subtitle {
+  font-size: 1rem;
+  color: var(--color-text-medium);
+  margin: 0;
+}
+
+.header-save-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-primary);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(56, 142, 60, 0.2);
+}
+
+.header-save-button:hover {
+  background-color: #2e7d32;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(56, 142, 60, 0.3);
+}
+
+.header-save-button:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Nested form styles */
+.nested-form {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-top: 15px;
+}
+
+.nested-form h3, .nested-form h4 {
+  margin-top: 0;
+  color: var(--color-text-dark);
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hint-text {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 5px;
+}
+
+/* --- Menu Grid Styles --- */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 1200px;
+  margin-top: 20px;
+}
+
+.menu-item {
+  background-color: white;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-color: var(--color-primary);
+}
+
+.menu-item-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0;
+}
+
+.menu-item-description {
+  font-size: 0.95rem;
+  color: var(--color-text-medium);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* === ESTILOS UNIFICADOS (Basados en EditFungus/FungusDetails) === */
+
+/* Variables (si no están definidas globalmente) */
+:root {
+  --color-primary: #388e3c; 
+  --color-text-dark: #212529; 
+  --color-text-medium: #495057; 
+  --color-background-light: #f8f9fa; 
+  --color-border-subtle: #dee2e6; 
+  --color-surface-white: #ffffff;
 }

@@ -14,88 +14,186 @@
   min-height: 100vh;
   width: 100%;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 60px 0;
+  flex-direction: column; /* Cambiado a columna para apilar header y window */
+  align-items: center; /* Centrar horizontalmente */
+  padding: 20px 0 40px;
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
 }
 
+.details-header-area {
+  width: 90%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+  padding: 0;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Separa los grupos a los extremos */
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-edit-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-medium);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.header-edit-button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: #f0f9f0; /* Verde muy suave */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.back-icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background-color: white;
+  color: var(--color-text-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.back-icon-button:hover {
+  background-color: var(--color-primary);
+  color: white;
+  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(56, 142, 60, 0.25);
+}
+
+.back-icon-button svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.header-info h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.header-info .subtitle {
+  font-size: 1rem;
+  color: var(--color-text-medium);
+  margin: 0;
+}
+
+.header-info .subtitle strong {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* === REMOVED OLD BUTTON STYLES === */
+
 .fungus-details-window {
   width: 90%;
-  max-width: 1100px;
+  max-width: 1200px;
   background: var(--color-surface-white);
   padding-top: 0;
   border-radius: 12px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Cambiado a fila para sidebar + contenido */
   margin: 0 auto;
+  min-height: 600px; /* Altura mínima para que se vea bien */
+}
+
+/* === SIDEBAR NAVIGATION === */
+.sidebar-nav {
+  width: 280px;
+  background-color: #f8f9fa;
+  border-right: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 0;
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  padding: 0 25px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-medium);
+  font-weight: 700;
+}
+
+.sidebar-button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 15px 25px;
+  font-size: 0.95rem;
+  color: var(--color-text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+  font-weight: 500;
+}
+
+.sidebar-button:hover {
+  background-color: #e9ecef;
+  color: var(--color-text-dark);
+}
+
+.sidebar-button.active {
+  background-color: #e8f5e9; /* Fondo verde muy claro */
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+  font-weight: 600;
 }
 
 .details-content {
-  /* Separación clave de los tabs */
-  padding: 40px 40px 40px 40px; 
+  flex: 1; /* Toma el resto del espacio */
+  padding: 20px 60px 50px; 
   box-sizing: border-box;
   margin: 0;
+  overflow-y: auto; /* Si el contenido es muy largo */
 }
 
-/* === NUEVOS ESTILOS DE DESPLAZAMIENTO (SCROLLING TABS) === */
-
-.tabs-wrapper {
-    position: relative;
-    /* Asegura que el wrapper se extienda a lo ancho de la ventana - padding del content */
-    width: 100%; 
-    box-sizing: border-box;
-    padding: 0 40px; /* Alineación horizontal con el content */
+.section-title {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  margin-bottom: 25px;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 10px;
 }
 
-.tabs-container {
-    width: 100%;
-    overflow-x: auto; /* Permite el desplazamiento */
-    display: flex;
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    background: var(--color-surface-white);
-    border-bottom: 2px solid var(--color-border-subtle);
-    box-sizing: border-box;
-    /* Truco de UX: Aplica un gradiente para desvanecer los bordes, indicando scroll */
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-}
+/* === OLD TABS STYLES REMOVED === */
 
-.tabs-container::-webkit-scrollbar {
-    display: none; /* Ocultar la barra de desplazamiento nativa */
-}
-
-/* Estilo para los indicadores de flecha (Opcional, pero da más feedback) */
-.scroll-indicator {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--color-text-medium);
-    font-size: 1.2rem;
-    cursor: pointer;
-    z-index: 10;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-    pointer-events: none; /* No bloquear el clic del tab */
-}
-
-.left-indicator {
-    left: 20px; /* Posicionamiento a la izquierda */
-}
-
-.right-indicator {
-    right: 20px; /* Posicionamiento a la derecha */
-}
-
-/* Ocultar los indicadores si no se usan flechas interactivas */
-.scroll-indicator {
-    display: none; 
-}
 
 
 /* --- Botones de Tab (Estilo Moderno) --- */
@@ -184,7 +282,7 @@ h1 {
 /* --- Contenido de la Pestaña --- */
 .tab-content {
   background: var(--color-surface-white);
-  padding: 25px 0;
+  padding: 0 0 25px;
   border-radius: 0;
   display: flex;
   flex-direction: column;

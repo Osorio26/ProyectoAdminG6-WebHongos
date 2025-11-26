@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../../config/prisma";
 import { injectable } from "inversify";
 import { IColectaRepository } from "./IColectaRepository";
 
 @injectable()
 export class PrismaColectaRepository implements IColectaRepository {
-  private prisma = new PrismaClient();
+  private prisma = prisma;
 
   create(data) {
     return this.prisma.colectas.create({ data });

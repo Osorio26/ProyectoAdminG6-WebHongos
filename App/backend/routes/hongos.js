@@ -2,6 +2,7 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import prisma from "../prismaClient.js";
 
 const router = express.Router();
 
@@ -9,29 +10,387 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dataPath = path.join(__dirname, "../data/hongos.json");
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
 	try {
-		const raw = fs.readFileSync(dataPath, "utf-8");
-		const data = JSON.parse(raw);
-		res.json(data);
-	} catch (err) {
-		console.error("Error reading hongos.json", err);
-		res.status(500).json({ message: "Error reading data" });
+		// Intentar obtener datos de la base de datos
+		const aislamientos = await prisma.aislamientos.findMany({
+			include: {
+				Organismo: true,
+				Colecta: {
+					include: {
+						Sitio: true
+					}
+				}
+			}
+		});
+		res.json(aislamientos);
+	} catch (dbError) {
+		console.error("Error fetching from DB:", dbError);
+		res.status(500).json({ message: "Database error" });
+		/*
+		// FALLBACK JSON DESACTIVADO
+		console.warn("Fallo al conectar con la BD, usando fallback JSON:", dbError.message);
+		try {
+			const raw = fs.readFileSync(dataPath, "utf-8");
+			const data = JSON.parse(raw);
+			
+			// Transformar JSON plano a estructura anidada para que el frontend funcione igual
+			const transformedData = data.map(item => ({
+				// ... (código omitido)
+			}));
+
+			res.json(transformedData);
+		} catch (err) {
+			console.error("Error reading hongos.json", err);
+			res.status(500).json({ message: "Error reading data" });
+		}
+		*/
 	}
 });
 
-router.get("/:code", (req, res) => {
+router.get("/:code", async (req, res) => {
 	try {
-		const raw = fs.readFileSync(dataPath, "utf-8");
-		const data = JSON.parse(raw);
-		const fungus = data.find((item) => item.code === req.params.code);
-		if (!fungus) {
-			return res.status(404).json({ message: "Fungus not found" });
+		// Intentar buscar en BD
+		const aislamiento = await prisma.aislamientos.findFirst({
+			where: { idHeredado: req.params.code },
+			include: {
+				Organismo: {
+					include: {
+						Hongo: {
+							include: {
+								Marcadores: true
+							}
+						}
+					}
+				},
+				Colecta: {
+					include: {
+						Sitio: true,
+						Planta: true
+					}
+				},
+				Morfologias: true
+			}
+		});
+
+		if (aislamiento) {
+			return res.json(aislamiento);
+		} else {
+			return res.status(404).json({ message: "Fungus not found in database" });
 		}
-		res.json(fungus);
-	} catch (err) {
-		console.error("Error reading hongos.json", err);
-		res.status(500).json({ message: "Error reading data" });
+
+	} catch (dbError) {
+		console.error("Error fetching from DB:", dbError);
+		res.status(500).json({ message: "Database error" });
+		/* 
+		// FALLBACK JSON DESACTIVADO
+		console.warn("Fallo al buscar en BD o no encontrado, usando fallback JSON:", dbError.message);
+		try {
+			const raw = fs.readFileSync(dataPath, "utf-8");
+			const data = JSON.parse(raw);
+			// ... (código omitido)
+		} catch (err) {
+			console.error("Error reading hongos.json", err);
+			res.status(500).json({ message: "Error reading data" });
+		}
+		*/
+	}
+});
+
+// ==========================================
+// CREACIÓN DE REGISTROS (NUEVOS ENDPOINTS)
+// ==========================================
+
+// 1. Crear Colecta (con Sitio, Coordenadas, Planta opcional)
+router.post("/colecta", async (req, res) => {
+	try {
+		const data = req.body;
+		
+		// Crear Coordenadas si existen
+		let idCoordenadas = null;
+		if (data.coordenadas && (data.coordenadas.latitud || data.coordenadas.longitud)) {
+			const coords = await prisma.coordenadas.create({
+				data: {
+					Latitud: parseFloat(data.coordenadas.latitud),
+					Longitud: parseFloat(data.coordenadas.longitud),
+					Altitud: parseInt(data.coordenadas.altitud) || null
+				}
+			});
+			idCoordenadas = coords.id;
+		}
+
+		// Crear Sitio si existe
+		let idSitio = null;
+		if (data.sitio && data.sitio.nombre) {
+			const sitio = await prisma.sitios.create({
+				data: {
+					Nombre: data.sitio.nombre,
+					EsAreaProtegida: data.sitio.esAreaProtegida,
+					NombreAreaProtegida: data.sitio.nombreAreaProtegida,
+					ReferenciasAdicionales: data.sitio.referenciasAdicionales
+				}
+			});
+			idSitio = sitio.id;
+		}
+
+		// Crear Planta si existe
+		let idPlanta = null;
+		if (data.organismo && data.organismo.reino) { // Asumiendo que si hay reino, hay planta
+			const planta = await prisma.organismos.create({
+				data: {
+					Tipo: "Planta",
+					Reino: data.organismo.reino,
+					Filo: data.organismo.filo,
+					Clase: data.organismo.clase,
+					Orden: data.organismo.orden,
+					Familia: data.organismo.familia,
+					Genero: data.organismo.genero,
+					Especie: data.organismo.especie
+				}
+			});
+			idPlanta = planta.id;
+		}
+
+		// Crear Colecta
+		const colecta = await prisma.colectas.create({
+			data: {
+				idHeredado: data.codigoColecta,
+				Colector: data.colector,
+				Fecha: data.fechaColecta ? new Date(data.fechaColecta) : null,
+				Temperatura: parseFloat(data.temperatura) || null,
+				Humedad: parseFloat(data.humedad) || null,
+				pH: parseFloat(data.ph) || null,
+				TieneCoordenadas: !!idCoordenadas,
+				idCoordenadas: idCoordenadas,
+				idSitio: idSitio,
+				ContienePlanta: !!idPlanta,
+				idPlanta: idPlanta
+			}
+		});
+
+		res.status(201).json(colecta);
+	} catch (error) {
+		console.error("Error creating colecta:", error);
+		res.status(500).json({ message: "Error creating colecta", error: error.message });
+	}
+});
+
+// 2. Crear Aislamiento (Vinculado a Colecta existente o nueva)
+router.post("/aislamiento", async (req, res) => {
+	try {
+		const data = req.body;
+		let idColecta = data.idColectaExistente;
+
+		// Si es nueva colecta, crearla primero (lógica simplificada, idealmente reutilizar función)
+		if (data.isNewColecta) {
+			// ... Repetir lógica de creación de colecta o llamar a servicio interno ...
+			// Por brevedad, asumimos que el frontend llama a /colecta primero o implementamos aquí:
+			
+			// (Implementación inline rápida para nueva colecta)
+			let idCoordenadas = null;
+			if (data.coordenadas && (data.coordenadas.latitud || data.coordenadas.longitud)) {
+				const coords = await prisma.coordenadas.create({
+					data: {
+						Latitud: parseFloat(data.coordenadas.latitud),
+						Longitud: parseFloat(data.coordenadas.longitud),
+						Altitud: parseInt(data.coordenadas.altitud) || null
+					}
+				});
+				idCoordenadas = coords.id;
+			}
+			let idSitio = null;
+			if (data.sitio && data.sitio.nombre) {
+				const sitio = await prisma.sitios.create({
+					data: {
+						Nombre: data.sitio.nombre,
+						EsAreaProtegida: data.sitio.esAreaProtegida,
+						NombreAreaProtegida: data.sitio.nombreAreaProtegida,
+						ReferenciasAdicionales: data.sitio.referenciasAdicionales
+					}
+				});
+				idSitio = sitio.id;
+			}
+			let idPlanta = null;
+			if (data.organismo && data.organismo.reino) {
+				const planta = await prisma.organismos.create({
+					data: {
+						Tipo: "Planta",
+						Reino: data.organismo.reino,
+						Filo: data.organismo.filo,
+						Clase: data.organismo.clase,
+						Orden: data.organismo.orden,
+						Familia: data.organismo.familia,
+						Genero: data.organismo.genero,
+						Especie: data.organismo.especie
+					}
+				});
+				idPlanta = planta.id;
+			}
+
+			const nuevaColecta = await prisma.colectas.create({
+				data: {
+					idHeredado: data.codigoColecta,
+					Colector: data.colector,
+					Fecha: data.fechaColecta ? new Date(data.fechaColecta) : null,
+					idSitio, idCoordenadas, idPlanta,
+					TieneCoordenadas: !!idCoordenadas,
+					ContienePlanta: !!idPlanta
+				}
+			});
+			idColecta = nuevaColecta.id;
+		}
+
+		// Crear Aislamiento
+		const aislamiento = await prisma.aislamientos.create({
+			data: {
+				idHeredado: data.idHeredado,
+				AisladoDePlanta: data.aisladoDePlanta,
+				ParteDePlanta: data.parteDePlanta,
+				FechaAislamiento: data.fechaAislamiento ? new Date(data.fechaAislamiento) : null,
+				FechaSalida: data.fechaSalida ? new Date(data.fechaSalida) : null,
+				IdAnalisisMolecular: data.idAnalisisMolecular,
+				MedioCultivo: data.medioCultivo,
+				MetodoSiembra: data.metodoSiembra,
+				Estado: data.estado,
+				Comentarios: data.comentarios,
+				CantidadExistencias: parseInt(data.cantidadExistencias) || 0,
+				EstaEnColeccion: data.enColeccion,
+				idColecta: idColecta
+			}
+		});
+
+		res.status(201).json(aislamiento);
+	} catch (error) {
+		console.error("Error creating aislamiento:", error);
+		res.status(500).json({ message: "Error creating aislamiento", error: error.message });
+	}
+});
+
+// 3. Registrar Hongo (Organismo + Hongo + Marcadores)
+router.post("/hongo", async (req, res) => {
+	try {
+		const data = req.body;
+
+		// Crear Organismo
+		const organismo = await prisma.organismos.create({
+			data: {
+				Tipo: "Hongo",
+				Reino: data.reino,
+				Filo: data.filo,
+				Clase: data.clase,
+				Orden: data.orden,
+				Familia: data.familia,
+				Genero: data.genero,
+				Especie: data.especie
+			}
+		});
+
+		// Crear Hongo (Detalles)
+		await prisma.hongos.create({
+			data: {
+				id: organismo.id, // Comparten ID
+				MetodoIdentificacion: data.metodoIdentificacion,
+				CodigoAccesoGenBank: data.codigoAccesoGenBank,
+				IdentificadorResponsable: data.responsableIdentificacion
+			}
+		});
+
+		// Crear Marcador si existe
+		if (data.tieneMarcadores && data.marcador && data.marcador.tipoMarcador) {
+			await prisma.marcadores.create({
+				data: {
+					idHongo: organismo.id,
+					Tipo: data.marcador.tipoMarcador,
+					Secuencia: data.marcador.secuenciaTexto
+				}
+			});
+		}
+
+		// Vincular al Aislamiento (si se proporcionó ID)
+		if (data.idRelacionado) {
+			// Buscar aislamiento por idHeredado (que es lo que usa el usuario)
+			const aislamiento = await prisma.aislamientos.findFirst({
+				where: { idHeredado: data.idRelacionado }
+			});
+			
+			if (aislamiento) {
+				await prisma.aislamientos.update({
+					where: { id: aislamiento.id },
+					data: { idOrganismo: organismo.id }
+				});
+			}
+		}
+
+		res.status(201).json(organismo);
+	} catch (error) {
+		console.error("Error creating hongo:", error);
+		res.status(500).json({ message: "Error creating hongo", error: error.message });
+	}
+});
+
+// 4. Agregar Morfología
+router.post("/morfologia", async (req, res) => {
+	try {
+		const data = req.body;
+		
+		// Buscar aislamiento por idHeredado
+		const aislamiento = await prisma.aislamientos.findFirst({
+			where: { idHeredado: data.idRelacionado }
+		});
+
+		if (!aislamiento) {
+			return res.status(404).json({ message: "Aislamiento no encontrado" });
+		}
+
+		const morfologia = await prisma.morfologias.create({
+			data: {
+				idAislamiento: aislamiento.id,
+				Forma: data.forma,
+				FormaBorde: data.formaBorde,
+				ColorAnverso: data.colorAnverso,
+				ColorReverso: data.colorReverso,
+				ColorBorde: data.colorBorde,
+				TieneMicelioAereo: data.tieneMicelioAereo,
+				DensidadMicelioAereo: data.densidadMicelioAereo,
+				TipoCrecimiento: data.tipoCrecimiento,
+				TipoHifa: data.tipoHifa,
+				TieneSecreciones: data.tieneSecreciones,
+				Observaciones: data.observaciones
+			}
+		});
+
+		res.status(201).json(morfologia);
+	} catch (error) {
+		console.error("Error creating morfologia:", error);
+		res.status(500).json({ message: "Error creating morfologia", error: error.message });
+	}
+});
+
+// 5. Agregar Ensayo Biológico
+router.post("/ensayo", async (req, res) => {
+	try {
+		const data = req.body;
+
+		const aislamiento = await prisma.aislamientos.findFirst({
+			where: { idHeredado: data.idRelacionado }
+		});
+
+		if (!aislamiento) {
+			return res.status(404).json({ message: "Aislamiento no encontrado" });
+		}
+
+		const ensayo = await prisma.ensayosBiologicos.create({
+			data: {
+				idAislamiento: aislamiento.id,
+				Tipo: data.tipoEnsayo,
+				Resultado: data.resultadoEnsayo
+			}
+		});
+
+		res.status(201).json(ensayo);
+	} catch (error) {
+		console.error("Error creating ensayo:", error);
+		res.status(500).json({ message: "Error creating ensayo", error: error.message });
 	}
 });
 
@@ -60,24 +419,153 @@ router.post("/", (req, res) => {
 	}
 });
 
-router.put("/:code", (req, res) => {
-	try {
-		const raw = fs.readFileSync(dataPath, "utf-8");
-		const data = JSON.parse(raw);
-		const index = data.findIndex((item) => item.code === req.params.code);
+router.put("/:code", async (req, res) => {
+	const { code } = req.params;
+	const data = req.body;
 
-		if (index === -1) {
+	try {
+		// 1. Buscar el registro existente para obtener IDs de relaciones
+		const existing = await prisma.aislamientos.findFirst({
+			where: { idHeredado: code },
+			include: {
+				Organismo: { include: { Hongo: { include: { Marcadores: true } } } },
+				Colecta: { include: { Sitio: true, Planta: true } },
+				Morfologias: true
+			}
+		});
+
+		if (!existing) {
 			return res.status(404).json({ message: "Fungus not found" });
 		}
 
-		const updated = { ...data[index], ...req.body, code: data[index].code };
-		data[index] = updated;
-		fs.writeFileSync(dataPath, JSON.stringify(data, null, 2), "utf-8");
+		// 2. Actualizar Organismo
+		if (data.Organismo && existing.idOrganismo) {
+			await prisma.organismos.update({
+				where: { id: existing.idOrganismo },
+				data: {
+					Reino: data.Organismo.Reino,
+					Filo: data.Organismo.Filo,
+					Clase: data.Organismo.Clase,
+					Orden: data.Organismo.Orden,
+					Familia: data.Organismo.Familia,
+					Genero: data.Organismo.Genero,
+					Especie: data.Organismo.Especie,
+				}
+			});
 
-		res.json(updated);
+			// Actualizar Hongo (si aplica)
+			if (existing.Organismo.Tipo === 'Hongo' && data.Organismo.Hongo) {
+				// Hongo comparte ID con Organismo
+				const hongoExists = await prisma.hongos.findUnique({ where: { id: existing.idOrganismo } });
+				if (hongoExists) {
+					await prisma.hongos.update({
+						where: { id: existing.idOrganismo },
+						data: {
+							MetodoIdentificacion: data.Organismo.Hongo.MetodoIdentificacion,
+							CodigoAccesoGenBank: data.Organismo.Hongo.CodigoAccesoGenBank,
+							IdentificadorResponsable: data.Organismo.Hongo.IdentificadorResponsable
+						}
+					});
+
+					// Actualizar Marcadores (Simplificación: solo el primero)
+					if (data.Organismo.Hongo.Marcadores && data.Organismo.Hongo.Marcadores.length > 0) {
+						const m = data.Organismo.Hongo.Marcadores[0];
+						if (existing.Organismo.Hongo.Marcadores && existing.Organismo.Hongo.Marcadores.length > 0) {
+							await prisma.marcadores.update({
+								where: { id: existing.Organismo.Hongo.Marcadores[0].id },
+								data: {
+									Tipo: m.Tipo,
+									Secuencia: m.Secuencia
+								}
+							});
+						}
+					}
+				}
+			}
+		}
+
+		// 3. Actualizar Colecta
+		if (data.Colecta && existing.idColecta) {
+			await prisma.colectas.update({
+				where: { id: existing.idColecta },
+				data: {
+					idHeredado: data.Colecta.idHeredado,
+					Fecha: data.Colecta.Fecha ? new Date(data.Colecta.Fecha) : undefined,
+					Colector: data.Colecta.Colector,
+					Temperatura: data.Colecta.Temperatura,
+				}
+			});
+
+			// Actualizar Sitio
+			if (data.Colecta.Sitio && existing.Colecta.idSitio) {
+				await prisma.sitios.update({
+					where: { id: existing.Colecta.idSitio },
+					data: {
+						Nombre: data.Colecta.Sitio.Nombre,
+						NombreAreaProtegida: data.Colecta.Sitio.NombreAreaProtegida,
+						ReferenciasAdicionales: data.Colecta.Sitio.ReferenciasAdicionales
+					}
+				});
+			}
+
+			// Actualizar Planta Asociada
+			if (data.Colecta.Planta && existing.Colecta.idPlanta) {
+				await prisma.organismos.update({
+					where: { id: existing.Colecta.idPlanta },
+					data: {
+						Reino: data.Colecta.Planta.Reino,
+						Filo: data.Colecta.Planta.Filo,
+						Clase: data.Colecta.Planta.Clase,
+						Orden: data.Colecta.Planta.Orden,
+						Familia: data.Colecta.Planta.Familia,
+						Genero: data.Colecta.Planta.Genero,
+						Especie: data.Colecta.Planta.Especie,
+					}
+				});
+			}
+		}
+
+		// 4. Actualizar Aislamiento (Campos propios)
+		await prisma.aislamientos.update({
+			where: { id: existing.id },
+			data: {
+				MedioCultivo: data.MedioCultivo,
+				FechaAislamiento: data.FechaAislamiento ? new Date(data.FechaAislamiento) : undefined,
+				CantidadExistencias: data.CantidadExistencias ? parseInt(data.CantidadExistencias) : undefined,
+				Comentarios: data.Comentarios
+			}
+		});
+
+		// 5. Actualizar Morfología (Simplificación: solo la primera)
+		if (data.Morfologias && data.Morfologias.length > 0) {
+			const m = data.Morfologias[0];
+			if (existing.Morfologias && existing.Morfologias.length > 0) {
+				await prisma.morfologias.update({
+					where: { id: existing.Morfologias[0].id },
+					data: {
+						Observaciones: m.Observaciones,
+						ColorAnverso: m.ColorAnverso,
+						Forma: m.Forma
+					}
+				});
+			}
+		}
+
+		// Retornar el objeto actualizado
+		const updatedFungus = await prisma.aislamientos.findFirst({
+			where: { idHeredado: code },
+			include: {
+				Organismo: { include: { Hongo: { include: { Marcadores: true } } } },
+				Colecta: { include: { Sitio: true, Planta: true } },
+				Morfologias: true
+			}
+		});
+
+		res.json(updatedFungus);
+
 	} catch (err) {
-		console.error("Error updating hongos.json", err);
-		res.status(500).json({ message: "Error updating data" });
+		console.error("Error updating fungus in DB:", err);
+		res.status(500).json({ message: "Error updating data in database" });
 	}
 });
 

@@ -7,9 +7,10 @@
 		"start": "node server.js"
 	},
 	"dependencies": {
-		"@prisma/client": "^7.0.0",
+		"@prisma/client": "5.22.0",
 		"cors": "^2.8.5",
+		"dotenv": "^17.2.3",
 		"express": "^4.21.2",
-		"prisma": "^7.0.0"
+		"prisma": "5.22.0"
 	}
 }

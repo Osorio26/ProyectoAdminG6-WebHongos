@@ -1,356 +1,219 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./AddFungus.css"; // Estilos
-import ReusableBackButton from "../components/ReusableBackButton";
+import "./AddFungus.css";
+import { createColecta } from "../api/FungusApi";
 
-const CoordenadasForm = ({ formData, handleChange }) => (
-    <div className="sub-form-section" style={{ border: '1px dashed #4caf50', padding: '15px', borderRadius: '4px', marginTop: '10px' }}>
-        <h4 style={{marginTop: '0'}}>Datos de Coordenadas</h4>
-        <div className="row-group" style={{ display: 'flex', gap: '15px' }}>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Latitud</label>
-                <input type="number" step="any" name="coordenadas.latitud" placeholder="Ej: 9.928069" value={formData.coordenadas.latitud} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Longitud</label>
-                <input type="number" step="any" name="coordenadas.longitud" placeholder="Ej: -84.090726" value={formData.coordenadas.longitud} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Altitud (metros)</label>
-                <input type="number" name="coordenadas.altitud" placeholder="Ej: 1100" value={formData.coordenadas.altitud} onChange={handleChange}/>
-            </div>
-        </div>
-    </div>
-);
-
-const SitioForm = ({ formData, handleChange }) => (
-    <div className="sub-form-section" style={{ border: '1px dashed #795548', padding: '15px', borderRadius: '4px', marginTop: '10px' }}>
-        <h4 style={{marginTop: '0'}}>Detalles del Sitio de Colecta</h4>
-        <div className="form-group">
-            <label>Nombre del Sitio</label>
-            <input type="text" name="sitio.nombre" placeholder="Ej: Sendero del Árbol Gigante" value={formData.sitio.nombre} onChange={handleChange}/>
-        </div>
-
-        <div className="form-group" style={{ marginBottom: '15px' }}>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="sitio.esAreaProtegida"
-                checked={formData.sitio.esAreaProtegida}
-                onChange={handleChange}
-              />
-            <span className="custom-checkbox"></span>
-              ¿Es Área Protegida?
-          </label>
-        </div>
-
-        {formData.sitio.esAreaProtegida && (
-            <div className="form-group">
-                <label>Nombre del Área Protegida</label>
-                <input type="text" name="sitio.nombreAreaProtegida" placeholder="Ej: Parque Nacional" value={formData.sitio.nombreAreaProtegida} onChange={handleChange}/>
-            </div>
-        )}
-        <div className="form-group">
-            <label>Referencias Adicionales del Sitio</label>
-            <textarea name="sitio.referenciasAdicionales" placeholder="Instrucciones para llegar, detalles geográficos relevantes, etc." value={formData.sitio.referenciasAdicionales} onChange={handleChange} rows="2"/>
-        </div>
-    </div>
-);
-
-const OrganismoForm = ({ formData, handleChange }) => (
-    <div className="sub-form-section" style={{ border: '1px dashed #42a5f5', padding: '15px', borderRadius: '4px', marginTop: '10px' }}>
-        <h4 style={{marginTop: '0'}}>Datos de Clasificación del Organismo (Planta)</h4>
-        
-        <div className="row-group" style={{ display: 'flex', gap: '15px' }}>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Reino</label>
-                <input type="text" name="organismo.reino" placeholder="Ej: Plantae" value={formData.organismo.reino} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Filo</label>
-                <input type="text" name="organismo.filo" placeholder="Ej: Magnoliophyta" value={formData.organismo.filo} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Clase</label>
-                <input type="text" name="organismo.clase" placeholder="Ej: Magnoliopsida" value={formData.organismo.clase} onChange={handleChange}/>
-            </div>
-        </div>
-        
-        <div className="row-group" style={{ display: 'flex', gap: '15px' }}>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Orden</label>
-                <input type="text" name="organismo.orden" placeholder="Ej: Fagales" value={formData.organismo.orden} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Familia</label>
-                <input type="text" name="organismo.familia" placeholder="Ej: Fagaceae" value={formData.organismo.familia} onChange={handleChange}/>
-            </div>
-        </div>
-        
-        <div className="row-group" style={{ display: 'flex', gap: '15px' }}>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Género</label>
-                <input type="text" name="organismo.genero" placeholder="Ej: Quercus" value={formData.organismo.genero} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{ flex: 1 }}>
-                <label>Especie</label>
-                <input type="text" name="organismo.especie" placeholder="Ej: Quercus robur" value={formData.organismo.especie} onChange={handleChange}/>
-            </div>
-        </div>
-    </div>
-);
+const TABS = ["Datos Generales", "Ubicación", "Planta Asociada"];
 
 const AddColectaPage = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    // Colectas Fields
-    idHeredado: "", 
-    colector: "",
-    fecha: new Date().toISOString().split('T')[0],
-    temperatura: "",
-    humedad: "",
-    ph: "",
-    observacionesTexto: "", 
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-    // Booleans para control de subformularios
-    tieneCoordenadas: false, 
-    registrarSitio: true, 
-    contienePlanta: false, // Controla subformulario de Organismo
+  const [formData, setFormData] = useState({
+    codigoColecta: "",
+    fechaColecta: new Date().toISOString().split("T")[0],
+    colector: "",
+    temperatura: "",
+    humedad: "",
+    ph: "",
+    
+    // Ubicación
+    coordenadas: { latitud: "", longitud: "", altitud: "" },
+    sitio: { nombre: "", esAreaProtegida: false, nombreAreaProtegida: "", referenciasAdicionales: "" },
+    
+    // Planta
+    organismo: { reino: "", filo: "", clase: "", orden: "", familia: "", genero: "", especie: "" }
+  });
 
-    // Coordenadas Fields (anidado)
-    coordenadas: {
-      latitud: "",
-      longitud: "",
-      altitud: "",
-    },
+  // Helper para actualizar estado anidado
+  const updateNestedState = (obj, path, value) => {
+    const newObj = JSON.parse(JSON.stringify(obj));
+    const keys = path.split('.');
+    let current = newObj;
+    for (let i = 0; i < keys.length - 1; i++) {
+      current = current[keys[i]];
+    }
+    current[keys[keys.length - 1]] = value;
+    return newObj;
+  };
 
-    // Sitios Fields (anidado)
-    sitio: {
-      nombre: "",
-      esAreaProtegida: false,
-      nombreAreaProtegida: "",
-      referenciasAdicionales: "",
-    },
-    
-    // Organismos Fields (anidado - Asumimos Tipo="Planta")
-    organismo: {
-        tipo: "Planta", // Tipo quemado
-        reino: "", 
-        filo: "", 
-        clase: "", 
-        orden: "", 
-        familia: "", 
-        genero: "", 
-        especie: "",
-    }
-  });
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const val = type === 'checkbox' ? checked : value;
+    
+    if (name.includes('.')) {
+      setFormData(prev => updateNestedState(prev, name, val));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: val }));
+    }
+  };
 
-  // Función handleChange (se mantiene igual, ya maneja la anidación correctamente)
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    
-    // Función para manejar campos anidados (Sitio, Coordenadas, Organismo)
-    if (name.includes('.')) {
-        const [parent, child] = name.split('.');
-        setFormData(prev => ({
-            ...prev,
-            [parent]: {
-                ...prev[parent],
-                [child]: type === 'checkbox' ? checked : value,
-            },
-        }));
-    } else {
-        // Campos principales
-        setFormData(prev => ({ 
-            ...prev, 
-            [name]: type === 'checkbox' ? checked : value,
-            // Opcional: Resetear datos anidados al desactivar el toggle (buena práctica)
-            ...(name === 'tieneCoordenadas' && !checked ? { coordenadas: { latitud: "", longitud: "", altitud: "" } } : {}),
-            ...(name === 'registrarSitio' && !checked ? { sitio: { nombre: "", esAreaProtegida: false, nombreAreaProtegida: "", referenciasAdicionales: "" } } : {}),
-            // Resetear organismo si se desactiva
-            ...(name === 'contienePlanta' && !checked ? { organismo: { tipo: "Planta", reino: "", filo: "", clase: "", orden: "", familia: "", genero: "", especie: "" } } : {}),
-        }));
-    }
-  };
+  const handleSubmit = async () => {
+    if (!formData.codigoColecta) {
+      alert("El código de colecta es obligatorio");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await createColecta(formData);
+      alert("Colecta creada exitosamente");
+      navigate("/inventario");
+    } catch (error) {
+      console.error(error);
+      alert("Error al crear la colecta");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const dataToSend = {
-      idHeredado: formData.idHeredado,
-      colector: formData.colector,
-      fecha: formData.fecha,
-      temperatura: formData.temperatura ? parseFloat(formData.temperatura) : null,
-      humedad: formData.humedad ? parseFloat(formData.humedad) : null,
-      ph: formData.ph ? parseFloat(formData.ph) : null,
-      observacionesTexto: formData.observacionesTexto,
-      
-      tieneCoordenadas: formData.tieneCoordenadas,
-      ...(formData.tieneCoordenadas ? { coordenadas: formData.coordenadas } : {}),
-
-      registrarSitio: formData.registrarSitio,
-      ...(formData.registrarSitio ? { sitio: formData.sitio } : {}),
-      
-      contienePlanta: formData.contienePlanta,
-      ...(formData.contienePlanta ? { organismo: formData.organismo } : {}),
-    };
-
-    console.log("Enviando Datos de Campo:", dataToSend);
-
-    try {
-      // await api.post('/colectas', dataToSend);
-      alert("Colecta de campo registrada correctamente.");
-      navigate("/inventario");
-    } catch (error) {
-      console.error(error);
-      alert("Error al guardar la colecta.");
-    }
-  };
- 
-  return (
-    <div className="addfungus-container">
-      <div className="header-section">
-        <div>
-          <ReusableBackButton />
+  return (
+    <div className="add-fungus-container">
+      {/* HEADER */}
+      <div className="details-header-area">
+        <div className="header-row">
+          <div className="header-left">
+            <button className="back-icon-button" onClick={() => navigate(-1)} title="Cancelar">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19L5 12L12 5"/></svg>
+            </button>
+            <div className="header-info">
+              <h1>Nueva Colecta</h1>
+              <p className="subtitle">Registrar datos de campo</p>
+            </div>
+          </div>
+          <button className="header-save-button" onClick={handleSubmit} disabled={loading}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 4v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>{loading ? "Guardando..." : "Guardar Colecta"}</span>
+          </button>
         </div>
-        <h1>Registro Detallado de Colecta</h1>
-      </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="fungus-form flow-container">
-
-        {/* Contexto */}
-        <div className="info-box" style={{ backgroundColor: '#f9fbe7', borderLeft: '4px solid #2f9b00' }}>
-          Ingrese los datos de campo registrados para la muestra.
-        </div>
-        
-        {/* --- 1. Identificación y Logística --- */}
-        <h2>1. Identificación y Logística</h2>
-        <div className="form-group">
-          <label><strong>Código de Colecta (ID Único)</strong></label>
-          <input
-            type="text"
-            name="idHeredado"
-            placeholder="Ej: COL-2024-Amazonas-05"
-            value={formData.idHeredado}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="row-group" style={{display: 'flex', gap: '15px'}}>
-            <div className="form-group" style={{flex: 1}}>
-                <label>Colector</label>
-                <input type="text" name="colector" placeholder="Nombre del responsable" value={formData.colector} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{flex: 1}}>
-                <label>Fecha de Colecta</label>
-                <input type="date" name="fecha" value={formData.fecha} onChange={handleChange}/>
-            </div>
-        </div>
-        
-        <hr style={{margin: '20px 0', border: 'none', borderBottom: '1px solid #ccc'}}/>
-
-        {/* --- 2. Condiciones Ambientales --- */}
-        <h2>2. Condiciones Ambientales</h2>
-        <div className="row-group" style={{display: 'flex', gap: '15px'}}>
-            <div className="form-group" style={{flex: 1}}>
-                <label>Temperatura (°C)</label>
-                <input type="number" step="0.01" name="temperatura" placeholder="Ej: 25.50" value={formData.temperatura} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{flex: 1}}>
-                <label>Humedad (%)</label>
-                <input type="number" step="0.01" name="humedad" placeholder="Ej: 80.50" value={formData.humedad} onChange={handleChange}/>
-            </div>
-            <div className="form-group" style={{flex: 1}}>
-                <label>pH</label>
-                <input type="number" step="0.01" name="ph" placeholder="Ej: 6.85" value={formData.ph} onChange={handleChange}/>
-            </div>
-        </div>
-        
-        <hr style={{margin: '20px 0', border: 'none', borderBottom: '1px solid #ccc'}}/>
-
-        {/* --- 3. Localización y Taxonomía --- */}
-        <h2>3. Localización y Taxonomía</h2>
-        
-        {/* Toggle Sitio */}
-        <div className="form-group" style={{ marginBottom: '15px' }}>
-            <label className="checkbox-label">
-            <input
-              type="checkbox"
-              name="registrarSitio"
-              checked={formData.registrarSitio}
-              onChange={handleChange}
-            />
-            <span className="custom-checkbox"></span>
-              ¿Deseas registrar el sitio de colecta?
-          </label>
-        </div>
-
-        {/* Formulario de Sitio */}
-        <div className={`expandable-section ${formData.registrarSitio ? "show" : ""}`}>
-          <SitioForm formData={formData} handleChange={handleChange} />
+      <div className="add-fungus-window">
+        {/* SIDEBAR */}
+        <div className="sidebar-nav">
+          <h3 className="sidebar-title">Secciones</h3>
+          {TABS.map((tab, index) => (
+            <button
+              key={index}
+              className={`sidebar-button ${activeTab === index ? 'active' : ''}`}
+              onClick={() => setActiveTab(index)}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
-        {/* Toggle Coordenadas */}
-        <div className="form-group" style={{ marginTop: '20px', marginBottom: '15px' }}>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="tieneCoordenadas"
-                checked={formData.tieneCoordenadas}
-                onChange={handleChange}
-              />
-              <span className="custom-checkbox"></span>
-                ¿Tienes las coordenadas GPS de la colecta?
-          </label>
-        </div>
+        {/* CONTENT */}
+        <div className="form-content">
+          <h2 className="section-title">{TABS[activeTab]}</h2>
 
-        {/* Formulario de Coordenadas */}
-        <div className={`expandable-section ${formData.tieneCoordenadas ? "show" : ""}`}>
-          <CoordenadasForm formData={formData} handleChange={handleChange} />
+          {activeTab === 0 && (
+            <div className="form-section">
+              <div className="form-group">
+                <label>Código de Colecta *</label>
+                <input type="text" name="codigoColecta" value={formData.codigoColecta} onChange={handleChange} placeholder="Ej: COL-2024-001" />
+              </div>
+              <div className="form-group">
+                <label>Fecha de Colecta</label>
+                <input type="date" name="fechaColecta" value={formData.fechaColecta} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Colector Responsable</label>
+                <input type="text" name="colector" value={formData.colector} onChange={handleChange} placeholder="Nombre del colector" />
+              </div>
+              <div className="form-group">
+                <label>Temperatura (°C)</label>
+                <input type="number" step="0.1" name="temperatura" value={formData.temperatura} onChange={handleChange} placeholder="Ej: 24.5" />
+              </div>
+              <div className="form-group">
+                <label>Humedad (%)</label>
+                <input type="number" step="0.1" name="humedad" value={formData.humedad} onChange={handleChange} placeholder="Ej: 80" />
+              </div>
+              <div className="form-group">
+                <label>pH</label>
+                <input type="number" step="0.1" name="ph" value={formData.ph} onChange={handleChange} placeholder="Ej: 6.5" />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 1 && (
+            <div className="form-section">
+              <h3>Sitio</h3>
+              <div className="form-group">
+                <label>Nombre del Sitio</label>
+                <input type="text" name="sitio.nombre" value={formData.sitio.nombre} onChange={handleChange} placeholder="Ej: Sendero Principal" />
+              </div>
+              <div className="form-group">
+                <label>
+                  <input type="checkbox" name="sitio.esAreaProtegida" checked={formData.sitio.esAreaProtegida} onChange={handleChange} />
+                  {' '}¿Es Área Protegida?
+                </label>
+              </div>
+              {formData.sitio.esAreaProtegida && (
+                <div className="form-group">
+                  <label>Nombre Área Protegida</label>
+                  <input type="text" name="sitio.nombreAreaProtegida" value={formData.sitio.nombreAreaProtegida} onChange={handleChange} />
+                </div>
+              )}
+              <div className="form-group">
+                <label>Referencias Adicionales</label>
+                <textarea name="sitio.referenciasAdicionales" value={formData.sitio.referenciasAdicionales} onChange={handleChange} rows="3" />
+              </div>
+
+              <h3>Coordenadas</h3>
+              <div className="form-group">
+                <label>Latitud</label>
+                <input type="number" step="any" name="coordenadas.latitud" value={formData.coordenadas.latitud} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Longitud</label>
+                <input type="number" step="any" name="coordenadas.longitud" value={formData.coordenadas.longitud} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Altitud (msnm)</label>
+                <input type="number" name="coordenadas.altitud" value={formData.coordenadas.altitud} onChange={handleChange} />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 2 && (
+            <div className="form-section">
+              <p className="hint-text">Si la muestra fue colectada sobre una planta, ingrese los datos aquí.</p>
+              <div className="form-group">
+                <label>Reino</label>
+                <input type="text" name="organismo.reino" value={formData.organismo.reino} onChange={handleChange} placeholder="Ej: Plantae" />
+              </div>
+              <div className="form-group">
+                <label>Filo</label>
+                <input type="text" name="organismo.filo" value={formData.organismo.filo} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Clase</label>
+                <input type="text" name="organismo.clase" value={formData.organismo.clase} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Orden</label>
+                <input type="text" name="organismo.orden" value={formData.organismo.orden} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Familia</label>
+                <input type="text" name="organismo.familia" value={formData.organismo.familia} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Género</label>
+                <input type="text" name="organismo.genero" value={formData.organismo.genero} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                <label>Especie</label>
+                <input type="text" name="organismo.especie" value={formData.organismo.especie} onChange={handleChange} />
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Toggle Organismo/Planta */}
-        <div className="form-group" style={{ marginTop: '20px'}}>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="contienePlanta"
-                checked={formData.contienePlanta}
-                onChange={handleChange}
-              />
-              <span className="custom-checkbox"></span>
-                ¿Colecta referencia una planta? (Hospedero o sustrato)
-          </label>
-        </div>
-        
-        {/* Formulario de Organismo */}
-        <div className={`expandable-section ${formData.contienePlanta ? "show" : ""}`}>
-          <OrganismoForm formData={formData} handleChange={handleChange} />
-        </div>  
-        
-        <hr style={{margin: '20px 0', border: 'none', borderBottom: '1px solid #ccc'}}/>
-        <h2>4. Observaciones</h2>
-        <div className="form-group">
-          <label>Observaciones de Campo</label>
-          <textarea
-            name="observacionesTexto"
-            placeholder="Detalles sobre el sustrato, comportamiento en el sitio, notas adicionales."
-            value={formData.observacionesTexto}
-            onChange={handleChange}
-            rows="4"
-          />
-        </div>
-
-        {/* Botón Submit */}
-        <div className="button-container">
-          <button type="submit" className="submit-button" style={{background: '#2f9b00'}}>
-            Guardar Colecta
-          </button>
-        </div>
-
-      </form>
-    </div>
-  );
+      </div>
+    </div>
+  );
 };
 
 export default AddColectaPage;

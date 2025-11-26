@@ -32,6 +32,56 @@ export async function createFungus(fungus) {
 	return res.json();
 }
 
+export async function createColecta(data) {
+	const res = await fetch(`${API_BASE_URL}/hongos/colecta`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(data),
+	});
+	if (!res.ok) throw new Error("Error creating colecta");
+	return res.json();
+}
+
+export async function createAislamiento(data) {
+	const res = await fetch(`${API_BASE_URL}/hongos/aislamiento`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(data),
+	});
+	if (!res.ok) throw new Error("Error creating aislamiento");
+	return res.json();
+}
+
+export async function createHongo(data) {
+	const res = await fetch(`${API_BASE_URL}/hongos/hongo`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(data),
+	});
+	if (!res.ok) throw new Error("Error creating hongo");
+	return res.json();
+}
+
+export async function createMorfologia(data) {
+	const res = await fetch(`${API_BASE_URL}/hongos/morfologia`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(data),
+	});
+	if (!res.ok) throw new Error("Error creating morfologia");
+	return res.json();
+}
+
+export async function createEnsayo(data) {
+	const res = await fetch(`${API_BASE_URL}/hongos/ensayo`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(data),
+	});
+	if (!res.ok) throw new Error("Error creating ensayo");
+	return res.json();
+}
+
 export async function updateFungus(code, updates) {
 	const res = await fetch(`${API_BASE_URL}/hongos/${code}`, {
 		method: "PUT",

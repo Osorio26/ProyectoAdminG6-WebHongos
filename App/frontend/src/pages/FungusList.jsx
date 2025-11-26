@@ -19,8 +19,6 @@ const FungusList = () => {
         const data = await getFungi();
         if (isMounted) {
           setFungi(data);
-        }else{
-          setFungi(DUMMY_FUNGUS);
         }
       } catch (error) {
         if (isMounted) {
@@ -72,12 +70,12 @@ const FungusList = () => {
         <table className="fungus-table">
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Género</th>
-              <th>Reino</th>
-              <th>Clase</th>
+              <th>Código</th>
               <th>Especie</th>
+              <th>Género</th>
               <th>Familia</th>
+              <th>Ubicación</th>
+              <th>Fecha Colecta</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -109,9 +107,9 @@ const FungusList = () => {
                     fungus.Organismo?.Reino,
                     fungus.Colecta?.Temperatura,
                     fungus.Organismo?.Clase,
-                    fungus.Organismo?.Especie,
                     fungus.Organismo?.Orden,
                     fungus.Organismo?.Familia,
+                    fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "",
                   ].map((v) => v?.toString().toLowerCase() || "");
 
                   return terms.every((term) =>
@@ -122,12 +120,12 @@ const FungusList = () => {
                 })
                 .map((fungus, idx) => (
                   <tr key={idx}>
-                    <td className="name-cell">{fungus.Organismo?.Especie || "Sin identificación"}</td>
-                    <td>{fungus.Organismo?.Genero}</td>
-                    <td>{fungus.Organismo?.Reino}</td>
-                    <td>{fungus.Organismo?.Clase}</td>
-                    <td>{fungus.Organismo?.Especie}</td>
+                    <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
+                    <td className="name-cell"><i>{fungus.Organismo?.Especie || "Sin identificación"}</i></td>
+                    <td><i>{fungus.Organismo?.Genero}</i></td>
                     <td>{fungus.Organismo?.Familia}</td>
+                    <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
+                    <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
                     <td>
                       <button
                         className="details-button"

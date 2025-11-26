@@ -75,6 +75,15 @@
   font-weight: 600;
 }
 
+.fungus-table th {
+  text-align: left;
+  padding: 16px;
+  border-bottom: 2px solid #eaeaea;
+  color: #666;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
 .fungus-table th,
 .fungus-table td {
   text-align: left;
@@ -83,8 +92,20 @@
   font-size: 0.95rem;
 }
 
+.fungus-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+  vertical-align: middle;
+}
+
+.code-cell {
+  font-family: 'Roboto Mono', monospace;
+  color: #2c3e50;
+}
+
 .name-cell {
-  color: #4d704d;
+  color: #2e7d32; /* Greenish for species name */
   font-weight: 500;
 }
 

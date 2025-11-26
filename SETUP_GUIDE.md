@@ -9,6 +9,7 @@ Asegúrate de tener instalado lo siguiente:
 1.  **Node.js** (Versión 18 o superior recomendada)
 2.  **Docker Desktop** (o Docker Engine) corriendo.
 3.  **Git**
+4.  **Prisma** (El proyecto utiliza la versión **5.x**. Se instalará automáticamente con `npm install`, pero tenlo en cuenta si tienes una versión global diferente).
 
 ---
 

@@ -54,12 +54,12 @@ const FungusList = () => {
         </div>
 
         <p className="search-label">
-          Buscar por nombre, clase, ubicación, familia, o cualquier atributo. (puedes separar varios términos con punto y coma ";")
+          Buscar por código heredado, nombre, ubicación, familia, o cualquier atributo. (puedes separar varios términos con punto y coma ";")
         </p>
         <div className="search-bar">
           <input
             type="text"
-            placeholder="Ej: Pleurotus ostreatus; Agaricomycetes; Alajuela; Agaricaceae"
+            placeholder="Ej: BD-2022523226; Agaricales; Cartago"
             className="search-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}

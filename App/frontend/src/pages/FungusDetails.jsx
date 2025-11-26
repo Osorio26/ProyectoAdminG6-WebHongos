@@ -67,6 +67,7 @@ const FungusDetails = () => {
   ];
 
   const AISLAMIENTO = [
+    { label: "Código Heredado", value: fungus.idHeredado },
     { label: "Medio de Cultivo", value: fungus.MedioCultivo },
     { label: "Fecha de Aislamiento", value: fungus.FechaAislamiento },
     { label: "Responsable", value: fungus.Colecta?.Colector }, // Asumiendo mismo responsable si no hay campo específico

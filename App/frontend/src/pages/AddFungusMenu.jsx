@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddFungus.css";
-import ReusableExitButtom from "../components/ReusableExitButtom";
 
 const AddFungusMenu = () => {
   const navigate = useNavigate();
@@ -14,12 +13,12 @@ const AddFungusMenu = () => {
     },
     {
       title: "Nuevo Aislamiento",
-      description: "Registrar un aislamiento.",
+      description: "Registrar un aislamiento a partir de una colecta existente o nueva.",
       path: "/add-aislamiento",
     },
     {
       title: "Registrar Hongo",
-      description: "Clasificación taxonómica e identificación.",
+      description: "Clasificación taxonómica e identificación de un aislamiento.",
       path: "/add-hongo",
     },
     {
@@ -35,19 +34,23 @@ const AddFungusMenu = () => {
   ];
 
   return (
-    <div className="addfungus-container">
-
-      <div className="header-section" style={{ justifyContent: "center" }}>
-       <div>
-          <ReusableExitButtom/>
+    <div className="add-fungus-container">
+      {/* HEADER */}
+      <div className="details-header-area">
+        <div className="header-row">
+          <div className="header-left">
+            <button className="back-icon-button" onClick={() => navigate(-1)} title="Volver">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19L5 12L12 5"/></svg>
+            </button>
+            <div className="header-info">
+              <h1>Gestión de Hongos</h1>
+              <p className="subtitle">Selecciona el tipo de registro que deseas crear</p>
+            </div>
+          </div>
         </div>
-        <h1 className="menu-title">Gestión de Hongos</h1>
       </div>
 
-      <p className="menu-subtitle">
-        Selecciona el tipo de registro que deseas crear o actualizar.
-      </p>
-
+      {/* MENU GRID */}
       <div className="menu-grid">
         {menuItems.map((item) => (
           <button

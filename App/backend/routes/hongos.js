@@ -97,6 +97,303 @@ router.get("/:code", async (req, res) => {
 	}
 });
 
+// ==========================================
+// CREACIÓN DE REGISTROS (NUEVOS ENDPOINTS)
+// ==========================================
+
+// 1. Crear Colecta (con Sitio, Coordenadas, Planta opcional)
+router.post("/colecta", async (req, res) => {
+	try {
+		const data = req.body;
+		
+		// Crear Coordenadas si existen
+		let idCoordenadas = null;
+		if (data.coordenadas && (data.coordenadas.latitud || data.coordenadas.longitud)) {
+			const coords = await prisma.coordenadas.create({
+				data: {
+					Latitud: parseFloat(data.coordenadas.latitud),
+					Longitud: parseFloat(data.coordenadas.longitud),
+					Altitud: parseInt(data.coordenadas.altitud) || null
+				}
+			});
+			idCoordenadas = coords.id;
+		}
+
+		// Crear Sitio si existe
+		let idSitio = null;
+		if (data.sitio && data.sitio.nombre) {
+			const sitio = await prisma.sitios.create({
+				data: {
+					Nombre: data.sitio.nombre,
+					EsAreaProtegida: data.sitio.esAreaProtegida,
+					NombreAreaProtegida: data.sitio.nombreAreaProtegida,
+					ReferenciasAdicionales: data.sitio.referenciasAdicionales
+				}
+			});
+			idSitio = sitio.id;
+		}
+
+		// Crear Planta si existe
+		let idPlanta = null;
+		if (data.organismo && data.organismo.reino) { // Asumiendo que si hay reino, hay planta
+			const planta = await prisma.organismos.create({
+				data: {
+					Tipo: "Planta",
+					Reino: data.organismo.reino,
+					Filo: data.organismo.filo,
+					Clase: data.organismo.clase,
+					Orden: data.organismo.orden,
+					Familia: data.organismo.familia,
+					Genero: data.organismo.genero,
+					Especie: data.organismo.especie
+				}
+			});
+			idPlanta = planta.id;
+		}
+
+		// Crear Colecta
+		const colecta = await prisma.colectas.create({
+			data: {
+				idHeredado: data.codigoColecta,
+				Colector: data.colector,
+				Fecha: data.fechaColecta ? new Date(data.fechaColecta) : null,
+				Temperatura: parseFloat(data.temperatura) || null,
+				Humedad: parseFloat(data.humedad) || null,
+				pH: parseFloat(data.ph) || null,
+				TieneCoordenadas: !!idCoordenadas,
+				idCoordenadas: idCoordenadas,
+				idSitio: idSitio,
+				ContienePlanta: !!idPlanta,
+				idPlanta: idPlanta
+			}
+		});
+
+		res.status(201).json(colecta);
+	} catch (error) {
+		console.error("Error creating colecta:", error);
+		res.status(500).json({ message: "Error creating colecta", error: error.message });
+	}
+});
+
+// 2. Crear Aislamiento (Vinculado a Colecta existente o nueva)
+router.post("/aislamiento", async (req, res) => {
+	try {
+		const data = req.body;
+		let idColecta = data.idColectaExistente;
+
+		// Si es nueva colecta, crearla primero (lógica simplificada, idealmente reutilizar función)
+		if (data.isNewColecta) {
+			// ... Repetir lógica de creación de colecta o llamar a servicio interno ...
+			// Por brevedad, asumimos que el frontend llama a /colecta primero o implementamos aquí:
+			
+			// (Implementación inline rápida para nueva colecta)
+			let idCoordenadas = null;
+			if (data.coordenadas && (data.coordenadas.latitud || data.coordenadas.longitud)) {
+				const coords = await prisma.coordenadas.create({
+					data: {
+						Latitud: parseFloat(data.coordenadas.latitud),
+						Longitud: parseFloat(data.coordenadas.longitud),
+						Altitud: parseInt(data.coordenadas.altitud) || null
+					}
+				});
+				idCoordenadas = coords.id;
+			}
+			let idSitio = null;
+			if (data.sitio && data.sitio.nombre) {
+				const sitio = await prisma.sitios.create({
+					data: {
+						Nombre: data.sitio.nombre,
+						EsAreaProtegida: data.sitio.esAreaProtegida,
+						NombreAreaProtegida: data.sitio.nombreAreaProtegida,
+						ReferenciasAdicionales: data.sitio.referenciasAdicionales
+					}
+				});
+				idSitio = sitio.id;
+			}
+			let idPlanta = null;
+			if (data.organismo && data.organismo.reino) {
+				const planta = await prisma.organismos.create({
+					data: {
+						Tipo: "Planta",
+						Reino: data.organismo.reino,
+						Filo: data.organismo.filo,
+						Clase: data.organismo.clase,
+						Orden: data.organismo.orden,
+						Familia: data.organismo.familia,
+						Genero: data.organismo.genero,
+						Especie: data.organismo.especie
+					}
+				});
+				idPlanta = planta.id;
+			}
+
+			const nuevaColecta = await prisma.colectas.create({
+				data: {
+					idHeredado: data.codigoColecta,
+					Colector: data.colector,
+					Fecha: data.fechaColecta ? new Date(data.fechaColecta) : null,
+					idSitio, idCoordenadas, idPlanta,
+					TieneCoordenadas: !!idCoordenadas,
+					ContienePlanta: !!idPlanta
+				}
+			});
+			idColecta = nuevaColecta.id;
+		}
+
+		// Crear Aislamiento
+		const aislamiento = await prisma.aislamientos.create({
+			data: {
+				idHeredado: data.idHeredado,
+				AisladoDePlanta: data.aisladoDePlanta,
+				ParteDePlanta: data.parteDePlanta,
+				FechaAislamiento: data.fechaAislamiento ? new Date(data.fechaAislamiento) : null,
+				FechaSalida: data.fechaSalida ? new Date(data.fechaSalida) : null,
+				IdAnalisisMolecular: data.idAnalisisMolecular,
+				MedioCultivo: data.medioCultivo,
+				MetodoSiembra: data.metodoSiembra,
+				Estado: data.estado,
+				Comentarios: data.comentarios,
+				CantidadExistencias: parseInt(data.cantidadExistencias) || 0,
+				EstaEnColeccion: data.enColeccion,
+				idColecta: idColecta
+			}
+		});
+
+		res.status(201).json(aislamiento);
+	} catch (error) {
+		console.error("Error creating aislamiento:", error);
+		res.status(500).json({ message: "Error creating aislamiento", error: error.message });
+	}
+});
+
+// 3. Registrar Hongo (Organismo + Hongo + Marcadores)
+router.post("/hongo", async (req, res) => {
+	try {
+		const data = req.body;
+
+		// Crear Organismo
+		const organismo = await prisma.organismos.create({
+			data: {
+				Tipo: "Hongo",
+				Reino: data.reino,
+				Filo: data.filo,
+				Clase: data.clase,
+				Orden: data.orden,
+				Familia: data.familia,
+				Genero: data.genero,
+				Especie: data.especie
+			}
+		});
+
+		// Crear Hongo (Detalles)
+		await prisma.hongos.create({
+			data: {
+				id: organismo.id, // Comparten ID
+				MetodoIdentificacion: data.metodoIdentificacion,
+				CodigoAccesoGenBank: data.codigoAccesoGenBank,
+				IdentificadorResponsable: data.responsableIdentificacion
+			}
+		});
+
+		// Crear Marcador si existe
+		if (data.tieneMarcadores && data.marcador && data.marcador.tipoMarcador) {
+			await prisma.marcadores.create({
+				data: {
+					idHongo: organismo.id,
+					Tipo: data.marcador.tipoMarcador,
+					Secuencia: data.marcador.secuenciaTexto
+				}
+			});
+		}
+
+		// Vincular al Aislamiento (si se proporcionó ID)
+		if (data.idRelacionado) {
+			// Buscar aislamiento por idHeredado (que es lo que usa el usuario)
+			const aislamiento = await prisma.aislamientos.findFirst({
+				where: { idHeredado: data.idRelacionado }
+			});
+			
+			if (aislamiento) {
+				await prisma.aislamientos.update({
+					where: { id: aislamiento.id },
+					data: { idOrganismo: organismo.id }
+				});
+			}
+		}
+
+		res.status(201).json(organismo);
+	} catch (error) {
+		console.error("Error creating hongo:", error);
+		res.status(500).json({ message: "Error creating hongo", error: error.message });
+	}
+});
+
+// 4. Agregar Morfología
+router.post("/morfologia", async (req, res) => {
+	try {
+		const data = req.body;
+		
+		// Buscar aislamiento por idHeredado
+		const aislamiento = await prisma.aislamientos.findFirst({
+			where: { idHeredado: data.idRelacionado }
+		});
+
+		if (!aislamiento) {
+			return res.status(404).json({ message: "Aislamiento no encontrado" });
+		}
+
+		const morfologia = await prisma.morfologias.create({
+			data: {
+				idAislamiento: aislamiento.id,
+				Forma: data.forma,
+				FormaBorde: data.formaBorde,
+				ColorAnverso: data.colorAnverso,
+				ColorReverso: data.colorReverso,
+				ColorBorde: data.colorBorde,
+				TieneMicelioAereo: data.tieneMicelioAereo,
+				DensidadMicelioAereo: data.densidadMicelioAereo,
+				TipoCrecimiento: data.tipoCrecimiento,
+				TipoHifa: data.tipoHifa,
+				TieneSecreciones: data.tieneSecreciones,
+				Observaciones: data.observaciones
+			}
+		});
+
+		res.status(201).json(morfologia);
+	} catch (error) {
+		console.error("Error creating morfologia:", error);
+		res.status(500).json({ message: "Error creating morfologia", error: error.message });
+	}
+});
+
+// 5. Agregar Ensayo Biológico
+router.post("/ensayo", async (req, res) => {
+	try {
+		const data = req.body;
+
+		const aislamiento = await prisma.aislamientos.findFirst({
+			where: { idHeredado: data.idRelacionado }
+		});
+
+		if (!aislamiento) {
+			return res.status(404).json({ message: "Aislamiento no encontrado" });
+		}
+
+		const ensayo = await prisma.ensayosBiologicos.create({
+			data: {
+				idAislamiento: aislamiento.id,
+				Tipo: data.tipoEnsayo,
+				Resultado: data.resultadoEnsayo
+			}
+		});
+
+		res.status(201).json(ensayo);
+	} catch (error) {
+		console.error("Error creating ensayo:", error);
+		res.status(500).json({ message: "Error creating ensayo", error: error.message });
+	}
+});
+
 router.post("/", (req, res) => {
 	try {
 		const raw = fs.readFileSync(dataPath, "utf-8");

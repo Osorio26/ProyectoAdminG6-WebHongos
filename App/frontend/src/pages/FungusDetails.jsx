@@ -116,6 +116,15 @@ const FungusDetails = () => {
 
   return (
     <div className="fungus-details-container">
+      <div className="details-header-area">
+        <button className="edit-back-button pill" onClick={() => navigate(-1)}>
+          <span className="arrow">←</span>
+          <span>Regresar</span>
+        </button>
+        <h1>{fungus.Organismo?.Especie || "Sin identificación"}</h1>
+        <p className="subtitle">Detalles de la muestra: {fungus.idHeredado}</p>
+      </div>
+
       <div className="fungus-details-window">
         <div className="sidebar-nav">
           <h3 className="sidebar-title">Secciones</h3>
@@ -131,15 +140,6 @@ const FungusDetails = () => {
         </div>
         
         <div className="details-content">
-          <button className="edit-back-button pill" onClick={() => navigate(-1)}>
-            <span className="arrow">←</span>
-            <span>Regresar</span>
-          </button>
-
-
-          <h1>{fungus.Organismo?.Especie || "Sin identificación"}</h1>
-          <p className="subtitle">Detalles de la muestra: {fungus.idHeredado}</p>
-
           <div className="tab-content">
             <h2 className="section-title">{TABS[activeTab]}</h2>
             {SECTIONS[activeTab].map((item, i) => (

@@ -14,11 +14,57 @@
   min-height: 100vh;
   width: 100%;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 60px 0;
+  flex-direction: column; /* Cambiado a columna para apilar header y window */
+  align-items: center; /* Centrar horizontalmente */
+  padding: 40px 0;
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
+}
+
+.details-header-area {
+  width: 90%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.details-header-area h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 15px 0 5px 0;
+}
+
+.details-header-area .subtitle {
+  font-size: 1rem;
+  color: var(--color-text-medium);
+  margin: 0;
+}
+
+.edit-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.edit-back-button:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.edit-back-button .arrow {
+  font-size: 1.1rem;
+  line-height: 1;
 }
 
 .fungus-details-window {

@@ -31,7 +31,38 @@
 .header-row {
   display: flex;
   align-items: center;
-  gap: 16px; /* Reduced gap slightly */
+  justify-content: space-between; /* Separa los grupos a los extremos */
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-edit-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-medium);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.header-edit-button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: #f0f9f0; /* Verde muy suave */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
 .back-icon-button {

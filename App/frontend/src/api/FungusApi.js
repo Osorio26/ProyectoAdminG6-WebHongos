@@ -98,3 +98,27 @@ export async function updateFungus(code, updates) {
 	return res.json();
 }
 
+export async function getColectas() {
+	const res = await fetch(`${API_BASE_URL}/hongos/list/colectas`);
+	if (!res.ok) throw new Error("Error fetching colectas");
+	return res.json();
+}
+
+export async function getSitios() {
+	const res = await fetch(`${API_BASE_URL}/hongos/list/sitios`);
+	if (!res.ok) throw new Error("Error fetching sitios");
+	return res.json();
+}
+
+export async function getPlantas() {
+	const res = await fetch(`${API_BASE_URL}/hongos/list/plantas`);
+	if (!res.ok) throw new Error("Error fetching plantas");
+	return res.json();
+}
+
+export async function getAislamientos() {
+	const res = await fetch(`${API_BASE_URL}/hongos/list/aislamientos`);
+	if (!res.ok) throw new Error("Error fetching aislamientos");
+	return res.json();
+}
+

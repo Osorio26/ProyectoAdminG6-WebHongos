@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./AddFungus.css";
 import { createHongo } from "../api/FungusApi";
 
@@ -7,6 +7,7 @@ const TABS = ["Taxonomía", "Identificación", "Marcadores", "Vinculación"];
 
 const AddHongoPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -35,6 +36,19 @@ const AddHongoPage = () => {
       secuenciaTexto: ""
     }
   });
+
+  // Detectar si venimos de crear un aislamiento
+  useEffect(() => {
+    if (location.state?.prefilledAislamiento) {
+      setFormData(prev => ({
+        ...prev,
+        idAislamiento: location.state.prefilledAislamiento
+      }));
+      // Cambiar a la pestaña de vinculación para mostrar que ya está seleccionada (opcional)
+      // setActiveTab(3); 
+      alert("Se ha pre-seleccionado el aislamiento recién creado (ID: " + location.state.prefilledAislamiento + "). Complete los datos taxonómicos.");
+    }
+  }, [location.state]);
 
   const updateNestedState = (obj, path, value) => {
     const newObj = JSON.parse(JSON.stringify(obj));
@@ -125,11 +139,11 @@ const AddHongoPage = () => {
             <div className="form-section">
               <div className="form-group">
                 <label>Reino</label>
-                <input type="text" name="reino" value={formData.reino} onChange={handleChange} disabled />
+                <input type="text" name="reino" value={formData.reino} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label>Filo</label>
-                <input type="text" name="filo" value={formData.filo} onChange={handleChange} placeholder="Ej: Ascomycota" />
+                <input type="text" name="filo" value={formData.filo} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label>Clase</label>
@@ -145,11 +159,11 @@ const AddHongoPage = () => {
               </div>
               <div className="form-group">
                 <label>Género *</label>
-                <input type="text" name="genero" value={formData.genero} onChange={handleChange} placeholder="Ej: Trichoderma" />
+                <input type="text" name="genero" value={formData.genero} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label>Especie</label>
-                <input type="text" name="especie" value={formData.especie} onChange={handleChange} placeholder="Ej: harzianum" />
+                <input type="text" name="especie" value={formData.especie} onChange={handleChange} />
               </div>
             </div>
           )}
@@ -161,8 +175,8 @@ const AddHongoPage = () => {
                 <input type="text" name="metodoIdentificacion" value={formData.metodoIdentificacion} onChange={handleChange} placeholder="Ej: Morfológico, Molecular" />
               </div>
               <div className="form-group">
-                <label>Código GenBank</label>
-                <input type="text" name="codigoAccesoGenBank" value={formData.codigoAccesoGenBank} onChange={handleChange} placeholder="Ej: KX123456" />
+                <label>Código Acceso GenBank</label>
+                <input type="text" name="codigoAccesoGenBank" value={formData.codigoAccesoGenBank} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label>Responsable Identificación</label>
@@ -184,11 +198,11 @@ const AddHongoPage = () => {
                 <div className="nested-form">
                   <div className="form-group">
                     <label>Tipo de Marcador</label>
-                    <input type="text" name="marcador.tipoMarcador" value={formData.marcador.tipoMarcador} onChange={handleChange} placeholder="Ej: ITS, LSU" />
+                    <input type="text" name="marcador.tipoMarcador" value={formData.marcador.tipoMarcador} onChange={handleChange} placeholder="Ej: ITS" />
                   </div>
                   <div className="form-group">
-                    <label>Secuencia</label>
-                    <textarea name="marcador.secuenciaTexto" value={formData.marcador.secuenciaTexto} onChange={handleChange} rows="5" placeholder="ATCG..." />
+                    <label>Secuencia (Texto)</label>
+                    <textarea name="marcador.secuenciaTexto" value={formData.marcador.secuenciaTexto} onChange={handleChange} rows="4" />
                   </div>
                 </div>
               )}
@@ -197,10 +211,16 @@ const AddHongoPage = () => {
 
           {activeTab === 3 && (
             <div className="form-section">
+              <p className="hint-text">Ingrese el código del aislamiento al que pertenece este hongo.</p>
               <div className="form-group">
-                <label>ID de Aislamiento *</label>
-                <input type="text" name="idAislamiento" value={formData.idAislamiento} onChange={handleChange} placeholder="Ingrese el ID numérico del aislamiento" />
-                <p className="hint-text">Debe ingresar el ID del aislamiento del cual proviene este hongo.</p>
+                <label>ID o Código de Aislamiento *</label>
+                <input 
+                  type="text" 
+                  name="idAislamiento" 
+                  value={formData.idAislamiento} 
+                  onChange={handleChange} 
+                  placeholder="Ej: AIS-2024-001"
+                />
               </div>
             </div>
           )}

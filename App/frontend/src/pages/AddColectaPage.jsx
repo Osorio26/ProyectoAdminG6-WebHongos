@@ -57,9 +57,22 @@ const AddColectaPage = () => {
     
     setLoading(true);
     try {
-      await createColecta(formData);
-      alert("Colecta creada exitosamente");
-      navigate("/inventario");
+      const response = await createColecta(formData);
+      
+      // Preguntar si desea continuar al siguiente paso
+      const continuar = window.confirm(
+        "Colecta creada exitosamente.\n\n¿Desea registrar un Aislamiento para esta colecta ahora?"
+      );
+
+      if (continuar) {
+        // Navegar a AddAislamiento pasando el ID de la colecta creada
+        navigate("/add-aislamiento", { 
+          state: { prefilledColecta: response.id } 
+        });
+      } else {
+        navigate("/inventario");
+      }
+
     } catch (error) {
       console.error(error);
       alert("Error al crear la colecta");
@@ -144,7 +157,7 @@ const AddColectaPage = () => {
                 <label>Nombre del Sitio</label>
                 <input type="text" name="sitio.nombre" value={formData.sitio.nombre} onChange={handleChange} placeholder="Ej: Sendero Principal" />
               </div>
-              <div className="form-group">
+              <div className="form-group checkbox-row">
                 <label>
                   <input type="checkbox" name="sitio.esAreaProtegida" checked={formData.sitio.esAreaProtegida} onChange={handleChange} />
                   {' '}¿Es Área Protegida?

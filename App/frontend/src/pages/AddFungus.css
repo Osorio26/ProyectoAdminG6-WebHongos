@@ -216,8 +216,18 @@ textarea {
   box-sizing: border-box;
 }
 
+.form-group input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px;
+  display: inline-block;
+  vertical-align: middle;
+  height: auto;
+  box-shadow: none;
+}
+
 .checkbox-row {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 12px;
 }
@@ -477,6 +487,31 @@ h2 {
   color: var(--color-text-medium);
   margin: 0;
   line-height: 1.5;
+}
+
+/* --- Menu Sections --- */
+.menu-sections {
+  width: 90%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.menu-section h2 {
+  font-size: 1.4rem;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 10px;
+}
+
+.section-hint {
+  font-size: 0.9rem;
+  color: var(--color-text-medium);
+  margin-bottom: 20px;
+  font-style: italic;
 }
 
 /* === ESTILOS UNIFICADOS (Basados en EditFungus/FungusDetails) === */

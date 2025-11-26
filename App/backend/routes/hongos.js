@@ -525,14 +525,16 @@ router.put("/:code", async (req, res) => {
 			}
 		}
 
-		// 4. Actualizar Aislamiento (Campos propios)
+		// 4. Actualizar Aislamiento (Campos propios y Relaciones)
 		await prisma.aislamientos.update({
 			where: { id: existing.id },
 			data: {
 				MedioCultivo: data.MedioCultivo,
 				FechaAislamiento: data.FechaAislamiento ? new Date(data.FechaAislamiento) : undefined,
 				CantidadExistencias: data.CantidadExistencias ? parseInt(data.CantidadExistencias) : undefined,
-				Comentarios: data.Comentarios
+				Comentarios: data.Comentarios,
+				// Permitir cambiar la Colecta asociada si se envía un ID
+				idColecta: data.idColecta ? parseInt(data.idColecta) : undefined
 			}
 		});
 
@@ -566,6 +568,55 @@ router.put("/:code", async (req, res) => {
 	} catch (err) {
 		console.error("Error updating fungus in DB:", err);
 		res.status(500).json({ message: "Error updating data in database" });
+	}
+});
+
+// ==========================================
+// LISTAS PARA DROPDOWNS (HELPER ENDPOINTS)
+// ==========================================
+
+router.get("/list/colectas", async (req, res) => {
+	try {
+		const colectas = await prisma.colectas.findMany({
+			select: { id: true, idHeredado: true, Colector: true, Fecha: true }
+		});
+		res.json(colectas);
+	} catch (error) {
+		res.status(500).json({ message: "Error fetching colectas" });
+	}
+});
+
+router.get("/list/sitios", async (req, res) => {
+	try {
+		const sitios = await prisma.sitios.findMany({
+			select: { id: true, Nombre: true, NombreAreaProtegida: true }
+		});
+		res.json(sitios);
+	} catch (error) {
+		res.status(500).json({ message: "Error fetching sitios" });
+	}
+});
+
+router.get("/list/plantas", async (req, res) => {
+	try {
+		const plantas = await prisma.organismos.findMany({
+			where: { Tipo: "Planta" },
+			select: { id: true, Genero: true, Especie: true, Familia: true }
+		});
+		res.json(plantas);
+	} catch (error) {
+		res.status(500).json({ message: "Error fetching plantas" });
+	}
+});
+
+router.get("/list/aislamientos", async (req, res) => {
+	try {
+		const aislamientos = await prisma.aislamientos.findMany({
+			select: { id: true, idHeredado: true, MedioCultivo: true, FechaAislamiento: true }
+		});
+		res.json(aislamientos);
+	} catch (error) {
+		res.status(500).json({ message: "Error fetching aislamientos" });
 	}
 });
 

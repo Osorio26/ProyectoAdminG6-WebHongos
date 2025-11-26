@@ -5,34 +5,6 @@ import "./AddFungus.css";
 const AddFungusMenu = () => {
   const navigate = useNavigate();
 
-  const menuItems = [
-    {
-      title: "Nueva Colecta",
-      description: "Registrar solamente datos de campo/colecta.",
-      path: "/add-colecta",
-    },
-    {
-      title: "Nuevo Aislamiento",
-      description: "Registrar un aislamiento a partir de una colecta existente o nueva.",
-      path: "/add-aislamiento",
-    },
-    {
-      title: "Registrar Hongo",
-      description: "Clasificación taxonómica e identificación de un aislamiento.",
-      path: "/add-hongo",
-    },
-    {
-      title: "Agregar Morfología",
-      description: "Añadir descripción macro y microscópica a un aislamiento.",
-      path: "/add-morfologia",
-    },
-    {
-      title: "Ensayo Biológico",
-      description: "Registrar resultados de ensayos biológicos.",
-      path: "/add-ensayo",
-    },
-  ];
-
   return (
     <div className="add-fungus-container">
       {/* HEADER */}
@@ -50,18 +22,51 @@ const AddFungusMenu = () => {
         </div>
       </div>
 
-      {/* MENU GRID */}
-      <div className="menu-grid">
-        {menuItems.map((item) => (
-          <button
-            key={item.path}
-            className="menu-item"
-            onClick={() => navigate(item.path)}
-          >
-            <h3 className="menu-item-title">{item.title}</h3>
-            <p className="menu-item-description">{item.description}</p>
-          </button>
-        ))}
+      <div className="menu-sections">
+        
+        {/* FASE 1: CAMPO */}
+        <div className="menu-section">
+          <h2>1. Fase de Campo</h2>
+          <div className="menu-grid">
+            <button className="menu-item" onClick={() => navigate("/add-colecta")}>
+              <h3 className="menu-item-title">Nueva Colecta</h3>
+              <p className="menu-item-description">Registrar datos de campo, ubicación y planta asociada.</p>
+            </button>
+          </div>
+        </div>
+
+        {/* FASE 2: LABORATORIO */}
+        <div className="menu-section">
+          <h2>2. Fase de Laboratorio</h2>
+          <p className="section-hint">Requiere haber registrado una Colecta previamente.</p>
+          <div className="menu-grid">
+            <button className="menu-item" onClick={() => navigate("/add-aislamiento")}>
+              <h3 className="menu-item-title">Nuevo Aislamiento</h3>
+              <p className="menu-item-description">Registrar aislamiento en medio de cultivo a partir de una colecta.</p>
+            </button>
+          </div>
+        </div>
+
+        {/* FASE 3: ANÁLISIS */}
+        <div className="menu-section">
+          <h2>3. Fase de Análisis e Identificación</h2>
+          <p className="section-hint">Requiere haber registrado un Aislamiento previamente.</p>
+          <div className="menu-grid">
+            <button className="menu-item" onClick={() => navigate("/add-hongo")}>
+              <h3 className="menu-item-title">Registrar Hongo</h3>
+              <p className="menu-item-description">Clasificación taxonómica e identificación molecular.</p>
+            </button>
+            <button className="menu-item" onClick={() => navigate("/add-morfologia")}>
+              <h3 className="menu-item-title">Agregar Morfología</h3>
+              <p className="menu-item-description">Descripción macro y microscópica.</p>
+            </button>
+            <button className="menu-item" onClick={() => navigate("/add-ensayo")}>
+              <h3 className="menu-item-title">Ensayo Biológico</h3>
+              <p className="menu-item-description">Resultados de pruebas de actividad biológica.</p>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );

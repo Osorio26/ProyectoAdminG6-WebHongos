@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./EditFungus.css";
-import { getFungusByCode, updateFungus } from "../api/FungusApi";
+import { getFungusByCode, updateFungus, getColectas } from "../api/FungusApi";
 
 const TABS = [
   "Clasificación Taxonómica",
@@ -21,14 +21,21 @@ const EditFungus = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
+  
+  // Listas para dropdowns
+  const [colectas, setColectas] = useState([]);
 
   useEffect(() => {
     (async () => {
       try {
-        const data = await getFungusByCode(code);
-        setFormData(data);
+        const [fungusData, colectasData] = await Promise.all([
+          getFungusByCode(code),
+          getColectas()
+        ]);
+        setFormData(fungusData);
+        setColectas(colectasData);
       } catch (error) {
-        console.error("Error loading fungus:", error);
+        console.error("Error loading data:", error);
       } finally {
         setLoading(false);
       }
@@ -37,13 +44,13 @@ const EditFungus = () => {
 
   // Helper para actualizar estado anidado
   const updateNestedState = (obj, path, value) => {
-    const newObj = JSON.parse(JSON.stringify(obj)); // Deep clone simple
-    const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.'); // Convertir [0] a .0
+    const newObj = JSON.parse(JSON.stringify(obj));
+    const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
     
     let current = newObj;
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
-      if (!current[key]) current[key] = {}; // Crear objeto si no existe
+      if (!current[key]) current[key] = {};
       current = current[key];
     }
     current[keys[keys.length - 1]] = value;
@@ -53,6 +60,24 @@ const EditFungus = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => updateNestedState(prev, name, value));
+  };
+
+  const handleSelectChange = (e, fieldKey) => {
+    const value = e.target.value;
+    
+    // Actualizar el valor (FK)
+    setFormData(prev => ({ ...prev, [fieldKey]: value }));
+
+    // Lógica específica para actualizar la vista previa si cambiamos la Colecta
+    if (fieldKey === 'idColecta') {
+      const selectedColecta = colectas.find(c => c.id === parseInt(value));
+      if (selectedColecta) {
+        setFormData(prev => ({
+          ...prev,
+          Colecta: { ...prev.Colecta, ...selectedColecta }
+        }));
+      }
+    }
   };
 
   const handleSave = async () => {
@@ -65,7 +90,6 @@ const EditFungus = () => {
     }
   };
 
-  // Helper para leer valor anidado de forma segura
   const getNestedValue = (obj, path) => {
     if (!obj) return "";
     const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
@@ -79,6 +103,7 @@ const EditFungus = () => {
 
   if (loading) return <p>Cargando...</p>;
 
+  // CONFIGURACIÓN DE CAMPOS
   const TAXONOMIA = [
     { label: "Reino", key: "Organismo.Reino" },
     { label: "Filo", key: "Organismo.Filo" },
@@ -96,17 +121,27 @@ const EditFungus = () => {
   ];
 
   const COLECTA = [
-    { label: "Código de Colecta", key: "Colecta.idHeredado" },
-    { label: "Fecha (YYYY-MM-DD)", key: "Colecta.Fecha" }, // Formato fecha simple
+    { 
+      label: "Código de Colecta (Vincular)", 
+      key: "idColecta", 
+      type: "select", 
+      options: colectas,
+      optionLabel: (c) => `${c.idHeredado} - ${c.Colector} (${c.Fecha ? c.Fecha.split('T')[0] : 'S/F'})`,
+      optionValue: "id"
+    },
+    // Campos informativos (se actualizan al cambiar el select)
+    { label: "Fecha (YYYY-MM-DD)", key: "Colecta.Fecha", readOnly: true },
+    { label: "Colector", key: "Colecta.Colector", readOnly: true },
+    // Campos editables de la colecta (si se quiere editar la colecta en sí)
+    // Nota: Editar estos campos modificará la colecta para TODOS los aislamientos vinculados
     { label: "Ubicación Geográfica", key: "Colecta.Sitio.Nombre" },
-    { label: "Colector", key: "Colecta.Colector" },
     { label: "Observaciones Sitio", key: "Colecta.Sitio.ReferenciasAdicionales" },
   ];
 
   const AISLAMIENTO = [
     { label: "Medio de Cultivo", key: "MedioCultivo" },
     { label: "Fecha de Aislamiento", key: "FechaAislamiento" },
-    { label: "Responsable (Colector)", key: "Colecta.Colector" }, // Reutiliza campo
+    { label: "Responsable (Colector)", key: "Colecta.Colector", readOnly: true },
     { label: "Condiciones (Temp)", key: "Colecta.Temperatura" },
   ];
 
@@ -206,17 +241,37 @@ const EditFungus = () => {
                 <span className="edit-label">{item.label}</span>
                 
                 <div className="edit-input-wrapper">
-                  <input
-                    type="text"
-                    name={item.key}
-                    value={getNestedValue(formData, item.key) || ""}
-                    placeholder="Campo vacío"
-                    className="edit-input-field"
-                    onChange={handleChange}
-                  />
-                  <span className="edit-icon" title="Campo editable">
-                    &#x270F; 
-                  </span>
+                  {item.type === "select" ? (
+                    <select
+                      name={item.key}
+                      value={formData[item.key] || ""}
+                      className="edit-input-field"
+                      onChange={(e) => handleSelectChange(e, item.key)}
+                    >
+                      <option value="">Seleccionar...</option>
+                      {item.options && item.options.map(opt => (
+                        <option key={opt[item.optionValue]} value={opt[item.optionValue]}>
+                          {item.optionLabel(opt)}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      name={item.key}
+                      value={getNestedValue(formData, item.key) || ""}
+                      placeholder={item.readOnly ? "Solo lectura" : "Campo vacío"}
+                      className={`edit-input-field ${item.readOnly ? 'readonly' : ''}`}
+                      onChange={handleChange}
+                      readOnly={item.readOnly}
+                    />
+                  )}
+                  
+                  {!item.readOnly && (
+                    <span className="edit-icon" title="Campo editable">
+                      &#x270F; 
+                    </span>
+                  )}
                 </div>
               </div>
             ))}

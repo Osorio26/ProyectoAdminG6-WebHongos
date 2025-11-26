@@ -117,20 +117,17 @@ const FungusDetails = () => {
   return (
     <div className="fungus-details-container">
       <div className="fungus-details-window">
-        <div className="tabs-wrapper"> 
-          <span className="scroll-indicator left-indicator"></span> {/* Indicador Izquierdo */}
-          <div className="tabs-container">
-            {TABS.map((tab, index) => (
-              <button
-                key={index}
-                className={`tab-button ${activeTab === index ? "active" : ""}`}
-                onClick={() => setActiveTab(index)}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-          <span className="scroll-indicator right-indicator"></span> {/* Indicador Derecho */}
+        <div className="sidebar-nav">
+          <h3 className="sidebar-title">Secciones</h3>
+          {TABS.map((tab, index) => (
+            <button
+              key={index}
+              className={`sidebar-button ${activeTab === index ? "active" : ""}`}
+              onClick={() => setActiveTab(index)}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
         
         <div className="details-content">
@@ -140,10 +137,11 @@ const FungusDetails = () => {
           </button>
 
 
-          <h1>{fungus.name}</h1>
-          <p className="subtitle">Detalles de la muestra</p>
+          <h1>{fungus.Organismo?.Especie || "Sin identificación"}</h1>
+          <p className="subtitle">Detalles de la muestra: {fungus.idHeredado}</p>
 
           <div className="tab-content">
+            <h2 className="section-title">{TABS[activeTab]}</h2>
             {SECTIONS[activeTab].map((item, i) => (
               <div className="detail-row" key={i}>
                 <span className="label">{item.label}</span>
@@ -155,7 +153,7 @@ const FungusDetails = () => {
           <div className="button-container">
             <button
               className="edit-button"
-              onClick={() => navigate(`/editar/${fungus.code}`)}
+              onClick={() => navigate(`/editar/${fungus.idHeredado}`)}
             >
               Editar Muestra
             </button>

@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column; /* Cambiado a columna para apilar header y window */
   align-items: center; /* Centrar horizontalmente */
-  padding: 40px 0;
+  padding: 0 0 40px;
   box-sizing: border-box;
   font-family: "Inter", sans-serif;
 }
@@ -129,7 +129,7 @@
 
 .details-content {
   flex: 1; /* Toma el resto del espacio */
-  padding: 50px 60px; 
+  padding: 20px 60px 50px; 
   box-sizing: border-box;
   margin: 0;
   overflow-y: auto; /* Si el contenido es muy largo */
@@ -233,7 +233,7 @@ h1 {
 /* --- Contenido de la Pestaña --- */
 .tab-content {
   background: var(--color-surface-white);
-  padding: 25px 0;
+  padding: 0 0 25px;
   border-radius: 0;
   display: flex;
   flex-direction: column;

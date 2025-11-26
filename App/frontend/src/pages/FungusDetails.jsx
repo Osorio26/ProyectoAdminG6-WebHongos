@@ -117,12 +117,22 @@ const FungusDetails = () => {
   return (
     <div className="fungus-details-container">
       <div className="details-header-area">
-        <button className="edit-back-button pill" onClick={() => navigate(-1)}>
-          <span className="arrow">←</span>
-          <span>Regresar</span>
-        </button>
-        <h1>{fungus.Organismo?.Especie || "Sin identificación"}</h1>
-        <p className="subtitle">Detalles de la muestra: {fungus.idHeredado}</p>
+        <div className="header-row">
+          <button 
+            className="back-icon-button" 
+            onClick={() => navigate(-1)}
+            title="Regresar al inventario"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 12H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <div className="header-info">
+            <h1>{fungus.Organismo?.Especie || "Sin identificación"}</h1>
+            <p className="subtitle">Detalles de la muestra: <strong>{fungus.idHeredado}</strong></p>
+          </div>
+        </div>
       </div>
 
       <div className="fungus-details-window">

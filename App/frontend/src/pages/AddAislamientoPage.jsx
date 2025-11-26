@@ -10,7 +10,6 @@ const AddAislamientoPage = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [isNewColecta, setIsNewColecta] = useState(false);
 
   const [formData, setFormData] = useState({
     // Aislamiento
@@ -28,18 +27,6 @@ const AddAislamientoPage = () => {
 
     // Colecta
     idColectaExistente: "", // ID numérico si se conoce, o código
-    
-    // Nueva Colecta (si isNewColecta es true)
-    codigoColecta: "",
-    fechaColecta: new Date().toISOString().split("T")[0],
-    colector: "",
-    
-    // Ubicación (Nueva Colecta)
-    coordenadas: { latitud: "", longitud: "", altitud: "" },
-    sitio: { nombre: "", esAreaProtegida: false, nombreAreaProtegida: "", referenciasAdicionales: "" },
-    
-    // Planta (Nueva Colecta)
-    organismo: { reino: "", filo: "", clase: "", orden: "", familia: "", genero: "", especie: "" }
   });
 
   // Detectar si venimos de crear una colecta
@@ -85,7 +72,7 @@ const AddAislamientoPage = () => {
     
     setLoading(true);
     try {
-      const payload = { ...formData, isNewColecta };
+      const payload = { ...formData };
       const response = await createAislamiento(payload);
       
       // Preguntar si desea continuar al siguiente paso
@@ -192,58 +179,20 @@ const AddAislamientoPage = () => {
 
           {activeTab === 1 && (
             <div className="form-section">
-              <div className="toggle-label" onClick={() => setIsNewColecta(!isNewColecta)}>
-                <div className={`custom-checkbox ${isNewColecta ? 'checked' : ''}`}></div>
-                <span>{isNewColecta ? "Crear Nueva Colecta" : "Vincular a Colecta Existente"}</span>
-              </div>
               <p className="hint-text" style={{marginBottom: '20px'}}>
-                {isNewColecta 
-                  ? "Complete los datos para registrar una nueva colecta automáticamente." 
-                  : "Ingrese el ID o Código de una colecta ya registrada."}
+                Ingrese el ID o Código de una colecta ya registrada.
               </p>
 
-              {!isNewColecta ? (
-                <div className="form-group">
-                  <label>ID o Código de Colecta Existente</label>
-                  <input 
-                    type="text" 
-                    name="idColectaExistente" 
-                    value={formData.idColectaExistente} 
-                    onChange={handleChange} 
-                    placeholder="Ej: COL-2024-001 o ID numérico"
-                  />
-                </div>
-              ) : (
-                <div className="nested-form">
-                  <h4>Datos de la Nueva Colecta</h4>
-                  <div className="form-group">
-                    <label>Código de Colecta *</label>
-                    <input type="text" name="codigoColecta" value={formData.codigoColecta} onChange={handleChange} />
-                  </div>
-                  <div className="form-group">
-                    <label>Fecha</label>
-                    <input type="date" name="fechaColecta" value={formData.fechaColecta} onChange={handleChange} />
-                  </div>
-                  <div className="form-group">
-                    <label>Colector</label>
-                    <input type="text" name="colector" value={formData.colector} onChange={handleChange} />
-                  </div>
-                  
-                  <h4>Ubicación</h4>
-                  <div className="form-group">
-                    <label>Nombre del Sitio</label>
-                    <input type="text" name="sitio.nombre" value={formData.sitio.nombre} onChange={handleChange} />
-                  </div>
-                  <div className="form-group">
-                    <label>Latitud</label>
-                    <input type="number" name="coordenadas.latitud" value={formData.coordenadas.latitud} onChange={handleChange} />
-                  </div>
-                  <div className="form-group">
-                    <label>Longitud</label>
-                    <input type="number" name="coordenadas.longitud" value={formData.coordenadas.longitud} onChange={handleChange} />
-                  </div>
-                </div>
-              )}
+              <div className="form-group">
+                <label>ID o Código de Colecta Existente</label>
+                <input 
+                  type="text" 
+                  name="idColectaExistente" 
+                  value={formData.idColectaExistente} 
+                  onChange={handleChange} 
+                  placeholder="Ej: COL-2024-001 o ID numérico"
+                />
+              </div>
             </div>
           )}
         </div>

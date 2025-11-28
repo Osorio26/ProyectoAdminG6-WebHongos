@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef } from "react";
+import { toast } from "react-toastify";
 import { useDropzone } from "react-dropzone";
 import { createCategory } from "../../api/CategoryApi";
 import upload_file_image from "../../assets/upload_file_image.png";
 import FileFormatModal from "../fileFormatInfomodal/fileFormatModal.jsx";
+import "react-toastify/dist/ReactToastify.css";
 import "./categoryFileReader.css";
 
 const CategoryFileReader = ({ onClose }) => {
@@ -18,7 +20,7 @@ const CategoryFileReader = ({ onClose }) => {
     if (!file) return;
 
     if (file.name !== expected_file_title) {
-      alert(`El archivo debe llamarse "${expected_file_title}".`);
+      toast.error(`El archivo debe llamarse "${expected_file_title}".`);
       return;
     }
 
@@ -56,9 +58,8 @@ const CategoryFileReader = ({ onClose }) => {
         await createCategory(cat);
       }
 
-      alert("Archivo leído y categorías guardadas correctamente!");
-
-
+      toast.success("Archivo leído y categorías guardadas correctamente!");
+      
       // Cerrar el modal después de procesar el archivo
       if (onClose) onClose();
     };
@@ -90,7 +91,6 @@ const CategoryFileReader = ({ onClose }) => {
 
   return (
     <div className="w-full flex flex-col items-center justify-center text-center gap-4">
-
       <div {...getRootProps()} className="dropzone">
         
         <input
@@ -118,14 +118,14 @@ const CategoryFileReader = ({ onClose }) => {
         )}
       </div>
 
-      {!isDragActive && (
-        <button
-          className="open-second-modal-button mt-8"
-          onClick={() => setShowSecondModal(true)}
-        >
-          Ayuda
-        </button>
-      )}
+   
+      <button
+        className={`open-second-modal-button transition-opacity`}
+        onClick={() => setShowSecondModal(true)}
+      >
+        Ayuda
+      </button>
+
 
       {showSecondModal && (
         <FileFormatModal onClose={() => setShowSecondModal(false)} />

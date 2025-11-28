@@ -4,6 +4,8 @@ import logo from "../assets/logo.png";
 import icono_upload from "../assets/upload_icon.svg";
 import { Link } from "react-router-dom";
 import FileUploadModal from "./fileUploadModal/fileUploadModal";
+import { ToastContainer } from "react-toastify";
+
 
 const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,6 +20,7 @@ const Header = () => {
 
   return (
     <header className="header">
+      <ToastContainer />
       <Link to="/" className="header-link-wrapper">
         <div className="header-left">
           <img src={logo} alt="COCMI Logo" className="header-logo" />

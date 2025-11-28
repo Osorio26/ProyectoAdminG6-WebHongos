@@ -32,20 +32,28 @@
 }
 
 .open-second-modal-button {
-  font-family: "Inter", system-ui, sans-serif;
-  background-color: #f0f4f0;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 18px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  color: #2c2c2c;
-  transition: background-color 0.2s 
-    ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-self: center;
+    gap: 8px;
+    background-color: white;
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-medium);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .open-second-modal-button:hover {
-  background-color: #e0e8e0;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background-color: #f0f9f0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .dropzone {

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./AddFungus.css";
 import { createColecta } from "../api/FungusApi";
 
-const TABS = ["Datos Generales", "Ubicación", "Planta Asociada"];
+const TABS = ["Datos Generales", "Ubicación", "Huésped Asociado"];
 
 const AddColectaPage = () => {
   const navigate = useNavigate();
@@ -166,60 +166,60 @@ const AddColectaPage = () => {
               {formData.sitio.esAreaProtegida && (
                 <div className="form-group">
                   <label>Nombre Área Protegida</label>
-                  <input type="text" name="sitio.nombreAreaProtegida" value={formData.sitio.nombreAreaProtegida} onChange={handleChange} />
+                  <input type="text" name="sitio.nombreAreaProtegida" value={formData.sitio.nombreAreaProtegida} onChange={handleChange} placeholder="Ej: Reserva Biológica Alberto Manuel Brenes"/>
                 </div>
               )}
               <div className="form-group">
                 <label>Referencias Adicionales</label>
-                <textarea name="sitio.referenciasAdicionales" value={formData.sitio.referenciasAdicionales} onChange={handleChange} rows="3" />
+                <textarea name="sitio.referenciasAdicionales" value={formData.sitio.referenciasAdicionales} onChange={handleChange} rows="3" placeholder="Ej: Bosque húmedo premontano; 50 m al oeste del río..." />
               </div>
 
               <h3>Coordenadas</h3>
               <div className="form-group">
                 <label>Latitud</label>
-                <input type="number" step="any" name="coordenadas.latitud" value={formData.coordenadas.latitud} onChange={handleChange} />
+                <input type="number" step="any" name="coordenadas.latitud" value={formData.coordenadas.latitud} onChange={handleChange} placeholder="Ej: 10.852340"/>
               </div>
               <div className="form-group">
                 <label>Longitud</label>
-                <input type="number" step="any" name="coordenadas.longitud" value={formData.coordenadas.longitud} onChange={handleChange} />
+                <input type="number" step="any" name="coordenadas.longitud" value={formData.coordenadas.longitud} onChange={handleChange} placeholder="Ej: -85.300125"/>
               </div>
               <div className="form-group">
                 <label>Altitud (msnm)</label>
-                <input type="number" name="coordenadas.altitud" value={formData.coordenadas.altitud} onChange={handleChange} />
+                <input type="number" name="coordenadas.altitud" value={formData.coordenadas.altitud} onChange={handleChange} placeholder="Ej: 1275"/>
               </div>
             </div>
           )}
 
           {activeTab === 2 && (
             <div className="form-section">
-              <p className="hint-text">Si la muestra fue colectada sobre una planta, ingrese los datos aquí.</p>
+              <p className="hint-text">Si la muestra fue colectada sobre un huésped, ingrese los datos aquí.</p>
               <div className="form-group">
                 <label>Reino</label>
                 <input type="text" name="organismo.reino" value={formData.organismo.reino} onChange={handleChange} placeholder="Ej: Plantae" />
               </div>
               <div className="form-group">
                 <label>Filo</label>
-                <input type="text" name="organismo.filo" value={formData.organismo.filo} onChange={handleChange} />
+                <input type="text" name="organismo.filo" value={formData.organismo.filo} onChange={handleChange} placeholder="Ej: Magnoliophyta"/>
               </div>
               <div className="form-group">
                 <label>Clase</label>
-                <input type="text" name="organismo.clase" value={formData.organismo.clase} onChange={handleChange} />
+                <input type="text" name="organismo.clase" value={formData.organismo.clase} onChange={handleChange} placeholder="Ej: Magnoliopsida"/>
               </div>
               <div className="form-group">
                 <label>Orden</label>
-                <input type="text" name="organismo.orden" value={formData.organismo.orden} onChange={handleChange} />
+                <input type="text" name="organismo.orden" value={formData.organismo.orden} onChange={handleChange} placeholder="Ej: Fabales"/>
               </div>
               <div className="form-group">
                 <label>Familia</label>
-                <input type="text" name="organismo.familia" value={formData.organismo.familia} onChange={handleChange} />
+                <input type="text" name="organismo.familia" value={formData.organismo.familia} onChange={handleChange} placeholder="Ej: Fabaceae"/>
               </div>
               <div className="form-group">
                 <label>Género</label>
-                <input type="text" name="organismo.genero" value={formData.organismo.genero} onChange={handleChange} />
+                <input type="text" name="organismo.genero" value={formData.organismo.genero} onChange={handleChange} placeholder="Ej: Inga"/>
               </div>
               <div className="form-group">
                 <label>Especie</label>
-                <input type="text" name="organismo.especie" value={formData.organismo.especie} onChange={handleChange} />
+                <input type="text" name="organismo.especie" value={formData.organismo.especie} onChange={handleChange} placeholder="Ej: Inga edulis"/>
               </div>
             </div>
           )}

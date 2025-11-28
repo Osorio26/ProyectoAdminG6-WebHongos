@@ -11,7 +11,7 @@ const TABS = [
   "Morfología",
   "Marcadores Moleculares",
   "Almacenamiento",
-  "Asociación con Planta",
+  "Asociación con el huésped",
 ];
 
 const FungusDetails = () => {

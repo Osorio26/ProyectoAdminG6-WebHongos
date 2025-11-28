@@ -16,7 +16,7 @@ const AddHongoPage = () => {
     idAislamiento: "", // ID numérico o código
 
     // Taxonomía (Organismo)
-    reino: "Fungi",
+    reino: "",
     filo: "",
     clase: "",
     orden: "",
@@ -139,31 +139,31 @@ const AddHongoPage = () => {
             <div className="form-section">
               <div className="form-group">
                 <label>Reino</label>
-                <input type="text" name="reino" value={formData.reino} onChange={handleChange} />
+                <input type="text" name="reino" value={formData.reino} onChange={handleChange} placeholder="Ej: Fungi"/>
               </div>
               <div className="form-group">
                 <label>Filo</label>
-                <input type="text" name="filo" value={formData.filo} onChange={handleChange} />
+                <input type="text" name="filo" value={formData.filo} onChange={handleChange} placeholder="Ej: Basidiomycota"/>
               </div>
               <div className="form-group">
                 <label>Clase</label>
-                <input type="text" name="clase" value={formData.clase} onChange={handleChange} />
+                <input type="text" name="clase" value={formData.clase} onChange={handleChange} placeholder="Ej: Agaricomycetes"/>
               </div>
               <div className="form-group">
                 <label>Orden</label>
-                <input type="text" name="orden" value={formData.orden} onChange={handleChange} />
+                <input type="text" name="orden" value={formData.orden} onChange={handleChange} placeholder="Ej: Agaricales"/>
               </div>
               <div className="form-group">
                 <label>Familia</label>
-                <input type="text" name="familia" value={formData.familia} onChange={handleChange} />
+                <input type="text" name="familia" value={formData.familia} onChange={handleChange} placeholder="Ej: Agaricaceae"/>
               </div>
               <div className="form-group">
                 <label>Género *</label>
-                <input type="text" name="genero" value={formData.genero} onChange={handleChange} />
+                <input type="text" name="genero" value={formData.genero} onChange={handleChange} placeholder="Ej: Agaricus"/>
               </div>
               <div className="form-group">
                 <label>Especie</label>
-                <input type="text" name="especie" value={formData.especie} onChange={handleChange} />
+                <input type="text" name="especie" value={formData.especie} onChange={handleChange} placeholder="Ej: Agaricus campestris"/>
               </div>
             </div>
           )}
@@ -176,11 +176,11 @@ const AddHongoPage = () => {
               </div>
               <div className="form-group">
                 <label>Código Acceso GenBank</label>
-                <input type="text" name="codigoAccesoGenBank" value={formData.codigoAccesoGenBank} onChange={handleChange} />
+                <input type="text" name="codigoAccesoGenBank" value={formData.codigoAccesoGenBank} onChange={handleChange} placeholder="Ej: OR123456"/>
               </div>
               <div className="form-group">
                 <label>Responsable Identificación</label>
-                <input type="text" name="responsableIdentificacion" value={formData.responsableIdentificacion} onChange={handleChange} />
+                <input type="text" name="responsableIdentificacion" value={formData.responsableIdentificacion} onChange={handleChange} placeholder="Ej: Nombre Apellido"/>
               </div>
             </div>
           )}
@@ -202,7 +202,7 @@ const AddHongoPage = () => {
                   </div>
                   <div className="form-group">
                     <label>Secuencia (Texto)</label>
-                    <textarea name="marcador.secuenciaTexto" value={formData.marcador.secuenciaTexto} onChange={handleChange} rows="4" />
+                    <textarea name="marcador.secuenciaTexto" value={formData.marcador.secuenciaTexto} onChange={handleChange} rows="4" placeholder="Ej: Escriba aquí la secuencia del marcador"/>
                   </div>
                 </div>
               )}

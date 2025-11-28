@@ -154,7 +154,7 @@ const AddMorfologiaPage = () => {
               </div>
               <div className="form-group">
                 <label>Observaciones</label>
-                <textarea name="observaciones" value={formData.observaciones} onChange={handleChange} rows="3" />
+                <textarea name="observaciones" value={formData.observaciones} onChange={handleChange} rows="3" placeholder="Ej: Escriba aquí las observaciones correspondientes"/>
               </div>
             </div>
           )}

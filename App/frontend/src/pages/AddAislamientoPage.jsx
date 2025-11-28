@@ -149,12 +149,12 @@ const AddAislamientoPage = () => {
               <div className="form-group">
                 <label>
                   <input type="checkbox" name="aisladoDePlanta" checked={formData.aisladoDePlanta} onChange={handleChange} />
-                  {' '}¿Aislado de Planta?
+                  {' '}¿Aislado de huésped?
                 </label>
               </div>
               {formData.aisladoDePlanta && (
                 <div className="form-group">
-                  <label>Parte de la Planta</label>
+                  <label>Parte del huésped</label>
                   <input type="text" name="parteDePlanta" value={formData.parteDePlanta} onChange={handleChange} placeholder="Ej: Hoja, Raíz" />
                 </div>
               )}
@@ -164,7 +164,7 @@ const AddAislamientoPage = () => {
               </div>
               <div className="form-group">
                 <label>Método de Siembra</label>
-                <input type="text" name="metodoSiembra" value={formData.metodoSiembra} onChange={handleChange} />
+                <input type="text" name="metodoSiembra" value={formData.metodoSiembra} onChange={handleChange} placeholder="Ej: Dilución en placa"/>
               </div>
               <div className="form-group">
                 <label>Estado</label>
@@ -172,7 +172,7 @@ const AddAislamientoPage = () => {
               </div>
               <div className="form-group">
                 <label>Comentarios</label>
-                <textarea name="comentarios" value={formData.comentarios} onChange={handleChange} rows="3" />
+                <textarea name="comentarios" value={formData.comentarios} onChange={handleChange} rows="3" placeholder="Ej: Crecimiento inicial blanco algodonoso..." />
               </div>
             </div>
           )}

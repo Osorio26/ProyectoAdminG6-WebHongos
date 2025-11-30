@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddFungus.css";
+import AppModal from "./AppModal";
 import { createColecta } from "../api/FungusApi";
 
 const TABS = ["Datos Generales", "Ubicación", "Huésped Asociado"];
@@ -9,6 +10,13 @@ const AddColectaPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [createdId, setCreatedId] = useState(null);
+  /** 
+  const [modalWarningOpen, setModalWarningOpen] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
+  const [pendingNavigation, setPendingNavigation] = useState(null);
+  */
 
   const [formData, setFormData] = useState({
     codigoColecta: "",
@@ -58,20 +66,9 @@ const AddColectaPage = () => {
     setLoading(true);
     try {
       const response = await createColecta(formData);
-      
-      // Preguntar si desea continuar al siguiente paso
-      const continuar = window.confirm(
-        "Colecta creada exitosamente.\n\n¿Desea registrar un Aislamiento para esta colecta ahora?"
-      );
 
-      if (continuar) {
-        // Navegar a AddAislamiento pasando el ID de la colecta creada
-        navigate("/add-aislamiento", { 
-          state: { prefilledColecta: response.id } 
-        });
-      } else {
-        navigate("/inventario");
-      }
+      setCreatedId(response.id); 
+      setModalOpen(true);      
 
     } catch (error) {
       console.error(error);
@@ -225,6 +222,35 @@ const AddColectaPage = () => {
           )}
         </div>
       </div>
+        <AppModal
+            open={modalOpen}
+            title="Colecta creada"
+            message="La colecta se registró exitosamente. ¿Desea registrar un Aislamiento ahora?"
+            onConfirm={() => {
+              setModalOpen(false);
+
+              const manualCode = formData.codigoColecta?.trim();
+
+              if (manualCode) {
+                // Usuario ya tenía código escrito → usar ese
+                navigate("/add-aislamiento", {
+                  state: { prefilledColecta: manualCode }
+                });
+              } else {
+                // No había código → usar ID creado, pero advertir al usuario primero
+                setWarningMessage(
+                  `El código de la colecta generada es: ${createdId}.\n\n` +
+                  `Por favor cópielo, ya que no podrá verse nuevamente en el futuro.`
+                );
+                setPendingNavigation(createdId);
+                setModalWarningOpen(true);
+              }
+            }}
+            onCancel={() => {
+              setModalOpen(false);
+              navigate("/inventario");
+            }}
+          />
     </div>
   );
 };

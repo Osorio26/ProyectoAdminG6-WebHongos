@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./AddFungus.css";
+import AppModal from "./AppModal";
 import { createHongo } from "../api/FungusApi";
+import { getAislamientos } from "../api/FungusApi";
 
 const TABS = ["Taxonomía", "Identificación", "Marcadores", "Vinculación"];
 
@@ -10,6 +12,13 @@ const AddHongoPage = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [AislamientosOption, setAislamientosOptions] = useState([]);
+  const [prefillModalOpen, setPrefillModalOpen] = useState(false);
+  const [prefillMessage, setPrefillMessage] = useState("");
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [createdId, setCreatedId] = useState(null);
+
+
 
   const [formData, setFormData] = useState({
     // Vinculación
@@ -40,15 +49,44 @@ const AddHongoPage = () => {
   // Detectar si venimos de crear un aislamiento
   useEffect(() => {
     if (location.state?.prefilledAislamiento) {
+      const id = location.state.prefilledAislamiento;
+
       setFormData(prev => ({
         ...prev,
-        idAislamiento: location.state.prefilledAislamiento
+        idAislamiento: id
       }));
-      // Cambiar a la pestaña de vinculación para mostrar que ya está seleccionada (opcional)
-      // setActiveTab(3); 
-      alert("Se ha pre-seleccionado el aislamiento recién creado (ID: " + location.state.prefilledAislamiento + "). Complete los datos taxonómicos.");
+
+      setPrefillMessage(
+        `Se ha cargado automáticamente el código de la colecta recién creada (ID: ${id}).`
+      );
+
+      setPrefillModalOpen(true);
     }
   }, [location.state]);
+
+
+  useEffect(() => {
+    const fetchAislamientos = async () => {
+      try {
+        const data = await getAislamientos(); // [{ idHeredado: "AIS-2024-001" }, ...]
+        const options = data.map(c => ({ value: c.idHeredado, label: c.idHeredado }));
+        setAislamientosOptions(options);
+      } catch (error) {
+        console.error("Error al obtener Aislamientos:", error);
+      }
+    };
+
+    fetchAislamientos();
+  }, []);
+
+
+  const handleAislamientoSelect = (selectedOption) => {
+    setFormData(prev => ({
+      ...prev,
+      idAislamientoExistente: selectedOption?.value || "" // Si escribe manualmente, se actualiza en handleChange
+    }));
+  };
+
 
   const updateNestedState = (obj, path, value) => {
     const newObj = JSON.parse(JSON.stringify(obj));
@@ -94,6 +132,17 @@ const AddHongoPage = () => {
       setLoading(false);
     }
   };
+
+  const handleTipoMarcadorSelect = (selectedOption) => {
+    setFormData(prev => ({
+      ...prev,
+      marcador: {
+        ...prev.marcador,
+        tipoMarcador: selectedOption?.value || ""
+      }
+    }));
+  };
+
 
   return (
     <div className="add-fungus-container">
@@ -198,7 +247,11 @@ const AddHongoPage = () => {
                 <div className="nested-form">
                   <div className="form-group">
                     <label>Tipo de Marcador</label>
-                    <input type="text" name="marcador.tipoMarcador" value={formData.marcador.tipoMarcador} onChange={handleChange} placeholder="Ej: ITS" />
+                    <CategoryDropdown
+                      categoryName="tipo de marcador"
+                      placeholder_text="Selecciona una opción..."
+                      handleOptionSelect={handleTipoMarcadorSelect}
+                    />
                   </div>
                   <div className="form-group">
                     <label>Secuencia (Texto)</label>
@@ -211,21 +264,39 @@ const AddHongoPage = () => {
 
           {activeTab === 3 && (
             <div className="form-section">
-              <p className="hint-text">Ingrese el código del aislamiento al que pertenece este hongo.</p>
+              <p className="hint-text" style={{ marginBottom: '20px' }}>
+                Ingresa el ID o Código de un aislamiento ya registrado (si no existe, debes crearlo primero y luego regresar aquí).
+              </p>
+
               <div className="form-group">
-                <label>ID o Código de Aislamiento *</label>
-                <input 
-                  type="text" 
-                  name="idAislamiento" 
-                  value={formData.idAislamiento} 
-                  onChange={handleChange} 
-                  placeholder="Ej: AIS-2024-001"
+                <label>ID o Código de Aislamiento Existente</label>
+                <input
+                  list="aislamientos-list"
+                  type="text"
+                  name="idAislamiento"
+                  value={formData.idAislamiento}
+                  onChange={handleChange}
+                  placeholder="Ej: COL-2024-001 o ID numérico"
                 />
+
+                <datalist id="aislamientos-list">
+                  {AislamientosOption.map((c, index) => (
+                    <option key={index} value={c.value} />
+                  ))}
+                </datalist>
               </div>
             </div>
           )}
         </div>
       </div>
+      <AppModal
+        open={prefillModalOpen}
+        title="Aislamiento precargada"
+        message={prefillMessage}
+        onConfirm={() => setPrefillModalOpen(false)}
+        onCancel={() => setPrefillModalOpen(false)}
+      />
+
     </div>
   );
 };

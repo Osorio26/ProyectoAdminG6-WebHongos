@@ -2,11 +2,12 @@
   {
     "title": "medio de cultivo",
     "content": [
-      "PDA (Potato Dextrose Agar)",
+      "PDAS (Potato Dextrose Agar)",
       "MEA (Malt Extract Agar)",
       "Sabouraud Dextrose Agar (SDA)",
       "WA (Water Agar)",
-      "CZ (Czapek-Dox Agar)"
+      "CZ (Czapek-Dox Agar)",
+      "CR7"
     ]
   },
   {
@@ -14,6 +15,7 @@
     "content": [
       "Externo",
       "Interno",
+      "Moderno",
       "Temporal"
     ]
   },

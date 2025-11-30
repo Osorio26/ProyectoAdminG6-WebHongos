@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddFungus.css";
+import CategoryDropdown from '../components/categoryDropdown/categoryDropdown';
 import { createMorfologia } from "../api/FungusApi";
+import { getAislamientos } from "../api/FungusApi";
 
 const TABS = ["Características Generales", "Características Microscópicas", "Vinculación"];
 
@@ -9,6 +11,7 @@ const AddMorfologiaPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [AislamientosOptions, setAislamientosOptions] = useState([]);
 
   const [formData, setFormData] = useState({
     // Vinculación
@@ -55,6 +58,47 @@ const AddMorfologiaPage = () => {
     }
   };
 
+  useEffect(() => {
+        const fetchAislamientos = async () => {
+          try {
+            const data = await getAislamientos();
+            const options = data.map(c => ({ value: c.idHeredado, label: c.idHeredado }));
+            setAislamientosOptions(options);
+          } catch (error) {
+            console.error("Error al obtener aislamientos:", error);
+          }
+        };
+        fetchAislamientos();
+      }, []);
+    
+        const handleAislamientoSelect = (selectedOption) => {
+          setFormData(prev => ({
+            ...prev,
+            idAislamiento: selectedOption?.value || "" // Si escribe manualmente, se actualiza en handleChange
+          }));
+        };
+
+  const handleFormaSelect = (selectedOption) => {
+    setFormData(prev => ({
+      ...prev,
+      forma: selectedOption?.value || ""
+    }));
+  };
+
+  const handleFormaBordeSelect = (selectedOption) => {
+    setFormData(prev => ({
+      ...prev,
+      formaBorde: selectedOption?.value || ""
+    }));
+  };
+
+  const handleTipoCrecimientoSelect = (selectedOption) => {
+    setFormData(prev => ({
+      ...prev,
+      medioCultivo: selectedOption?.value || ""
+    }));
+  };
+
   return (
     <div className="add-fungus-container">
       {/* HEADER */}
@@ -99,11 +143,19 @@ const AddMorfologiaPage = () => {
             <div className="form-section">
               <div className="form-group">
                 <label>Forma</label>
-                <input type="text" name="forma" value={formData.forma} onChange={handleChange} placeholder="Ej: Circular, Irregular" />
+                <CategoryDropdown
+                  categoryName="forma"
+                  placeholder_text="Selecciona una opción..."
+                  handleOptionSelect={handleFormaSelect}
+                />
               </div>
               <div className="form-group">
                 <label>Forma del Borde</label>
-                <input type="text" name="formaBorde" value={formData.formaBorde} onChange={handleChange} placeholder="Ej: Ondulado, Liso" />
+                <CategoryDropdown
+                  categoryName="forma del borde"
+                  placeholder_text="Selecciona una opción..."
+                  handleOptionSelect={handleFormaBordeSelect}
+                />
               </div>
               <div className="form-group">
                 <label>Color Anverso</label>
@@ -124,11 +176,11 @@ const AddMorfologiaPage = () => {
             <div className="form-section">
               <div className="form-group">
                 <label>Tipo de Crecimiento</label>
-                <select name="tipoCrecimiento" value={formData.tipoCrecimiento} onChange={handleChange}>
-                  <option value="Filamentoso">Filamentoso</option>
-                  <option value="Levaduriforme">Levaduriforme</option>
-                  <option value="Levaduriforme-filamentoso">Levaduriforme-filamentoso</option>
-                </select>
+                <CategoryDropdown
+                  categoryName="tipo de crecimiento"
+                  placeholder_text="Selecciona una opción..."
+                  handleOptionSelect={handleTipoCrecimientoSelect}
+                />
               </div>
               <div className="form-group">
                 <label>Tipo de Hifa</label>
@@ -160,13 +212,24 @@ const AddMorfologiaPage = () => {
           )}
 
           {activeTab === 2 && (
-            <div className="form-section">
-              <div className="form-group">
-                <label>ID de Aislamiento *</label>
-                <input type="text" name="idAislamiento" value={formData.idAislamiento} onChange={handleChange} placeholder="Ingrese el ID numérico del aislamiento" />
+            <div className="form-group">
+                <label>ID o Código de Colecta Existente</label>
+                <input
+                  list="aislamientos-list"
+                  type="text"
+                  name="idAislamiento"
+                  value={formData.idAislamiento}
+                  onChange={handleChange}
+                  placeholder="Seleccione o escriba el ID del aislamiento"
+                />
+                
+                <datalist id="aislamientos-list">
+                  {AislamientosOptions.map((c, index) => (
+                    <option key={index} value={c.value} />
+                  ))}
+                </datalist>
                 <p className="hint-text">Debe ingresar el ID del aislamiento al que pertenece esta morfología.</p>
               </div>
-            </div>
           )}
         </div>
       </div>

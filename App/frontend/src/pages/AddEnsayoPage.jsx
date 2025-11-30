@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import CategoryDropdown from '../components/categoryDropdown/categoryDropdown';
 import "./AddFungus.css";
 import { createEnsayo } from "../api/FungusApi";
+import { getAislamientos } from "../api/FungusApi";
 
 const TABS = ["Datos del Ensayo", "Vinculación"];
 
@@ -9,16 +11,45 @@ const AddEnsayoPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [AislamientosOptions, setAislamientosOptions] = useState([]);
 
   const [formData, setFormData] = useState({
     // Vinculación
-    idAislamiento: "", // ID numérico o código
+    idAislamiento: "",
 
     // Ensayo
     tipoEnsayo: "",
     fechaEnsayo: new Date().toISOString().split("T")[0],
     resultadoEnsayo: ""
   });
+
+  // Handler para seleccionar tipo de ensayo
+  const handleTipoEnsayoSelect = (selectedOption) => {
+    setFormData(prev => ({
+      ...prev,
+      tipoEnsayo: selectedOption?.value || ""
+    }));
+  };
+
+  useEffect(() => {
+      const fetchAislamientos = async () => {
+        try {
+          const data = await getAislamientos();
+          const options = data.map(c => ({ value: c.idHeredado, label: c.idHeredado }));
+          setAislamientosOptions(options);
+        } catch (error) {
+          console.error("Error al obtener aislamientos:", error);
+        }
+      };
+      fetchAislamientos();
+    }, []);
+  
+      const handleAislamientoSelect = (selectedOption) => {
+        setFormData(prev => ({
+          ...prev,
+          idAislamiento: selectedOption?.value || "" // Si escribe manualmente, se actualiza en handleChange
+        }));
+      };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -37,7 +68,7 @@ const AddEnsayoPage = () => {
       alert("El tipo de ensayo es obligatorio");
       return;
     }
-    
+
     setLoading(true);
     try {
       await createEnsayo(formData);
@@ -91,32 +122,63 @@ const AddEnsayoPage = () => {
         <div className="form-content">
           <h2 className="section-title">{TABS[activeTab]}</h2>
 
+          {/* DATOS DEL ENSAYO */}
           {activeTab === 0 && (
             <div className="form-section">
               <div className="form-group">
                 <label>Tipo de Ensayo *</label>
-                <input type="text" name="tipoEnsayo" value={formData.tipoEnsayo} onChange={handleChange} placeholder="Ej: Antagonismo, Crecimiento" />
+                <CategoryDropdown
+                  categoryName="tipo de ensayo"
+                  placeholder_text="Seleccione Filamentoso, Levaduriforme, etc."
+                  handleOptionSelect={handleTipoEnsayoSelect}
+                />
               </div>
+
               <div className="form-group">
                 <label>Fecha del Ensayo</label>
-                <input type="date" name="fechaEnsayo" value={formData.fechaEnsayo} onChange={handleChange} />
+                <input
+                  type="date"
+                  name="fechaEnsayo"
+                  value={formData.fechaEnsayo}
+                  onChange={handleChange}
+                />
               </div>
+
               <div className="form-group">
                 <label>Resultados</label>
-                <textarea name="resultadoEnsayo" value={formData.resultadoEnsayo} onChange={handleChange} rows="5" placeholder="Describa los resultados observados..." />
+                <textarea
+                  name="resultadoEnsayo"
+                  value={formData.resultadoEnsayo}
+                  onChange={handleChange}
+                  rows="5"
+                  placeholder="Describa los resultados observados..."
+                />
               </div>
             </div>
           )}
 
+          {/* VINCULACIÓN */}
           {activeTab === 1 && (
-            <div className="form-section">
-              <div className="form-group">
-                <label>ID de Aislamiento *</label>
-                <input type="text" name="idAislamiento" value={formData.idAislamiento} onChange={handleChange} placeholder="Ingrese el ID numérico del aislamiento" />
+            <div className="form-group">
+                <label>ID o Código de Colecta Existente</label>
+                <input
+                  list="aislamientos-list"
+                  type="text"
+                  name="idAislamiento"
+                  value={formData.idAislamiento}
+                  onChange={handleChange}
+                  placeholder="Seleccione o escriba el ID del aislamiento"
+                />
                 <p className="hint-text">Debe ingresar el ID del aislamiento evaluado.</p>
+                
+                <datalist id="aislamientos-list">
+                  {AislamientosOptions.map((c, index) => (
+                    <option key={index} value={c.value} />
+                  ))}
+                </datalist>
               </div>
-            </div>
           )}
+
         </div>
       </div>
     </div>

@@ -30,7 +30,6 @@ function App() {
           <Route path="/add-hongo" element={<AddHongo />} />
           <Route path="/add-morfologia" element={<AddMorfologia />} />  
           <Route path="/add-ensayo" element={<AddEnsayo />} />
-
           {/* DETALLES / EDICIÓN */}
           <Route path="/detalle/:code" element={<FungusDetails />} />
           <Route path="/editar/:code" element={<EditFungus />} />

@@ -1,0 +1,48 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "- Alejandro Solórzano\r - Antony Picado \r - Isaac Vargas \r - Rachit Díaz\r - Kenneth Osorio",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-frontend": "cd frontend && npm install && npm run build",
+    "build-backend": "cd backend && npm install",
+    "pack": "npm run build-frontend && npm run build-backend && electron-builder --dir",
+    "dist": "npm run build-frontend && npm run build-backend && electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "electron": "^39.2.3",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.proyecto.adming6",
+    "productName": "ProyectoAdminG6",
+    "files": [
+      "electron/**/*",
+      "frontend/dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend",
+        "filter": [
+          "**/*",
+          "!**/*.ts",
+          "!**/src/**"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

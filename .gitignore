@@ -1,7 +1,32 @@
-<<<<<<< HEAD
-# Ignorar los archivos package y package-lock.json
-package.json
-package-lock.json
-=======
-.github
->>>>>>> 860b6518bf6d51ff0d3a3d25ee67a8b903a0c22f
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+build/
+App/dist/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

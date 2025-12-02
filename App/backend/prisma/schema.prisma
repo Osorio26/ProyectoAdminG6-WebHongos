@@ -34,8 +34,8 @@ model Sitios {
 
 model Coordenadas {
   id        String       @id @default(uuid())
-  Latitud   Decimal?
-  Longitud  Decimal?
+  Latitud   Float?
+  Longitud  Float?
   Altitud   Int?
 
   // RELACIONES
@@ -81,9 +81,9 @@ model Colectas {
   idHeredado        String?       @unique
   Colector          String?
   Fecha             DateTime?
-  Temperatura       Decimal?
-  Humedad           Decimal?
-  pH                Decimal?
+  Temperatura       Float?
+  Humedad           Float?
+  pH                Float?
   idSitio           String?
   TieneCoordenadas  Boolean
   idCoordenadas     String?

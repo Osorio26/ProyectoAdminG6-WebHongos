@@ -1,114 +1,93 @@
-import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataPath = path.join(__dirname, '../data/hongos.json');
 
 async function main() {
-  console.log('Start seeding...');
+  const sqlPath = path.join(__dirname, '../data/cocmi_backup_v2.sql');
+  console.log(`Reading SQL dump from ${sqlPath}...`);
+  
+  if (!fs.existsSync(sqlPath)) {
+    console.error("SQL file not found!");
+    process.exit(1);
+  }
+
+  const sqlContent = fs.readFileSync(sqlPath, 'utf-8');
+
+  // Split by semicolon at the end of lines to separate statements
+  const statements = sqlContent.split(/;\s*[\r\n]+/);
+
+  console.log(`Found ${statements.length} potential statements.`);
+
+  // Clean existing data
+  console.log('Cleaning existing data...');
+  try {
+    // Order matters for foreign keys
+    await prisma.$executeRawUnsafe(`DELETE FROM EnsayosBiologicos;`);
+    await prisma.$executeRawUnsafe(`DELETE FROM Morfologias;`);
+    await prisma.$executeRawUnsafe(`DELETE FROM Marcadores;`);
+    await prisma.$executeRawUnsafe(`DELETE FROM Aislamientos;`);
+    await prisma.$executeRawUnsafe(`DELETE FROM Colectas;`);
+    await prisma.$executeRawUnsafe(`DELETE FROM Hongos;`);
+    await prisma.$executeRawUnsafe(`DELETE FROM Organismos;`);
+    await prisma.$executeRawUnsafe(`DELETE FROM Sitios;`);
+    await prisma.$executeRawUnsafe(`DELETE FROM Coordenadas;`);
+  } catch (e) {
+    console.warn("Error cleaning data (tables might not exist or other error):", e.message);
+  }
+
+  // Disable foreign keys to allow out-of-order insertion
+  try {
+    await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = OFF;`);
+    console.log("Foreign keys disabled.");
+  } catch (e) {
+    console.warn("Could not disable foreign keys:", e.message);
+  }
+
+  let successCount = 0;
+  let errorCount = 0;
+
+  for (const statement of statements) {
+    const trimmed = statement.trim();
+    if (trimmed.toUpperCase().startsWith('INSERT INTO')) {
+      try {
+        // Execute the raw INSERT statement
+        await prisma.$executeRawUnsafe(trimmed);
+        successCount++;
+        if (successCount % 100 === 0) process.stdout.write('.');
+      } catch (e) {
+        errorCount++;
+        // Only log unique errors to avoid spamming
+        if (errorCount < 10) {
+            console.error(`\nFailed to execute statement starting with: ${trimmed.substring(0, 50)}...`);
+            console.error(`Error: ${e.message}`);
+        }
+      }
+    }
+  }
+
+  console.log(`\nSeeding completed.`);
+  console.log(`Success: ${successCount}`);
+  console.log(`Errors: ${errorCount}`);
 
   try {
-    // 0. Limpiar tablas (Orden inverso para respetar Foreign Keys)
-    // Esto permite que el seed sea idempotente (se pueda correr varias veces)
-    await prisma.ensayosBiologicos.deleteMany();
-    await prisma.morfologias.deleteMany();
-    await prisma.aislamientos.deleteMany();
-    await prisma.marcadores.deleteMany();
-    await prisma.hongos.deleteMany();
-    await prisma.colectas.deleteMany();
-    await prisma.organismos.deleteMany();
-    await prisma.sitios.deleteMany();
-    await prisma.coordenadas.deleteMany();
-    console.log('Database cleaned.');
-
-    const raw = fs.readFileSync(dataPath, 'utf-8');
-    const hongosData = JSON.parse(raw);
-
-    for (const item of hongosData) {
-      // 1. Crear Sitio
-      const sitio = await prisma.sitios.create({
-        data: {
-          Nombre: item.location,
-          EsAreaProtegida: !!item.protectedArea,
-          NombreAreaProtegida: item.protectedArea || null,
-          ReferenciasAdicionales: item.exactSite || null,
-        },
-      });
-
-      // 2. Crear Organismo (Hongo)
-      // Nota: El JSON tiene info taxonómica que mapeamos a Organismos
-      const organismo = await prisma.organismos.create({
-        data: {
-          Tipo: 'Hongo',
-          Reino: item.kingdom,
-          Filo: null, // No está en el JSON
-          Clase: item.class,
-          Orden: item.order,
-          Familia: item.family,
-          Genero: item.genus,
-          Especie: item.species,
-        },
-      });
-
-      // 3. Crear entrada en tabla Hongos (vinculada al Organismo)
-      await prisma.hongos.create({
-        data: {
-          id: organismo.id,
-          MetodoIdentificacion: 'Observación directa', // Valor por defecto
-          CodigoAccesoGenBank: null,
-          IdentificadorResponsable: item.collector,
-        },
-      });
-
-      // 4. Crear Colecta
-      // Parsear temperatura "16 C" -> 16.0
-      const temp = item.temperature ? parseFloat(item.temperature.replace(' C', '')) : null;
-
-      const colecta = await prisma.colectas.create({
-        data: {
-          idHeredado: item.collectionNumber, // Usamos collectionNumber como idHeredado de colecta
-          Colector: item.collector,
-          Fecha: new Date(), // Fecha actual por defecto
-          Temperatura: temp,
-          Humedad: null,
-          pH: null,
-          idSitio: sitio.id,
-          TieneCoordenadas: false,
-          ContienePlanta: false,
-          // No vinculamos idPlanta porque este organismo es un Hongo, no la planta hospedera
-        },
-      });
-
-      // 5. Crear Aislamiento
-      // Usamos el 'code' principal del JSON como idHeredado del aislamiento
-      await prisma.aislamientos.create({
-        data: {
-          idHeredado: item.code,
-          AisladoDePlanta: false,
-          FechaAislamiento: new Date(),
-          Estado: 'Activo',
-          CantidadExistencias: item.quantity ? parseInt(item.quantity) : 1,
-          EstaEnColeccion: true,
-          idColecta: colecta.id,
-          idOrganismo: organismo.id, // Vinculamos el organismo
-        },
-      });
-
-      console.log(`Created entry for ${item.name} (Code: ${item.code})`);
-    }
-
-    console.log('Seeding finished.');
-  } catch (error) {
-    console.error('Error seeding database:', error);
-    process.exit(1);
-  } finally {
-    await prisma.$disconnect();
+    await prisma.$executeRawUnsafe(`PRAGMA foreign_keys = ON;`);
+    console.log("Foreign keys enabled.");
+  } catch (e) {
+    console.warn("Could not enable foreign keys:", e.message);
   }
 }
 
-main();
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

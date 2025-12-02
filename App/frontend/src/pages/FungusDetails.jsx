@@ -3,17 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./FungusDetails.css";
 import { getFungusByCode } from "../api/FungusApi";
 
-// Tabs fijos, SIN depender de 'fungus'
+// Tabs fijos, reordenados para mostrar datos más relevantes primero
 const TABS = [
-  "Identificación",
-  "Clasificación Taxonómica",
-  "Colecta",
-  "Aislamiento",
+  "Taxonomía e Identificación",
+  "Datos de Colecta",
+  "Aislamiento y Cultivo",
   "Morfología",
+  "Huésped / Planta",
   "Marcadores Moleculares",
-  "Almacenamiento",
-  "Asociación con el huésped",
   "Ensayos Biológicos",
+  "Almacenamiento",
 ];
 
 const FungusDetails = () => {
@@ -171,15 +170,14 @@ const FungusDetails = () => {
       ];
 
   const SECTIONS = [
-    IDENTIFICACION,
-    TAXONOMIA,
+    [...TAXONOMIA, ...IDENTIFICACION],
     COLECTA,
     AISLAMIENTO,
     MORFOLOGIA,
-    MARCADORES,
-    ALMACENAMIENTO,
     PLANTA,
+    MARCADORES,
     ENSAYOS,
+    ALMACENAMIENTO,
   ];
 
   return (

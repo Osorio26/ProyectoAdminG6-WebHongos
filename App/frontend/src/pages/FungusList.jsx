@@ -14,6 +14,9 @@ const FungusList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // ORDENAMIENTO
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+
   useEffect(() => {
     let isMounted = true;
     (async () => {
@@ -75,11 +78,56 @@ const FungusList = () => {
     );
   });
 
+  // ---- ORDENAMIENTO ----
+  const sortedFungi = React.useMemo(() => {
+    let sortableItems = [...filteredFungi];
+    if (sortConfig.key !== null) {
+      sortableItems.sort((a, b) => {
+        let aValue, bValue;
+
+        // Helper to get nested properties safely
+        const getNestedValue = (obj, path) => {
+          return path.split('.').reduce((o, p) => (o ? o[p] : null), obj);
+        };
+
+        aValue = getNestedValue(a, sortConfig.key);
+        bValue = getNestedValue(b, sortConfig.key);
+
+        // Handle dates specifically if needed, or just string comparison
+        if (sortConfig.key === 'Colecta.Fecha') {
+            aValue = aValue ? new Date(aValue).getTime() : 0;
+            bValue = bValue ? new Date(bValue).getTime() : 0;
+        } else {
+             // Handle nulls/undefined
+            aValue = aValue ? aValue.toString().toLowerCase() : "";
+            bValue = bValue ? bValue.toString().toLowerCase() : "";
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [filteredFungi, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
   // ---- PAGINACIÓN ----
-  const totalPages = Math.ceil(filteredFungi.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedFungi.length / itemsPerPage);
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentItems = filteredFungi.slice(indexOfFirst, indexOfLast);
+  const currentItems = sortedFungi.slice(indexOfFirst, indexOfLast);
 
   const changePage = (num) => setCurrentPage(num);
 
@@ -148,12 +196,24 @@ const FungusList = () => {
         <table className="fungus-table">
           <thead>
             <tr>
-              <th>Código</th>
-              <th>Especie</th>
-              <th>Género</th>
-              <th>Familia</th>
-              <th>Ubicación</th>
-              <th>Fecha Colecta</th>
+              <th onClick={() => requestSort('idHeredado')} className={sortConfig.key === 'idHeredado' ? sortConfig.direction : ''}>
+                Código {sortConfig.key === 'idHeredado' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => requestSort('Organismo.Especie')} className={sortConfig.key === 'Organismo.Especie' ? sortConfig.direction : ''}>
+                Especie {sortConfig.key === 'Organismo.Especie' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => requestSort('Organismo.Genero')} className={sortConfig.key === 'Organismo.Genero' ? sortConfig.direction : ''}>
+                Género {sortConfig.key === 'Organismo.Genero' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => requestSort('Organismo.Familia')} className={sortConfig.key === 'Organismo.Familia' ? sortConfig.direction : ''}>
+                Familia {sortConfig.key === 'Organismo.Familia' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => requestSort('Colecta.Sitio.Nombre')} className={sortConfig.key === 'Colecta.Sitio.Nombre' ? sortConfig.direction : ''}>
+                Ubicación {sortConfig.key === 'Colecta.Sitio.Nombre' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => requestSort('Colecta.Fecha')} className={sortConfig.key === 'Colecta.Fecha' ? sortConfig.direction : ''}>
+                Fecha Colecta {sortConfig.key === 'Colecta.Fecha' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+              </th>
               <th>Acciones</th>
             </tr>
           </thead>

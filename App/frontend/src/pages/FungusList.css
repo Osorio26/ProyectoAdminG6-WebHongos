@@ -101,6 +101,21 @@
   color: #666;
   font-weight: 600;
   font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.fungus-table th:hover {
+  background-color: #e9ecef;
+}
+
+.fungus-table th:last-child {
+  cursor: default;
+}
+
+.fungus-table th:last-child:hover {
+  background-color: transparent;
 }
 
 .fungus-table th,

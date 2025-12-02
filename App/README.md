@@ -122,7 +122,7 @@ Este comando realizará lo siguiente:
 ## Equipo de Desarrollo
 >>>>>>> Stashed changes
 - Alejandro Solórzano
-- Antony Picado 
-- Isaac Vargas 
+- Antony Picado
+- Isaac Vargas
 - Rachit Díaz
 - Kenneth Osorio

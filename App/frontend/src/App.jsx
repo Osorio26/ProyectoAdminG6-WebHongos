@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import FungusList from "./pages/FungusList";
 import MainLayout from "./components/MainLayout";
 import FungusDetails from "./pages/FungusDetails";

@@ -1,10 +1,16 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { fork } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+function logToFile(message) {
+  const logPath = path.join(app.getPath('userData'), 'app.log');
+  fs.appendFileSync(logPath, `${new Date().toISOString()} - ${message}\n`);
+}
 
 let mainWindow;
 let backendProcess;
@@ -33,25 +39,70 @@ function createWindow() {
 
 function startBackend() {
   let scriptPath;
-  const userDataPath = app.getPath('userData');
+  let dbUrl;
 
   if (app.isPackaged) {
     // In production, backend is copied to resources/backend
     scriptPath = path.join(process.resourcesPath, 'backend', 'server.js');
+
+    // Define DB location: Next to the executable in a 'database' folder
+    const exeDir = path.dirname(app.getPath('exe'));
+    const dbDir = path.join(exeDir, 'database');
+    const dbName = 'dev.db';
+    const dbDest = path.join(dbDir, dbName);
+
+    // Ensure database folder exists
+    if (!fs.existsSync(dbDir)) {
+      try {
+        fs.mkdirSync(dbDir, { recursive: true });
+      } catch (err) {
+        logToFile(`Failed to create database directory: ${err}`);
+      }
+    }
+
+    // Copy DB from resources (seed) if it doesn't exist in the destination
+    const dbSource = path.join(process.resourcesPath, 'backend', 'prisma', dbName);
+    
+    if (!fs.existsSync(dbDest)) {
+      try {
+        logToFile(`Copying database from ${dbSource} to ${dbDest}`);
+        fs.copyFileSync(dbSource, dbDest);
+      } catch (err) {
+        logToFile(`Failed to copy database: ${err}`);
+        console.error('Failed to copy database:', err);
+      }
+    }
+    
+    dbUrl = `file:${dbDest}`;
+
   } else {
     // In development
     scriptPath = path.join(__dirname, '../backend/server.js');
+    dbUrl = `file:${path.join(__dirname, '../backend/prisma/dev.db')}`;
   }
 
   console.log('Starting backend from:', scriptPath);
+  console.log('Using DATABASE_URL:', dbUrl);
+  logToFile(`Starting backend from: ${scriptPath}`);
+  logToFile(`Using DATABASE_URL: ${dbUrl}`);
 
   backendProcess = fork(scriptPath, [], {
     env: {
       ...process.env,
       PORT: 3000,
-      DATABASE_URL: process.env.DATABASE_URL, // Ensure DB URL is passed if needed, or rely on .env in backend folder
+      DATABASE_URL: dbUrl, 
     },
-    stdio: 'inherit'
+    stdio: ['ignore', 'pipe', 'pipe', 'ipc']
+  });
+
+  backendProcess.stdout.on('data', (data) => {
+    console.log(`Backend: ${data}`);
+    logToFile(`Backend: ${data}`);
+  });
+
+  backendProcess.stderr.on('data', (data) => {
+    console.error(`Backend Error: ${data}`);
+    logToFile(`Backend Error: ${data}`);
   });
 }
 

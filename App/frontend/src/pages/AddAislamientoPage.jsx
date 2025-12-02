@@ -31,7 +31,6 @@ const AddAislamientoPage = () => {
     metodoSiembra: "",
     estado: "",
     comentarios: "",
-    enColeccion: true,
     enColeccion: false,
     cantidadExistencias: 1,
 

@@ -97,6 +97,11 @@ const FungusList = () => {
         if (sortConfig.key === 'Colecta.Fecha') {
             aValue = aValue ? new Date(aValue).getTime() : 0;
             bValue = bValue ? new Date(bValue).getTime() : 0;
+        } else if (sortConfig.key === 'Identificacion') {
+            // Custom sort for combined Genus + Species
+            const getIdent = (obj) => (obj.Organismo?.Genero || '') + ' ' + (obj.Organismo?.Especie || '');
+            aValue = getIdent(a).toLowerCase();
+            bValue = getIdent(b).toLowerCase();
         } else {
              // Handle nulls/undefined
             aValue = aValue ? aValue.toString().toLowerCase() : "";
@@ -199,14 +204,11 @@ const FungusList = () => {
               <th onClick={() => requestSort('idHeredado')} className={sortConfig.key === 'idHeredado' ? sortConfig.direction : ''}>
                 Código {sortConfig.key === 'idHeredado' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
               </th>
-              <th onClick={() => requestSort('Organismo.Especie')} className={sortConfig.key === 'Organismo.Especie' ? sortConfig.direction : ''}>
-                Especie {sortConfig.key === 'Organismo.Especie' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+              <th onClick={() => requestSort('Identificacion')} className={sortConfig.key === 'Identificacion' ? sortConfig.direction : ''}>
+                Identificación {sortConfig.key === 'Identificacion' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
               </th>
-              <th onClick={() => requestSort('Organismo.Genero')} className={sortConfig.key === 'Organismo.Genero' ? sortConfig.direction : ''}>
-                Género {sortConfig.key === 'Organismo.Genero' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => requestSort('Organismo.Familia')} className={sortConfig.key === 'Organismo.Familia' ? sortConfig.direction : ''}>
-                Familia {sortConfig.key === 'Organismo.Familia' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+              <th onClick={() => requestSort('Colecta.Colector')} className={sortConfig.key === 'Colecta.Colector' ? sortConfig.direction : ''}>
+                Colector {sortConfig.key === 'Colecta.Colector' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
               </th>
               <th onClick={() => requestSort('Colecta.Sitio.Nombre')} className={sortConfig.key === 'Colecta.Sitio.Nombre' ? sortConfig.direction : ''}>
                 Ubicación {sortConfig.key === 'Colecta.Sitio.Nombre' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
@@ -221,9 +223,10 @@ const FungusList = () => {
             {currentItems.map((fungus, idx) => (
               <tr key={idx}>
                 <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
-                <td className="name-cell"><i>{fungus.Organismo?.Especie || "Sin identificación"}</i></td>
-                <td><i>{fungus.Organismo?.Genero}</i></td>
-                <td>{fungus.Organismo?.Familia}</td>
+                <td className="name-cell">
+                  <i>{fungus.Organismo?.Genero} {fungus.Organismo?.Especie || "sp."}</i>
+                </td>
+                <td>{fungus.Colecta?.Colector || "N/A"}</td>
                 <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
                 <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
                 <td>

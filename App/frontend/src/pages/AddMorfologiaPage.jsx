@@ -47,7 +47,11 @@ const AddMorfologiaPage = () => {
     
     setLoading(true);
     try {
-      await createMorfologia(formData);
+      const payload = {
+        ...formData,
+        idRelacionado: formData.idAislamiento
+      };
+      await createMorfologia(payload);
       alert("Morfología registrada exitosamente");
       navigate("/inventario");
     } catch (error) {
@@ -62,7 +66,10 @@ const AddMorfologiaPage = () => {
         const fetchAislamientos = async () => {
           try {
             const data = await getAislamientos();
-            const options = data.map(c => ({ value: c.idHeredado, label: c.idHeredado }));
+            const options = data.map(c => ({ 
+              value: c.idHeredado, 
+              label: c.idHeredado 
+            }));
             setAislamientosOptions(options);
           } catch (error) {
             console.error("Error al obtener aislamientos:", error);
@@ -213,22 +220,29 @@ const AddMorfologiaPage = () => {
 
           {activeTab === 2 && (
             <div className="form-group">
-                <label>ID o Código de Colecta Existente</label>
-                <input
-                  list="aislamientos-list"
-                  type="text"
+                <label>Seleccionar Aislamiento Existente</label>
+                <select
                   name="idAislamiento"
                   value={formData.idAislamiento}
                   onChange={handleChange}
-                  placeholder="Seleccione o escriba el ID del aislamiento"
-                />
-                
-                <datalist id="aislamientos-list">
-                  {AislamientosOptions.map((c, index) => (
-                    <option key={index} value={c.value} />
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px', 
+                    borderRadius: '8px', 
+                    border: '1px solid #ddd', 
+                    backgroundColor: 'white',
+                    fontSize: '0.95rem',
+                    color: '#333'
+                  }}
+                >
+                  <option value="">-- Seleccione un aislamiento --</option>
+                  {AislamientosOptions.map((opt, index) => (
+                    <option key={index} value={opt.value}>
+                      {opt.label}
+                    </option>
                   ))}
-                </datalist>
-                <p className="hint-text">Debe ingresar el ID del aislamiento al que pertenece esta morfología.</p>
+                </select>
+                <p className="hint-text">Debe seleccionar el aislamiento al que pertenece esta morfología.</p>
               </div>
           )}
         </div>

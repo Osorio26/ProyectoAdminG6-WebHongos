@@ -68,8 +68,13 @@ const AddHongoPage = () => {
   useEffect(() => {
     const fetchAislamientos = async () => {
       try {
-        const data = await getAislamientos(); // [{ idHeredado: "AIS-2024-001" }, ...]
-        const options = data.map(c => ({ value: c.idHeredado, label: c.idHeredado }));
+        const data = await getAislamientos(); // [{ idHeredado: "AIS-2024-001", MedioCultivo: "PDA", ... }, ...]
+        const options = data
+          .filter(c => !c.idHongo)
+          .map(c => ({ 
+            value: c.idHeredado, 
+            label: c.idHeredado 
+          }));
         setAislamientosOptions(options);
       } catch (error) {
         console.error("Error al obtener Aislamientos:", error);
@@ -122,7 +127,12 @@ const AddHongoPage = () => {
     
     setLoading(true);
     try {
-      await createHongo(formData);
+      // Mapear idAislamiento a idRelacionado para el backend
+      const payload = {
+        ...formData,
+        idRelacionado: formData.idAislamiento
+      };
+      await createHongo(payload);
       alert("Hongo registrado exitosamente");
       navigate("/inventario");
     } catch (error) {
@@ -265,25 +275,32 @@ const AddHongoPage = () => {
           {activeTab === 3 && (
             <div className="form-section">
               <p className="hint-text" style={{ marginBottom: '20px' }}>
-                Ingresa el ID o Código de un aislamiento ya registrado (si no existe, debes crearlo primero y luego regresar aquí).
+                Seleccione el aislamiento al que pertenece este hongo. El código de aislamiento es el identificador único asignado en la fase de laboratorio.
               </p>
 
               <div className="form-group">
-                <label>ID o Código de Aislamiento Existente</label>
-                <input
-                  list="aislamientos-list"
-                  type="text"
+                <label>Seleccionar Aislamiento Existente</label>
+                <select
                   name="idAislamiento"
                   value={formData.idAislamiento}
                   onChange={handleChange}
-                  placeholder="Ej: COL-2024-001 o ID numérico"
-                />
-
-                <datalist id="aislamientos-list">
-                  {AislamientosOption.map((c, index) => (
-                    <option key={index} value={c.value} />
+                  style={{ 
+                    width: '100%', 
+                    padding: '12px', 
+                    borderRadius: '8px', 
+                    border: '1px solid #ddd', 
+                    backgroundColor: 'white',
+                    fontSize: '0.95rem',
+                    color: '#333'
+                  }}
+                >
+                  <option value="">-- Seleccione un aislamiento --</option>
+                  {AislamientosOption.map((opt, index) => (
+                    <option key={index} value={opt.value}>
+                      {opt.label}
+                    </option>
                   ))}
-                </datalist>
+                </select>
               </div>
             </div>
           )}

@@ -35,7 +35,12 @@ const AddEnsayoPage = () => {
       const fetchAislamientos = async () => {
         try {
           const data = await getAislamientos();
-          const options = data.map(c => ({ value: c.idHeredado, label: c.idHeredado }));
+          const options = data
+            .filter(c => !c.idHongo) // Solo mostrar aislamientos SIN hongo asociado
+            .map(c => ({ 
+              value: c.idHeredado, 
+              label: c.idHeredado 
+            }));
           setAislamientosOptions(options);
         } catch (error) {
           console.error("Error al obtener aislamientos:", error);
@@ -71,7 +76,11 @@ const AddEnsayoPage = () => {
 
     setLoading(true);
     try {
-      await createEnsayo(formData);
+      const payload = {
+        ...formData,
+        idRelacionado: formData.idAislamiento
+      };
+      await createEnsayo(payload);
       alert("Ensayo registrado exitosamente");
       navigate("/inventario");
     } catch (error) {
@@ -160,23 +169,22 @@ const AddEnsayoPage = () => {
           {/* VINCULACIÓN */}
           {activeTab === 1 && (
             <div className="form-group">
-                <label>ID o Código de Colecta Existente</label>
-                <input
-                  list="aislamientos-list"
-                  type="text"
+                <label>ID o Código de Aislamiento Existente</label>
+                <select
                   name="idAislamiento"
                   value={formData.idAislamiento}
                   onChange={handleChange}
-                  placeholder="Seleccione o escriba el ID del aislamiento"
-                />
-                <p className="hint-text">Debe ingresar el ID del aislamiento evaluado.</p>
-                
-                <datalist id="aislamientos-list">
-                  {AislamientosOptions.map((c, index) => (
-                    <option key={index} value={c.value} />
+                  className="form-select"
+                >
+                  <option value="">-- Seleccione un Aislamiento --</option>
+                  {AislamientosOptions.map((option, index) => (
+                    <option key={index} value={option.value}>
+                      {option.label}
+                    </option>
                   ))}
-                </datalist>
-              </div>
+                </select>
+                <p className="hint-text">Seleccione el aislamiento evaluado.</p>
+            </div>
           )}
 
         </div>

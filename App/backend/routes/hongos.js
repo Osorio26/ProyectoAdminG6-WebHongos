@@ -181,7 +181,7 @@ router.post("/colecta", async (req, res) => {
 router.post("/aislamiento", async (req, res) => {
 	try {
 		const data = req.body;
-		let idColecta = data.idColectaExistente;
+		let idColecta = data.idColectaExistente || data.idColecta;
 
 		// Si es nueva colecta, crearla primero (lógica simplificada, idealmente reutilizar función)
 		if (data.isNewColecta) {
@@ -317,7 +317,10 @@ router.post("/hongo", async (req, res) => {
 			if (aislamiento) {
 				await prisma.aislamientos.update({
 					where: { id: aislamiento.id },
-					data: { idOrganismo: organismo.id } // Aquí guardas el ID del hongo/organismo
+					data: { 
+						idOrganismo: organismo.id,
+						idHongo: organismo.id // También actualizamos la relación explícita con Hongos
+					} 
 				});
 			} else {
 				console.warn(`No se encontró un aislamiento con idHeredado ${data.idRelacionado}`);
@@ -544,7 +547,7 @@ router.put("/:code", async (req, res) => {
 				CantidadExistencias: data.CantidadExistencias ? parseInt(data.CantidadExistencias) : undefined,
 				Comentarios: data.Comentarios,
 				// Permitir cambiar la Colecta asociada si se envía un ID
-				idColecta: data.idColecta ? parseInt(data.idColecta) : undefined
+				idColecta: data.idColecta ? data.idColecta : undefined
 			}
 		});
 
@@ -622,7 +625,7 @@ router.get("/list/plantas", async (req, res) => {
 router.get("/list/aislamientos", async (req, res) => {
 	try {
 		const aislamientos = await prisma.aislamientos.findMany({
-			select: { id: true, idHeredado: true, MedioCultivo: true, FechaAislamiento: true }
+			select: { id: true, idHeredado: true, MedioCultivo: true, FechaAislamiento: true, idHongo: true }
 		});
 		res.json(aislamientos);
 	} catch (error) {

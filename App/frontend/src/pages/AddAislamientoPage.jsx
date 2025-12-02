@@ -56,7 +56,10 @@ const AddAislamientoPage = () => {
     const fetchColectas = async () => {
       try {
         const data = await getColectas(); // [{ idHeredado: "COL-2024-001" }, ...]
-        const options = data.map(c => ({ value: c.idHeredado, label: c.idHeredado }));
+        const options = data.map(c => ({ 
+          value: c.idHeredado, 
+          label: `${c.idHeredado} | ${c.Colector || 'Sin colector'} | ${c.Fecha ? new Date(c.Fecha).toLocaleDateString() : 'Sin fecha'}` 
+        }));
         setColectasOptions(options);
       } catch (error) {
         console.error("Error al obtener colectas:", error);
@@ -282,24 +285,24 @@ const AddAislamientoPage = () => {
           {activeTab === 1 && (
             <div className="form-section">
               <p className="hint-text" style={{ marginBottom: '20px' }}>
-                Ingrese el ID o Código de una colecta ya registrada (si no existe, debes crearla primero y luego regresar aquí).
+                Seleccione una colecta ya registrada (si no existe, debes crearla primero y luego regresar aquí).
               </p>
 
               <div className="form-group">
                 <label>ID o Código de Colecta Existente</label>
-                <input
-                  list="colectas-list"
-                  type="text"
+                <select
                   name="idColectaExistente"
                   value={formData.idColectaExistente}
                   onChange={handleChange}
-                  placeholder="Ej: COL-2024-001 o ID numérico"
-                />
-                <datalist id="colectas-list">
-                  {colectasOptions.map((c, index) => (
-                    <option key={index} value={c.value} />
+                  className="form-select"
+                >
+                  <option value="">-- Seleccione una Colecta --</option>
+                  {colectasOptions.map((option, index) => (
+                    <option key={index} value={option.value}>
+                      {option.label}
+                    </option>
                   ))}
-                </datalist>
+                </select>
               </div>
             </div>
           )}

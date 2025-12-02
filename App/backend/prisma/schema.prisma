@@ -22,36 +22,36 @@ datasource db {
 //
 
 model Sitios {
-  id                     String       @id @default(uuid())
-  Nombre                 String?
-  EsAreaProtegida        Boolean?
-  NombreAreaProtegida    String?
-  ReferenciasAdicionales String?
+  id                     String       @id @default(uuid()) @map("Id")
+  Nombre                 String?      @map("Nombre")
+  EsAreaProtegida        Boolean?     @map("EsAreaProtegida")
+  NombreAreaProtegida    String?      @map("NombreAreaProtegida")
+  ReferenciasAdicionales String?      @map("ReferenciasAdicionales")
 
   // RELACIONES
   Colectas               Colectas[]
 }
 
 model Coordenadas {
-  id        String       @id @default(uuid())
-  Latitud   Float?
-  Longitud  Float?
-  Altitud   Int?
+  id        String       @id @default(uuid()) @map("Id")
+  Latitud   Float?       @map("Latitud")
+  Longitud  Float?       @map("Longitud")
+  Altitud   Int?         @map("Altitud")
 
   // RELACIONES
   Colectas  Colectas[]
 }
 
 model Organismos {
-  id       String          @id @default(uuid())
-  Tipo     String
-  Reino    String?
-  Filo     String?
-  Clase    String?
-  Orden    String?
-  Familia  String?
-  Genero   String?
-  Especie  String?
+  id       String          @id @default(uuid()) @map("Id")
+  Tipo     String          @map("Tipo")
+  Reino    String?         @map("Reino")
+  Filo     String?         @map("Filo")
+  Clase    String?         @map("Clase")
+  Orden    String?         @map("Orden")
+  Familia  String?         @map("Familia")
+  Genero   String?         @map("Genero")
+  Especie  String?         @map("Especie")
 
   // RELACIONES
   Hongo        Hongos?
@@ -60,10 +60,10 @@ model Organismos {
 }
 
 model Hongos {
-  id                        String        @id
-  MetodoIdentificacion      String?
-  CodigoAccesoGenBank       String?
-  IdentificadorResponsable  String?
+  id                        String        @id @map("Id")
+  MetodoIdentificacion      String?       @map("MetodoIdentificacion")
+  CodigoAccesoGenBank       String?       @map("CodigoAccesoGenBank")
+  IdentificadorResponsable  String?       @map("IdentificadorResponsable")
 
   // RELACIONES
   Organismo   Organismos     @relation(fields: [id], references: [id])
@@ -78,18 +78,18 @@ model Hongos {
 //
 
 model Colectas {
-  id                String        @id @default(uuid())
-  idHeredado        String?       @unique
-  Colector          String?
-  Fecha             DateTime?
-  Temperatura       Float?
-  Humedad           Float?
-  pH                Float?
-  idSitio           String?
-  TieneCoordenadas  Boolean
-  idCoordenadas     String?
-  ContienePlanta    Boolean
-  idPlanta          String?
+  id                String        @id @default(uuid()) @map("Id")
+  idHeredado        String?       @unique @map("IdHeredado")
+  Colector          String?       @map("Colector")
+  Fecha             DateTime?     @map("Fecha")
+  Temperatura       Float?        @map("Temperatura")
+  Humedad           Float?        @map("Humedad")
+  pH                Float?        @map("pH")
+  idSitio           String?       @map("IdSitio")
+  TieneCoordenadas  Boolean       @map("TieneCoordenadas")
+  idCoordenadas     String?       @map("IdCoordenadas")
+  ContienePlanta    Boolean       @map("ContienePlanta")
+  idPlanta          String?       @map("IdPlanta")
 
   // RELACIONES
   Sitio        Sitios?       @relation(fields: [idSitio], references: [id])
@@ -100,22 +100,22 @@ model Colectas {
 }
 
 model Aislamientos {
-  id                 String        @id @default(uuid())
-  idHeredado         String        @unique
-  AisladoDePlanta    Boolean
-  ParteDePlanta      String?
-  FechaAislamiento   DateTime?
-  FechaSalida        DateTime?
-  IdAnalisisMolecular String?
-  MedioCultivo       String?
-  MetodoSiembra      String?
-  Estado             String?
-  Comentarios        String?
-  CantidadExistencias Int?
-  EstaEnColeccion     Boolean      @default(false)
-  idColecta          String?
-  idOrganismo        String?
-  idHongo            String?
+  id                 String        @id @default(uuid()) @map("Id")
+  idHeredado         String        @unique @map("IdHeredado")
+  AisladoDePlanta    Boolean       @map("AisladoDePlanta")
+  ParteDePlanta      String?       @map("ParteDePlanta")
+  FechaAislamiento   DateTime?     @map("FechaAislamiento")
+  FechaSalida        DateTime?     @map("FechaSalida")
+  IdAnalisisMolecular String?      @map("IdAnalisisMolecular")
+  MedioCultivo       String?       @map("MedioCultivo")
+  MetodoSiembra      String?       @map("MetodoSiembra")
+  Estado             String?       @map("Estado")
+  Comentarios        String?       @map("Comentarios")
+  CantidadExistencias Int?         @map("CantidadExistencias")
+  EstaEnColeccion     Boolean      @default(false) @map("EstaEnColeccion")
+  idColecta          String?       @map("IdColecta")
+  idOrganismo        String?       @map("IdOrganismo")
+  idHongo            String?       @map("IdHongo")
 
   // RELACIONES
   Colecta      Colectas?           @relation(fields: [idColecta], references: [id])
@@ -133,29 +133,29 @@ model Aislamientos {
 //
 
 model EnsayosBiologicos {
-  id            String     @id @default(uuid())
-  idAislamiento String
-  Tipo          String
-  Resultado     String?
+  id            String     @id @default(uuid()) @map("Id")
+  idAislamiento String     @map("IdAislamiento")
+  Tipo          String     @map("Tipo")
+  Resultado     String?    @map("Resultado")
 
   // RELACIONES
   Aislamiento   Aislamientos @relation(fields: [idAislamiento], references: [id], onDelete: Cascade)
 }
 
 model Morfologias {
-  id                    String     @id @default(uuid())
-  idAislamiento         String
-  Forma                 String?
-  FormaBorde            String?
-  ColorAnverso          String?
-  ColorReverso          String?
-  ColorBorde            String?
-  TieneMicelioAereo     Boolean?
-  DensidadMicelioAereo  String?
-  TipoCrecimiento       String?
-  TipoHifa              String?
-  TieneSecreciones      Boolean?
-  Observaciones         String?
+  id                    String     @id @default(uuid()) @map("Id")
+  idAislamiento         String     @map("IdAislamiento")
+  Forma                 String?    @map("Forma")
+  FormaBorde            String?    @map("FormaBorde")
+  ColorAnverso          String?    @map("ColorAnverso")
+  ColorReverso          String?    @map("ColorReverso")
+  ColorBorde            String?    @map("ColorBorde")
+  TieneMicelioAereo     Boolean?   @map("TieneMicelioAereo")
+  DensidadMicelioAereo  String?    @map("DensidadMicelioAereo")
+  TipoCrecimiento       String?    @map("TipoCrecimiento")
+  TipoHifa              String?    @map("TipoHifa")
+  TieneSecreciones      Boolean?   @map("TieneSecreciones")
+  Observaciones         String?    @map("Observaciones")
 
   // RELACIONES
   Aislamiento Aislamientos @relation(fields: [idAislamiento], references: [id], onDelete: Cascade)
@@ -168,10 +168,10 @@ model Morfologias {
 //
 
 model Marcadores {
-  id        String     @id @default(uuid())
-  idHongo   String
-  Tipo      String
-  Secuencia String?
+  id        String     @id @default(uuid()) @map("Id")
+  idHongo   String     @map("IdHongo")
+  Tipo      String     @map("Tipo")
+  Secuencia String?    @map("Secuencia")
 
   // RELACIONES
   Hongo     Hongos     @relation(fields: [idHongo], references: [id], onDelete: Cascade)

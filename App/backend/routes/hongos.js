@@ -285,7 +285,7 @@ router.post("/hongo", async (req, res) => {
 			}
 		});
 
-		// Crear Hongo (Detalles)
+		// Crear Hongo
 		await prisma.hongos.create({
 			data: {
 				id: organismo.id, // Comparten ID
@@ -296,7 +296,7 @@ router.post("/hongo", async (req, res) => {
 		});
 
 		// Crear Marcador si existe
-		if (data.tieneMarcadores && data.marcador && data.marcador.tipoMarcador) {
+		if (data.tieneMarcadores && data.marcador?.tipoMarcador) {
 			await prisma.marcadores.create({
 				data: {
 					idHongo: organismo.id,
@@ -306,25 +306,33 @@ router.post("/hongo", async (req, res) => {
 			});
 		}
 
-		// Vincular al Aislamiento (si se proporcionó ID)
+		// 🔥 Vincular al Aislamiento usando idHeredado
 		if (data.idRelacionado) {
-			// Buscar aislamiento por idHeredado (que es lo que usa el usuario)
 			const aislamiento = await prisma.aislamientos.findFirst({
 				where: { idHeredado: data.idRelacionado }
 			});
-			
+
 			if (aislamiento) {
 				await prisma.aislamientos.update({
 					where: { id: aislamiento.id },
-					data: { idOrganismo: organismo.id }
+					data: { idOrganismo: organismo.id } // Aquí guardas el ID del hongo/organismo
 				});
+			} else {
+				console.warn(`No se encontró un aislamiento con idHeredado ${data.idRelacionado}`);
 			}
 		}
 
-		res.status(201).json(organismo);
+		res.status(201).json({
+			message: "Hongo registrado y vínculo creado correctamente",
+			idOrganismo: organismo.id
+		});
+
 	} catch (error) {
 		console.error("Error creating hongo:", error);
-		res.status(500).json({ message: "Error creating hongo", error: error.message });
+		res.status(500).json({
+			message: "Error creating hongo",
+			error: error.message
+		});
 	}
 });
 

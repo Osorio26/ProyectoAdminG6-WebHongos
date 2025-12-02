@@ -66,10 +66,12 @@ router.get("/:code", async (req, res) => {
 				Colecta: {
 					include: {
 						Sitio: true,
-						Planta: true
+						Planta: true,
+						Coordenadas: true
 					}
 				},
-				Morfologias: true
+				Morfologias: true,
+				EnsayosBiologicos: true 
 			}
 		});
 

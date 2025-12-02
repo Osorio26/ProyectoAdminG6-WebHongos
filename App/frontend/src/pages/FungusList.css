@@ -145,3 +145,29 @@
 .fungus-table tr:hover {
   background-color: #fafafa;
 }
+
+.pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+  background: none;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: none;
+  color: #495057;
+  border-color: #e5e5e5;
+}
+
+.pagination button:disabled {
+  background: #eee;
+  cursor: not-allowed;
+}

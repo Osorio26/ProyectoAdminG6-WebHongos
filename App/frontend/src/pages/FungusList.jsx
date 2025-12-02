@@ -3,15 +3,17 @@ import { useNavigate } from "react-router-dom";
 import "./FungusList.css";
 import { getFungi } from "../api/FungusApi";
 
-
-
 const FungusList = () => {
   const navigate = useNavigate();
   const [fungi, setFungi] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
+  // PAGINACIÓN
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
     let isMounted = true;
     (async () => {
@@ -37,6 +39,74 @@ const FungusList = () => {
     };
   }, []);
 
+  // ---- FILTRADO ----
+  const filteredFungi = fungi.filter((fungus) => {
+    if (!search.trim()) return true;
+
+    const terms = search
+      .split(";")
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean);
+
+    const fieldsToSearch = [
+      fungus.idHeredado,
+      fungus.Organismo?.Especie,
+      fungus.CantidadExistencias,
+      fungus.Colecta?.Colector,
+      fungus.Colecta?.idHeredado,
+      fungus.Colecta?.Sitio?.Nombre,
+      fungus.Colecta?.Sitio?.NombreAreaProtegida,
+      fungus.Colecta?.Sitio?.ReferenciasAdicionales,
+      fungus.Organismo?.Genero,
+      fungus.Organismo?.Reino,
+      fungus.Colecta?.Temperatura,
+      fungus.Organismo?.Clase,
+      fungus.Organismo?.Orden,
+      fungus.Organismo?.Familia,
+      fungus.Colecta?.Fecha
+        ? new Date(fungus.Colecta.Fecha).toLocaleDateString()
+        : "",
+    ].map((v) => v?.toString().toLowerCase() || "");
+
+    return terms.every((term) =>
+      fieldsToSearch.some((field) =>
+        term.includes(" ") ? field === term : field.includes(term)
+      )
+    );
+  });
+
+  // ---- PAGINACIÓN ----
+  const totalPages = Math.ceil(filteredFungi.length / itemsPerPage);
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentItems = filteredFungi.slice(indexOfFirst, indexOfLast);
+
+  const changePage = (num) => setCurrentPage(num);
+
+  // --- PAGINACIÓN INTELIGENTE (máx 7 botones visibles) ---
+  const getVisiblePageRange = () => {
+    const maxButtons = 7;
+
+    if (totalPages <= maxButtons) {
+      return { start: 1, end: totalPages };
+    }
+
+    let start = currentPage - Math.floor(maxButtons / 2);
+    let end = currentPage + Math.floor(maxButtons / 2);
+
+    if (start < 1) {
+      start = 1;
+      end = maxButtons;
+    } else if (end > totalPages) {
+      end = totalPages;
+      start = totalPages - maxButtons + 1;
+    }
+
+    return { start, end };
+  };
+
+  const { start, end } = getVisiblePageRange();
+
   return (
     <div className="fungus-container">
       <div className="fungus-window">
@@ -58,13 +128,17 @@ const FungusList = () => {
         <p className="search-label">
           Buscar por código heredado, nombre, ubicación, familia, o cualquier atributo. (puedes separar varios términos con punto y coma ";")
         </p>
+
         <div className="search-bar">
           <input
             type="text"
             placeholder="Ej: BD-2022523226; Agaricales; Cartago"
             className="search-input"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1); // reset paginación al buscar
+            }}
           />
         </div>
 
@@ -84,67 +158,71 @@ const FungusList = () => {
             </tr>
           </thead>
           <tbody>
-            {!loading &&
-              !error &&
-              fungi
-                .filter((fungus) => {
-                  if (!search.trim()) return true;
-
-                  // Permitir múltiples términos separados por punto y coma
-                  const terms = search
-                    .split(";")
-                    .map((t) => t.trim().toLowerCase())
-                    .filter(Boolean);
-
-                  if (terms.length === 0) return true;
-
-                  const fieldsToSearch = [
-                    fungus.idHeredado,
-                    fungus.Organismo?.Especie,
-                    fungus.CantidadExistencias,
-                    fungus.Colecta?.Colector,
-                    fungus.Colecta?.idHeredado,
-                    fungus.Colecta?.Sitio?.Nombre,
-                    fungus.Colecta?.Sitio?.NombreAreaProtegida,
-                    fungus.Colecta?.Sitio?.ReferenciasAdicionales,
-                    fungus.Organismo?.Genero,
-                    fungus.Organismo?.Reino,
-                    fungus.Colecta?.Temperatura,
-                    fungus.Organismo?.Clase,
-                    fungus.Organismo?.Orden,
-                    fungus.Organismo?.Familia,
-                    fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "",
-                  ].map((v) => v?.toString().toLowerCase() || "");
-
-                  return terms.every((term) =>
-                    fieldsToSearch.some((field) =>
-                      term.includes(" ") ? field === term : field.includes(term)
-                    )
-                  );
-                })
-                .map((fungus, idx) => (
-                  <tr key={idx}>
-                    <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
-                    <td className="name-cell"><i>{fungus.Organismo?.Especie || "Sin identificación"}</i></td>
-                    <td><i>{fungus.Organismo?.Genero}</i></td>
-                    <td>{fungus.Organismo?.Familia}</td>
-                    <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
-                    <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
-                    <td>
-                      <button
-                        className="details-button"
-                        onClick={() => navigate(`/detalle/${fungus.idHeredado}`)}
-                      >
-                        Ver detalles
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+            {currentItems.map((fungus, idx) => (
+              <tr key={idx}>
+                <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
+                <td className="name-cell"><i>{fungus.Organismo?.Especie || "Sin identificación"}</i></td>
+                <td><i>{fungus.Organismo?.Genero}</i></td>
+                <td>{fungus.Organismo?.Familia}</td>
+                <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
+                <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
+                <td>
+                  <button
+                    className="details-button"
+                    onClick={() => navigate(`/detalle/${fungus.idHeredado}`)}
+                  >
+                    Ver detalles
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
+
+        {/* ---- CONTROLES DE PAGINACIÓN ---- */}
+        <div className="pagination">
+          {/* Primero */}
+          <button disabled={currentPage === 1} onClick={() => changePage(1)}>
+            «
+          </button>
+
+          {/* Anterior */}
+          <button disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}>
+            ‹
+          </button>
+
+          {/* Punto suspensivo izquierdo */}
+          {start > 1 && <span className="dots">...</span>}
+
+          {/* Botones visibles */}
+          {Array.from({ length: end - start + 1 }, (_, i) => {
+            const page = start + i;
+            return (
+              <button
+                key={page}
+                className={currentPage === page ? "active" : ""}
+                onClick={() => changePage(page)}
+              >
+                {page}
+              </button>
+            );
+          })}
+
+          {/* Punto suspensivo derecho */}
+          {end < totalPages && <span className="dots">...</span>}
+
+          {/* Siguiente */}
+          <button disabled={currentPage === totalPages} onClick={() => changePage(currentPage + 1)}>
+            ›
+          </button>
+
+          {/* Última */}
+          <button disabled={currentPage === totalPages} onClick={() => changePage(totalPages)}>
+            »
+          </button>
+        </div>
       </div>
     </div>
-    
   );
 };
 

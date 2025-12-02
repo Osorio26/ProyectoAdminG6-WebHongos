@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./EditFungus.css";
-import { getFungusByCode, updateFungus, getColectas } from "../api/FungusApi";
+import {
+  getFungusByCode,
+  updateFungus,
+  getColectas,
+} from "../api/FungusApi";
 
 const TABS = [
   "Clasificación Taxonómica",
@@ -12,6 +16,7 @@ const TABS = [
   "Marcadores Moleculares",
   "Almacenamiento",
   "Asociación con Planta",
+  "Ensayos Biológicos",
 ];
 
 const EditFungus = () => {
@@ -20,261 +25,393 @@ const EditFungus = () => {
 
   const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(true);
-  
-  // Listas para dropdowns
   const [colectas, setColectas] = useState([]);
+  const [categories, setCategories] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    const load = async () => {
       try {
-        const [fungusData, colectasData] = await Promise.all([
-          getFungusByCode(code),
-          getColectas()
-        ]);
-        setFormData(fungusData);
-        setColectas(colectasData);
-      } catch (error) {
-        console.error("Error loading data:", error);
+        const fungus = await getFungusByCode(code);
+        const colectasList = await getColectas();
+        const catRes = await fetch("http://localhost:3000/categories");
+        const catData = await catRes.json();
+
+        setFormData(fungus);
+        setColectas(colectasList);
+        setCategories(
+          Object.fromEntries(catData.map((c) => [c.title.toLowerCase(), c.content]))
+        );
       } finally {
         setLoading(false);
       }
-    })();
+    };
+    load();
   }, [code]);
 
-  // Helper para actualizar estado anidado
-  const updateNestedState = (obj, path, value) => {
-    const newObj = JSON.parse(JSON.stringify(obj));
-    const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
-    
-    let current = newObj;
+  const updateNested = (obj, path, value) => {
+    const output = structuredClone(obj);
+    const keys = path.replace(/\[(\d+)\]/g, ".$1").split(".");
+    let current = output;
     for (let i = 0; i < keys.length - 1; i++) {
-      const key = keys[i];
-      if (!current[key]) current[key] = {};
-      current = current[key];
+      const k = keys[i];
+      if (current[k] === undefined) current[k] = {};
+      current = current[k];
     }
     current[keys[keys.length - 1]] = value;
-    return newObj;
+    return output;
+  };
+
+  const getNested = (obj, path) => {
+    if (!obj) return "";
+    const keys = path.replace(/\[(\d+)\]/g, ".$1").split(".");
+    let v = obj;
+    for (const k of keys) {
+      if (v === undefined || v === null) return "";
+      v = v[k];
+    }
+    return v ?? "";
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => updateNestedState(prev, name, value));
+    setFormData((prev) => updateNested(prev, name, value));
   };
 
-  const handleSelectChange = (e, fieldKey) => {
+  const handleSelectChange = (e, key) => {
     const value = e.target.value;
-    
-    // Actualizar el valor (FK)
-    setFormData(prev => ({ ...prev, [fieldKey]: value }));
+    setFormData((prev) => updateNested(prev, key, value));
 
-    // Lógica específica para actualizar la vista previa si cambiamos la Colecta
-    if (fieldKey === 'idColecta') {
-      const selectedColecta = colectas.find(c => c.id === parseInt(value));
-      if (selectedColecta) {
-        setFormData(prev => ({
+    if (key === "idColecta") {
+      const selected = colectas.find((c) => c.id === parseInt(value));
+      if (selected) {
+        setFormData((prev) => ({
           ...prev,
-          Colecta: { ...prev.Colecta, ...selectedColecta }
+          Colecta: { ...prev.Colecta, ...selected },
         }));
       }
     }
   };
 
+  const addNewEnsayo = () => {
+    setFormData((prev) => ({
+      ...prev,
+      EnsayosBiologicos: [
+        ...(prev.EnsayosBiologicos || []),
+        { Tipo: "", Resultado: "", _isNew: true },
+      ],
+    }));
+  };
+
+  const addNewMorfologia = () => {
+    if (formData.Morfologias?.length > 0) return;
+    setFormData((prev) => ({
+      ...prev,
+      Morfologias: [
+        {
+          Forma: "",
+          FormaBorde: "",
+          ColorAnverso: "",
+          ColorReverso: "",
+          ColorBorde: "",
+          TieneMicelioAereo: "",
+          DensidadMicelioAereo: "",
+          TipoCrecimiento: "",
+          TipoHifa: "",
+          TieneSecreciones: "",
+          Observaciones: "",
+          _isNew: true,
+        },
+      ],
+    }));
+  };
+
   const handleSave = async () => {
     try {
       await updateFungus(code, formData);
-      navigate(`/detalle/${code}`);
-    } catch (error) {
-      console.error("Error updating fungus:", error);
-      alert("Error al guardar los cambios");
-    }
-  };
 
-  const getNestedValue = (obj, path) => {
-    if (!obj) return "";
-    const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
-    let current = obj;
-    for (const key of keys) {
-      if (current === undefined || current === null) return "";
-      current = current[key];
+      if (formData.EnsayosBiologicos) {
+        for (const ensayo of formData.EnsayosBiologicos) {
+          if (ensayo._isNew) {
+            await fetch("http://localhost:3000/hongos/ensayo", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                idRelacionado: formData.idHeredado,
+                tipoEnsayo: ensayo.Tipo,
+                resultadoEnsayo: ensayo.Resultado,
+              }),
+            });
+          }
+        }
+      }
+
+      if (formData.Morfologias?.[0]?._isNew) {
+        const m = formData.Morfologias[0];
+        await fetch("http://localhost:3000/hongos/morfologia", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            idRelacionado: formData.idHeredado,
+            forma: m.Forma,
+            formaBorde: m.FormaBorde,
+            colorAnverso: m.ColorAnverso,
+            colorReverso: m.ColorReverso,
+            colorBorde: m.ColorBorde,
+            tieneMicelioAereo: m.TieneMicelioAereo,
+            densidadMicelioAereo: m.DensidadMicelioAereo,
+            tipoCrecimiento: m.TipoCrecimiento,
+            tipoHifa: m.TipoHifa,
+            tieneSecreciones: m.TieneSecreciones,
+            observaciones: m.Observaciones,
+          }),
+        });
+      }
+
+      navigate(`/detalle/${code}`);
+    } catch {
+      alert("Error al guardar");
     }
-    return current;
   };
 
   if (loading) return <p>Cargando...</p>;
 
-  // CONFIGURACIÓN DE CAMPOS
-  const TAXONOMIA = [
-    { label: "Reino", key: "Organismo.Reino" },
-    { label: "Filo", key: "Organismo.Filo" },
-    { label: "Clase", key: "Organismo.Clase" },
-    { label: "Orden", key: "Organismo.Orden" },
-    { label: "Familia", key: "Organismo.Familia" },
-    { label: "Género", key: "Organismo.Genero" },
-    { label: "Especie", key: "Organismo.Especie" },
-  ];
-
-  const IDENTIFICACION = [
-    { label: "Método", key: "Organismo.Hongo.MetodoIdentificacion" },
-    { label: "Código GenBank", key: "Organismo.Hongo.CodigoAccesoGenBank" },
-    { label: "Responsable", key: "Organismo.Hongo.IdentificadorResponsable" },
-  ];
-
-  const COLECTA = [
-    { 
-      label: "Código de Colecta (Vincular)", 
-      key: "idColecta", 
-      type: "select", 
-      options: colectas,
-      optionLabel: (c) => `${c.idHeredado} - ${c.Colector} (${c.Fecha ? c.Fecha.split('T')[0] : 'S/F'})`,
-      optionValue: "id"
-    },
-    // Campos informativos (se actualizan al cambiar el select)
-    { label: "Fecha (YYYY-MM-DD)", key: "Colecta.Fecha", readOnly: true },
-    { label: "Colector", key: "Colecta.Colector", readOnly: true },
-    // Campos editables de la colecta (si se quiere editar la colecta en sí)
-    // Nota: Editar estos campos modificará la colecta para TODOS los aislamientos vinculados
-    { label: "Ubicación Geográfica", key: "Colecta.Sitio.Nombre" },
-    { label: "Observaciones Sitio", key: "Colecta.Sitio.ReferenciasAdicionales" },
-  ];
-
-  const AISLAMIENTO = [
-    { label: "Medio de Cultivo", key: "MedioCultivo" },
-    { label: "Fecha de Aislamiento", key: "FechaAislamiento" },
-    { label: "Responsable (Colector)", key: "Colecta.Colector", readOnly: true },
-    { label: "Condiciones (Temp)", key: "Colecta.Temperatura" },
-  ];
-
-  const MORFOLOGIA = [
-    { label: "Descripción Macroscópica", key: "Morfologias[0].Observaciones" },
-    { label: "Color Anverso", key: "Morfologias[0].ColorAnverso" },
-    { label: "Forma/Textura", key: "Morfologias[0].Forma" },
-    { label: "Notas Generales", key: "Comentarios" },
-  ];
-
-  const MARCADORES = [
-    { label: "Tipo Marcador", key: "Organismo.Hongo.Marcadores[0].Tipo" },
-    { label: "Secuencia", key: "Organismo.Hongo.Marcadores[0].Secuencia" },
-  ];
-
-  const ALMACENAMIENTO = [
-    { label: "Cantidad Existencias", key: "CantidadExistencias" },
-    { label: "Área Protegida", key: "Colecta.Sitio.NombreAreaProtegida" },
-  ];
-
-  const PLANTA = [
-    { label: "Reino Planta", key: "Colecta.Planta.Reino" },
-    { label: "Filo Planta", key: "Colecta.Planta.Filo" },
-    { label: "Clase Planta", key: "Colecta.Planta.Clase" },
-    { label: "Orden Planta", key: "Colecta.Planta.Orden" },
-    { label: "Familia Planta", key: "Colecta.Planta.Familia" },
-    { label: "Género Planta", key: "Colecta.Planta.Genero" },
-    { label: "Especie Planta", key: "Colecta.Planta.Especie" },
-  ];
-
-  const SECTIONS = [
-    TAXONOMIA,
-    IDENTIFICACION,
-    COLECTA,
-    AISLAMIENTO,
-    MORFOLOGIA,
-    MARCADORES,
-    ALMACENAMIENTO,
-    PLANTA,
-  ];
+  const SECTION_CONFIG = {
+    TAXONOMIA: [
+      { label: "Reino", key: "Organismo.Reino" },
+      { label: "Filo", key: "Organismo.Filo" },
+      { label: "Clase", key: "Organismo.Clase" },
+      { label: "Orden", key: "Organismo.Orden" },
+      { label: "Familia", key: "Organismo.Familia" },
+      { label: "Género", key: "Organismo.Genero" },
+      { label: "Especie", key: "Organismo.Especie" },
+    ],
+    IDENT: [
+      { label: "Método", key: "Organismo.Hongo.MetodoIdentificacion" },
+      { label: "Código GenBank", key: "Organismo.Hongo.CodigoAccesoGenBank" },
+      { label: "Responsable", key: "Organismo.Hongo.IdentificadorResponsable" },
+    ],
+    COLECTA: [
+      {
+        label: "Código de Colecta",
+        key: "idColecta",
+        type: "select",
+        options: colectas,
+        optionLabel: (c) =>
+          `${c.idHeredado} - ${c.Colector} (${c.Fecha?.split("T")[0]})`,
+        optionValue: "id",
+      },
+      { label: "Fecha", key: "Colecta.Fecha", readOnly: true },
+      { label: "Colector", key: "Colecta.Colector", readOnly: true },
+      { label: "Sitio", key: "Colecta.Sitio.Nombre" },
+      { label: "Área Protegida", key: "Colecta.Sitio.NombreAreaProtegida" },
+      { label: "Observaciones Sitio", key: "Colecta.Sitio.ReferenciasAdicionales" },
+    ],
+    AISLAM: [
+      {
+        label: "Medio de Cultivo",
+        key: "MedioCultivo",
+        type: "select",
+        options: categories["medio de cultivo"] || [],
+        optionLabel: (v) => v,
+        optionValue: null,
+      },
+      {
+        label: "Método Siembra",
+        key: "MetodoSiembra",
+        type: "select",
+        options: categories["método de siembra"] || [],
+        optionLabel: (v) => v,
+        optionValue: null,
+      },
+      { label: "Fecha Aislamiento", key: "FechaAislamiento" },
+      { label: "Estado", key: "Estado" },
+      { label: "Comentarios", key: "Comentarios" },
+    ],
+    MORFO: [
+      {
+        label: "Forma",
+        key: "Morfologias[0].Forma",
+        type: "select",
+        options: categories["forma"] || [],
+        optionLabel: (v) => v,
+        optionValue: null,
+      },
+      {
+        label: "Forma Borde",
+        key: "Morfologias[0].FormaBorde",
+        type: "select",
+        options: categories["forma del borde"] || [],
+        optionLabel: (v) => v,
+        optionValue: null,
+      },
+      { label: "Color Anverso", key: "Morfologias[0].ColorAnverso" },
+      { label: "Color Reverso", key: "Morfologias[0].ColorReverso" },
+      {
+        label: "Color Borde",
+        key: "Morfologias[0].ColorBorde",
+        type: "select",
+        options: categories["color de borde"] || [],
+      },
+      { label: "Tipo Crecimiento", key: "Morfologias[0].TipoCrecimiento" },
+      { label: "Observaciones", key: "Morfologias[0].Observaciones" },
+    ],
+    MARC: [
+      {
+        label: "Tipo Marcador",
+        key: "Organismo.Hongo.Marcadores[0].Tipo",
+        type: "select",
+        options: categories["tipo de marcador"] || [],
+      },
+      { label: "Secuencia", key: "Organismo.Hongo.Marcadores[0].Secuencia" },
+    ],
+    ALMAC: [
+      { label: "Cantidad Existencias", key: "CantidadExistencias" },
+      { label: "Área Protegida", key: "Colecta.Sitio.NombreAreaProtegida" },
+    ],
+    PLANTA: [
+      { label: "Reino Planta", key: "Colecta.Planta.Reino" },
+      { label: "Familia Planta", key: "Colecta.Planta.Familia" },
+      { label: "Género Planta", key: "Colecta.Planta.Genero" },
+      { label: "Especie Planta", key: "Colecta.Planta.Especie" },
+    ],
+    ENSAYOS: [],
+  };
 
   return (
     <div className="edit-fungus-container">
-      {/* === HEADER AREA === */}
       <div className="details-header-area">
         <div className="header-row">
           <div className="header-left">
-            <button 
-              className="back-icon-button" 
-              onClick={() => navigate(-1)}
-              title="Cancelar edición"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 12H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <button className="back-icon-button" onClick={() => navigate(-1)}>
+              <svg width="24" height="24">
+                <path d="M19 12H5" stroke="currentColor" />
+                <path d="M12 19L5 12L12 5" stroke="currentColor" />
               </svg>
             </button>
             <div className="header-info">
-              <h1>Editar: {formData.Organismo?.Especie || "Sin identificación"}</h1>
-              <p className="subtitle">Editando muestra: <strong>{formData.idHeredado}</strong></p>
+              <h1>Editar: {formData.Organismo?.Especie}</h1>
+              <p className="subtitle">
+                Mostrando muestra <strong>{formData.idHeredado}</strong>
+              </p>
             </div>
           </div>
 
           <button className="header-save-button" onClick={handleSave}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 21H5C4.44772 21 4 20.5523 4 20V4C4 3.44772 4.44772 3 5 3H16L20 7V20C20 20.5523 19.5523 21 19 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M17 21V13H7V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M7 3V8H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span>Guardar Cambios</span>
+            Guardar Cambios
           </button>
         </div>
       </div>
 
       <div className="edit-fungus-window">
-        
-        {/* === SIDEBAR NAVIGATION === */}
         <div className="sidebar-nav">
           <h3 className="sidebar-title">Secciones</h3>
-          {TABS.map((tab, index) => (
+          {TABS.map((tab, i) => (
             <button
-              key={index}
-              className={`sidebar-button ${activeTab === index ? "active" : ""}`}
-              onClick={() => setActiveTab(index)}
+              key={i}
+              className={`sidebar-button ${activeTab === i ? "active" : ""}`}
+              onClick={() => setActiveTab(i)}
             >
               {tab}
             </button>
           ))}
         </div>
 
-        {/* === CONTENIDO EDITABLE === */}
         <div className="details-content">
           <h2 className="section-title">{TABS[activeTab]}</h2>
+
           <div className="edit-tab-content">
-            {SECTIONS[activeTab].map((item, i) => (
-              <div className="edit-row" key={i}>
-                <span className="edit-label">{item.label}</span>
-                
-                <div className="edit-input-wrapper">
-                  {item.type === "select" ? (
-                    <select
-                      name={item.key}
-                      value={formData[item.key] || ""}
-                      className="edit-input-field"
-                      onChange={(e) => handleSelectChange(e, item.key)}
-                    >
-                      <option value="">Seleccionar...</option>
-                      {item.options && item.options.map(opt => (
-                        <option key={opt[item.optionValue]} value={opt[item.optionValue]}>
-                          {item.optionLabel(opt)}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      name={item.key}
-                      value={getNestedValue(formData, item.key) || ""}
-                      placeholder={item.readOnly ? "Solo lectura" : "Campo vacío"}
-                      className={`edit-input-field ${item.readOnly ? 'readonly' : ''}`}
-                      onChange={handleChange}
-                      readOnly={item.readOnly}
-                    />
-                  )}
-                  
-                  {!item.readOnly && (
-                    <span className="edit-icon" title="Campo editable">
-                      &#x270F; 
-                    </span>
-                  )}
+            {activeTab === 8 && (
+              <>
+                {formData.EnsayosBiologicos?.map((ens, idx) => (
+                  <div key={idx} className="edit-row">
+                    <span className="edit-label">Tipo Ensayo</span>
+                    <div className="edit-input-wrapper">
+                      <select
+                        name={`EnsayosBiologicos[${idx}].Tipo`}
+                        className="edit-input-field"
+                        value={ens.Tipo}
+                        onChange={handleChange}
+                      >
+                        <option value="">Seleccione</option>
+                        {(categories["tipo de ensayo"] || []).map((o) => (
+                          <option key={o} value={o}>
+                            {o}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <span className="edit-label">Resultado</span>
+                    <div className="edit-input-wrapper">
+                      <input
+                        name={`EnsayosBiologicos[${idx}].Resultado`}
+                        value={ens.Resultado}
+                        className="edit-input-field"
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                <button className="add-button" onClick={addNewEnsayo}>
+                  Agregar Ensayo
+                </button>
+              </>
+            )}
+
+            {activeTab !== 8 &&
+              (
+                Object.values(SECTION_CONFIG)[activeTab]
+              ).map((item, i) => (
+                <div className="edit-row" key={i}>
+                  <span className="edit-label">{item.label}</span>
+
+                  <div className="edit-input-wrapper">
+                    {item.type === "select" ? (
+                      <select
+                        name={item.key}
+                        className="edit-input-field"
+                        value={getNested(formData, item.key)}
+                        onChange={(e) => {
+                          if (item.optionValue === null)
+                            handleChange(e);
+                          else handleSelectChange(e, item.key);
+                        }}
+                      >
+                        <option value="">Seleccione</option>
+                        {item.options.map((opt) =>
+                          item.optionValue
+                            ? (
+                              <option key={opt[item.optionValue]} value={opt[item.optionValue]}>
+                                {item.optionLabel(opt)}
+                              </option>
+                            )
+                            : (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            )
+                        )}
+                      </select>
+                    ) : (
+                      <input
+                        name={item.key}
+                        className="edit-input-field"
+                        value={getNested(formData, item.key)}
+                        onChange={handleChange}
+                        readOnly={item.readOnly}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+
+            {activeTab === 4 && (
+              <button className="add-button" onClick={addNewMorfologia}>
+                Agregar Morfología
+              </button>
+            )}
           </div>
         </div>
       </div>

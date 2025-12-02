@@ -70,17 +70,27 @@ const EditFungus = () => {
       if (v === undefined || v === null) return "";
       v = v[k];
     }
+    // Formatear fechas para input type="date"
+    if (path.includes("Fecha") && typeof v === "string" && v.includes("T")) {
+      return v.split("T")[0];
+    }
     return v ?? "";
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => updateNested(prev, name, value));
+    const { name, value, type, checked } = e.target;
+    const val = type === "checkbox" ? checked : value;
+    setFormData((prev) => updateNested(prev, name, val));
   };
 
   const handleSelectChange = (e, key) => {
     const value = e.target.value;
-    setFormData((prev) => updateNested(prev, key, value));
+    // Convertir "true"/"false" strings a booleanos si es necesario
+    let finalValue = value;
+    if (value === "true") finalValue = true;
+    if (value === "false") finalValue = false;
+    
+    setFormData((prev) => updateNested(prev, key, finalValue));
 
     if (key === "idColecta") {
       const selected = colectas.find((c) => c.id === parseInt(value));
@@ -201,10 +211,18 @@ const EditFungus = () => {
           `${c.idHeredado} - ${c.Colector} (${c.Fecha?.split("T")[0]})`,
         optionValue: "id",
       },
-      { label: "Fecha", key: "Colecta.Fecha", readOnly: true },
-      { label: "Colector", key: "Colecta.Colector", readOnly: true },
+      { label: "Fecha", key: "Colecta.Fecha", type: "date" },
+      { label: "Colector", key: "Colecta.Colector" },
+      { label: "Temperatura (°C)", key: "Colecta.Temperatura", type: "number" },
+      { label: "Humedad (%)", key: "Colecta.Humedad", type: "number" },
+      { label: "pH", key: "Colecta.pH", type: "number" },
       { label: "Sitio", key: "Colecta.Sitio.Nombre" },
       { label: "Área Protegida", key: "Colecta.Sitio.NombreAreaProtegida" },
+      { 
+        label: "¿Es Área Protegida?", 
+        key: "Colecta.Sitio.EsAreaProtegida", 
+        type: "checkbox" 
+      },
       { label: "Observaciones Sitio", key: "Colecta.Sitio.ReferenciasAdicionales" },
     ],
     AISLAM: [
@@ -224,9 +242,13 @@ const EditFungus = () => {
         optionLabel: (v) => v,
         optionValue: null,
       },
-      { label: "Fecha Aislamiento", key: "FechaAislamiento" },
+      { label: "Fecha Aislamiento", key: "FechaAislamiento", type: "date" },
+      { label: "Fecha Salida", key: "FechaSalida", type: "date" },
+      { label: "Parte de Planta", key: "ParteDePlanta" },
       { label: "Estado", key: "Estado" },
       { label: "Comentarios", key: "Comentarios" },
+      { label: "¿Aislado de Planta?", key: "AisladoDePlanta", type: "checkbox" },
+      { label: "¿En Colección?", key: "EstaEnColeccion", type: "checkbox" },
     ],
     MORFO: [
       {
@@ -252,8 +274,14 @@ const EditFungus = () => {
         key: "Morfologias[0].ColorBorde",
         type: "select",
         options: categories["color de borde"] || [],
+        optionLabel: (v) => v,
+        optionValue: null,
       },
       { label: "Tipo Crecimiento", key: "Morfologias[0].TipoCrecimiento" },
+      { label: "Tipo Hifa", key: "Morfologias[0].TipoHifa" },
+      { label: "Densidad Micelio", key: "Morfologias[0].DensidadMicelioAereo" },
+      { label: "¿Tiene Micelio Aéreo?", key: "Morfologias[0].TieneMicelioAereo", type: "checkbox" },
+      { label: "¿Tiene Secreciones?", key: "Morfologias[0].TieneSecreciones", type: "checkbox" },
       { label: "Observaciones", key: "Morfologias[0].Observaciones" },
     ],
     MARC: [
@@ -391,8 +419,17 @@ const EditFungus = () => {
                             )
                         )}
                       </select>
+                    ) : item.type === "checkbox" ? (
+                      <input
+                        type="checkbox"
+                        name={item.key}
+                        checked={!!getNested(formData, item.key)}
+                        onChange={handleChange}
+                        className="edit-checkbox"
+                      />
                     ) : (
                       <input
+                        type={item.type || "text"}
                         name={item.key}
                         className="edit-input-field"
                         value={getNested(formData, item.key)}

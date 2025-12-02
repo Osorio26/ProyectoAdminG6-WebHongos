@@ -468,7 +468,6 @@ router.put("/:code", async (req, res) => {
 
 			// Actualizar Hongo (si aplica)
 			if (existing.Organismo.Tipo === 'Hongo' && data.Organismo.Hongo) {
-				// Hongo comparte ID con Organismo
 				const hongoExists = await prisma.hongos.findUnique({ where: { id: existing.idOrganismo } });
 				if (hongoExists) {
 					await prisma.hongos.update({
@@ -483,10 +482,20 @@ router.put("/:code", async (req, res) => {
 					// Actualizar Marcadores (Simplificación: solo el primero)
 					if (data.Organismo.Hongo.Marcadores && data.Organismo.Hongo.Marcadores.length > 0) {
 						const m = data.Organismo.Hongo.Marcadores[0];
+						// Si ya existe un marcador, actualizarlo
 						if (existing.Organismo.Hongo.Marcadores && existing.Organismo.Hongo.Marcadores.length > 0) {
 							await prisma.marcadores.update({
 								where: { id: existing.Organismo.Hongo.Marcadores[0].id },
 								data: {
+									Tipo: m.Tipo,
+									Secuencia: m.Secuencia
+								}
+							});
+						} else {
+							// Si no existe, crearlo
+							await prisma.marcadores.create({
+								data: {
+									idHongo: existing.idOrganismo,
 									Tipo: m.Tipo,
 									Secuencia: m.Secuencia
 								}
@@ -505,7 +514,9 @@ router.put("/:code", async (req, res) => {
 					idHeredado: data.Colecta.idHeredado,
 					Fecha: data.Colecta.Fecha ? new Date(data.Colecta.Fecha) : undefined,
 					Colector: data.Colecta.Colector,
-					Temperatura: data.Colecta.Temperatura,
+					Temperatura: data.Colecta.Temperatura ? parseFloat(data.Colecta.Temperatura) : null,
+					Humedad: data.Colecta.Humedad ? parseFloat(data.Colecta.Humedad) : null,
+					pH: data.Colecta.pH ? parseFloat(data.Colecta.pH) : null,
 				}
 			});
 
@@ -516,6 +527,7 @@ router.put("/:code", async (req, res) => {
 					data: {
 						Nombre: data.Colecta.Sitio.Nombre,
 						NombreAreaProtegida: data.Colecta.Sitio.NombreAreaProtegida,
+						EsAreaProtegida: data.Colecta.Sitio.EsAreaProtegida,
 						ReferenciasAdicionales: data.Colecta.Sitio.ReferenciasAdicionales
 					}
 				});
@@ -543,9 +555,14 @@ router.put("/:code", async (req, res) => {
 			where: { id: existing.id },
 			data: {
 				MedioCultivo: data.MedioCultivo,
+				MetodoSiembra: data.MetodoSiembra,
+				Estado: data.Estado,
+				ParteDePlanta: data.ParteDePlanta,
 				FechaAislamiento: data.FechaAislamiento ? new Date(data.FechaAislamiento) : undefined,
+				FechaSalida: data.FechaSalida ? new Date(data.FechaSalida) : undefined,
 				CantidadExistencias: data.CantidadExistencias ? parseInt(data.CantidadExistencias) : undefined,
 				Comentarios: data.Comentarios,
+				EstaEnColeccion: data.EstaEnColeccion,
 				// Permitir cambiar la Colecta asociada si se envía un ID
 				idColecta: data.idColecta ? data.idColecta : undefined
 			}
@@ -558,9 +575,35 @@ router.put("/:code", async (req, res) => {
 				await prisma.morfologias.update({
 					where: { id: existing.Morfologias[0].id },
 					data: {
-						Observaciones: m.Observaciones,
+						Forma: m.Forma,
+						FormaBorde: m.FormaBorde,
 						ColorAnverso: m.ColorAnverso,
-						Forma: m.Forma
+						ColorReverso: m.ColorReverso,
+						ColorBorde: m.ColorBorde,
+						TieneMicelioAereo: m.TieneMicelioAereo,
+						DensidadMicelioAereo: m.DensidadMicelioAereo,
+						TipoCrecimiento: m.TipoCrecimiento,
+						TipoHifa: m.TipoHifa,
+						TieneSecreciones: m.TieneSecreciones,
+						Observaciones: m.Observaciones
+					}
+				});
+			} else {
+				// Si no existe, crearla
+				await prisma.morfologias.create({
+					data: {
+						idAislamiento: existing.id,
+						Forma: m.Forma,
+						FormaBorde: m.FormaBorde,
+						ColorAnverso: m.ColorAnverso,
+						ColorReverso: m.ColorReverso,
+						ColorBorde: m.ColorBorde,
+						TieneMicelioAereo: m.TieneMicelioAereo,
+						DensidadMicelioAereo: m.DensidadMicelioAereo,
+						TipoCrecimiento: m.TipoCrecimiento,
+						TipoHifa: m.TipoHifa,
+						TieneSecreciones: m.TieneSecreciones,
+						Observaciones: m.Observaciones
 					}
 				});
 			}

@@ -18,6 +18,8 @@ const AddAislamientoPage = () => {
   const [modalInfoMessage, setModalInfoMessage] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [createdId, setCreatedId] = useState(null);
+  const [searchColecta, setSearchColecta] = useState("");
+
 
   const [formData, setFormData] = useState({
     // Aislamiento
@@ -290,22 +292,75 @@ const AddAislamientoPage = () => {
 
               <div className="form-group">
                 <label>ID o Código de Colecta Existente</label>
-                <select
-                  name="idColectaExistente"
-                  value={formData.idColectaExistente}
-                  onChange={handleChange}
-                  className="form-select"
-                >
-                  <option value="">-- Seleccione una Colecta --</option>
-                  {colectasOptions.map((option, index) => (
-                    <option key={index} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    placeholder="Escribe o selecciona una colecta..."
+                    value={searchColecta}
+                    onChange={(e) => setSearchColecta(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px",
+                      borderRadius: "8px",
+                      border: "1px solid #aaa",
+                      backgroundColor: "#fafafa",
+                      fontSize: "0.95rem",
+                    }}
+                  />
+
+                  {searchColecta.length > 0 && (
+                    <ul
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                        width: "100%",
+                        background: "white",
+                        border: "1px solid #ddd",
+                        borderRadius: "8px",
+                        maxHeight: "180px",
+                        overflowY: "auto",
+                        boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                        zIndex: 10,
+                        padding: 0,
+                        margin: 0,
+                        listStyle: "none",
+                      }}
+                    >
+                      {colectasOptions
+                        .filter((opt) =>
+                          opt.label.toLowerCase().includes(searchColecta.toLowerCase())
+                        )
+                        .map((opt, index) => (
+                          <li
+                            key={index}
+                            onClick={() => {
+                              setSearchColecta(opt.label);
+
+                              handleChange({
+                                target: {
+                                  name: "idColectaExistente",
+                                  value: opt.value,
+                                },
+                              });
+                            }}
+                            style={{
+                              padding: "10px 14px",
+                              cursor: "pointer",
+                              borderBottom: "1px solid #eee",
+                            }}
+                          >
+                            {opt.label}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             </div>
           )}
+
         </div>
       </div>
 

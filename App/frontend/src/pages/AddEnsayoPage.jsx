@@ -12,6 +12,8 @@ const AddEnsayoPage = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [AislamientosOptions, setAislamientosOptions] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+
 
   const [formData, setFormData] = useState({
     // Vinculación
@@ -169,24 +171,76 @@ const AddEnsayoPage = () => {
           {/* VINCULACIÓN */}
           {activeTab === 1 && (
             <div className="form-group">
-                <label>ID o Código de Aislamiento Existente</label>
-                <select
-                  name="idAislamiento"
-                  value={formData.idAislamiento}
-                  onChange={handleChange}
-                  className="form-select"
-                >
-                  <option value="">-- Seleccione un Aislamiento --</option>
-                  {AislamientosOptions.map((option, index) => (
-                    <option key={index} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="hint-text">Seleccione el aislamiento evaluado.</p>
+              <label>Seleccionar Aislamiento Existente</label>
+
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  placeholder="Escribe o selecciona un aislamiento..."
+                  value={searchValue}
+                  onChange={(e) => {
+                    setSearchValue(e.target.value);
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "8px",
+                    border: "1px solid #aaa",
+                    backgroundColor: "#fafafa",
+                    fontSize: "0.95rem",
+                  }}
+                />
+
+                {searchValue.length > 0 && (
+                  <ul
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      width: "100%",
+                      background: "white",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      maxHeight: "180px",
+                      overflowY: "auto",
+                      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                      zIndex: 10,
+                      padding: 0,
+                      margin: 0,
+                      listStyle: "none"
+                    }}
+                  >
+                    {AislamientosOptions
+                      .filter(opt =>
+                        opt.label.toLowerCase().includes(searchValue.toLowerCase())
+                      )
+                      .map((opt, index) => (
+                        <li
+                          key={index}
+                          onClick={() => {
+                            setSearchValue(opt.label);
+                            handleChange({
+                              target: { name: "idAislamiento", value: opt.value }
+                            });
+                          }}
+                          style={{
+                            padding: "10px 14px",
+                            cursor: "pointer",
+                            borderBottom: "1px solid #eee"
+                          }}
+                        >
+                          {opt.label}
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </div>
+
+              <p className="hint-text">
+                Debe seleccionar el aislamiento al que pertenece esta morfología.
+              </p>
             </div>
           )}
-
         </div>
       </div>
     </div>

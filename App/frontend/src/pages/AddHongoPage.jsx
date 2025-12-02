@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./AddFungus.css";
 import AppModal from "./AppModal";
 import { createHongo } from "../api/FungusApi";
+import CategoryDropdown from "../components/categoryDropdown/categoryDropdown";
 import { getAislamientos } from "../api/FungusApi";
 
 const TABS = ["Taxonomía", "Identificación", "Marcadores", "Vinculación"];
@@ -12,13 +13,9 @@ const AddHongoPage = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [AislamientosOption, setAislamientosOptions] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
   const [prefillModalOpen, setPrefillModalOpen] = useState(false);
   const [prefillMessage, setPrefillMessage] = useState("");
-  const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [createdId, setCreatedId] = useState(null);
-
-
 
   const [formData, setFormData] = useState({
     // Vinculación
@@ -88,32 +85,30 @@ const AddHongoPage = () => {
   const handleAislamientoSelect = (selectedOption) => {
     setFormData(prev => ({
       ...prev,
-      idAislamientoExistente: selectedOption?.value || "" // Si escribe manualmente, se actualiza en handleChange
+      idAislamiento: selectedOption?.value || "" // Si escribe manualmente, se actualiza en handleChange
     }));
-  };
-
-
-  const updateNestedState = (obj, path, value) => {
-    const newObj = JSON.parse(JSON.stringify(obj));
-    const keys = path.split('.');
-    let current = newObj;
-    for (let i = 0; i < keys.length - 1; i++) {
-      current = current[keys[i]];
-    }
-    current[keys[keys.length - 1]] = value;
-    return newObj;
   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const val = type === 'checkbox' ? checked : value;
-    
-    if (name.includes('.')) {
-      setFormData(prev => updateNestedState(prev, name, val));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: val }));
+
+    if (name.startsWith("marcador.")) {
+      const key = name.split(".")[1];
+      setFormData(prev => ({
+        ...prev,
+        marcador: {
+          ...prev.marcador,
+          [key]: val
+        }
+      }));
+      return; 
     }
+
+    // Normal
+    setFormData(prev => ({ ...prev, [name]: val }));
   };
+
 
   const handleSubmit = async () => {
     if (!formData.idAislamiento) {
@@ -273,35 +268,75 @@ const AddHongoPage = () => {
           )}
 
           {activeTab === 3 && (
-            <div className="form-section">
-              <p className="hint-text" style={{ marginBottom: '20px' }}>
-                Seleccione el aislamiento al que pertenece este hongo. El código de aislamiento es el identificador único asignado en la fase de laboratorio.
-              </p>
+            <div className="form-group">
+              <label>Seleccionar Aislamiento Existente</label>
 
-              <div className="form-group">
-                <label>Seleccionar Aislamiento Existente</label>
-                <select
-                  name="idAislamiento"
-                  value={formData.idAislamiento}
-                  onChange={handleChange}
-                  style={{ 
-                    width: '100%', 
-                    padding: '12px', 
-                    borderRadius: '8px', 
-                    border: '1px solid #ddd', 
-                    backgroundColor: 'white',
-                    fontSize: '0.95rem',
-                    color: '#333'
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  placeholder="Escribe o selecciona un aislamiento..."
+                  value={searchValue}
+                  onChange={(e) => {
+                    setSearchValue(e.target.value);
                   }}
-                >
-                  <option value="">-- Seleccione un aislamiento --</option>
-                  {AislamientosOption.map((opt, index) => (
-                    <option key={index} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "8px",
+                    border: "1px solid #aaa",
+                    backgroundColor: "#fafafa",
+                    fontSize: "0.95rem",
+                  }}
+                />
+
+                {searchValue.length > 0 && (
+                  <ul
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      width: "100%",
+                      background: "white",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      maxHeight: "180px",
+                      overflowY: "auto",
+                      boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                      zIndex: 10,
+                      padding: 0,
+                      margin: 0,
+                      listStyle: "none"
+                    }}
+                  >
+                    {AislamientosOptions
+                      .filter(opt =>
+                        opt.label.toLowerCase().includes(searchValue.toLowerCase())
+                      )
+                      .map((opt, index) => (
+                        <li
+                          key={index}
+                          onClick={() => {
+                            setSearchValue(opt.label);
+                            handleChange({
+                              target: { name: "idAislamiento", value: opt.value }
+                            });
+                          }}
+                          style={{
+                            padding: "10px 14px",
+                            cursor: "pointer",
+                            borderBottom: "1px solid #eee"
+                          }}
+                        >
+                          {opt.label}
+                        </li>
+                      ))}
+                  </ul>
+                )}
               </div>
+
+              <p className="hint-text">
+                Debe seleccionar el aislamiento al que pertenece esta morfología.
+              </p>
             </div>
           )}
         </div>

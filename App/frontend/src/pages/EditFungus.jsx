@@ -15,7 +15,7 @@ const TABS = [
   "Morfología",
   "Marcadores Moleculares",
   "Almacenamiento",
-  "Asociación con Planta",
+  "Asociación con Huésped",
   "Ensayos Biológicos",
 ];
 
@@ -79,9 +79,16 @@ const EditFungus = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    const val = type === "checkbox" ? checked : value;
+
+    let val = type === "checkbox" ? checked : value;
+
+    // Normalizar booleans provenientes de selects
+    if (val === "true") val = true;
+    if (val === "false") val = false;
+
     setFormData((prev) => updateNested(prev, name, val));
   };
+
 
   const handleSelectChange = (e, key) => {
     const value = e.target.value;
@@ -93,6 +100,8 @@ const EditFungus = () => {
     setFormData((prev) => updateNested(prev, key, finalValue));
 
     if (key === "idColecta") {
+      if (!value) return; // evita fallos si se limpia el select
+
       const selected = colectas.find((c) => c.id === parseInt(value));
       if (selected) {
         setFormData((prev) => ({
@@ -244,11 +253,12 @@ const EditFungus = () => {
       },
       { label: "Fecha Aislamiento", key: "FechaAislamiento", type: "date" },
       { label: "Fecha Salida", key: "FechaSalida", type: "date" },
-      { label: "Parte de Planta", key: "ParteDePlanta" },
+      { label: "Parte de Huésped", key: "ParteDeHuésped", showIf: { key: "aisladoDePlanta", equals: true } },
       { label: "Estado", key: "Estado" },
       { label: "Comentarios", key: "Comentarios" },
-      { label: "¿Aislado de Planta?", key: "AisladoDePlanta", type: "checkbox" },
+      { label: "¿Aislado de Huésped?", key: "AisladoDeHuésped", type: "checkbox" },
       { label: "¿En Colección?", key: "EstaEnColeccion", type: "checkbox" },
+      { label: "Cantidad de existencias", key: "cantidadExistencias", type: "number", showIf: { key: "enColeccion", equals: true } }
     ],
     MORFO: [
       {
@@ -297,11 +307,11 @@ const EditFungus = () => {
       { label: "Cantidad Existencias", key: "CantidadExistencias" },
       { label: "Área Protegida", key: "Colecta.Sitio.NombreAreaProtegida" },
     ],
-    PLANTA: [
-      { label: "Reino Planta", key: "Colecta.Planta.Reino" },
-      { label: "Familia Planta", key: "Colecta.Planta.Familia" },
-      { label: "Género Planta", key: "Colecta.Planta.Genero" },
-      { label: "Especie Planta", key: "Colecta.Planta.Especie" },
+    Huésped: [
+      { label: "Reino Huésped", key: "Colecta.Huésped.Reino" },
+      { label: "Familia Huésped", key: "Colecta.Huésped.Familia" },
+      { label: "Género Huésped", key: "Colecta.Huésped.Genero" },
+      { label: "Especie Huésped", key: "Colecta.Huésped.Especie" },
     ],
     ENSAYOS: [],
   };
@@ -389,6 +399,7 @@ const EditFungus = () => {
               (
                 Object.values(SECTION_CONFIG)[activeTab]
               ).map((item, i) => (
+
                 <div className="edit-row" key={i}>
                   <span className="edit-label">{item.label}</span>
 

@@ -12,7 +12,7 @@ const FungusList = () => {
 
   // PAGINACIÓN
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 150;
 
   // ORDENAMIENTO
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });

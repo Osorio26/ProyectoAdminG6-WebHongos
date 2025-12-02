@@ -68,6 +68,7 @@ model Hongos {
   // RELACIONES
   Organismo   Organismos     @relation(fields: [id], references: [id])
   Marcadores  Marcadores[]
+  Aislamientos Aislamientos[]
 }
 
 //
@@ -114,10 +115,12 @@ model Aislamientos {
   EstaEnColeccion     Boolean      @default(false)
   idColecta          String?
   idOrganismo        String?
+  idHongo            String?
 
   // RELACIONES
   Colecta      Colectas?           @relation(fields: [idColecta], references: [id])
   Organismo    Organismos?         @relation(fields: [idOrganismo], references: [id])
+  Hongo        Hongos?             @relation(fields: [idHongo], references: [id])
 
   EnsayosBiologicos EnsayosBiologicos[]
   Morfologias  Morfologias[]

@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-# Página Web Gestión de Hongos
-## Equipo:
-=======
 # COCMI - Sistema de Gestión de Inventario de Hongos
 
 Este proyecto es una aplicación de escritorio desarrollada para la gestión del inventario de la colección de hongos (COCMI).
@@ -20,6 +16,7 @@ A diferencia de una aplicación web tradicional, esta aplicación **no requiere 
 
 *   **Motor**: SQLite.
 *   **Archivo de Datos**: La base de datos completa reside en un único archivo llamado `dev.db`.
+*   **Tipos de Datos**: Para asegurar compatibilidad total con SQLite, se utilizan tipos `Float` en lugar de `Decimal` para campos numéricos como Temperatura, Humedad, pH, Latitud y Longitud.
 
 ### Ubicación de la Base de Datos
 
@@ -84,6 +81,8 @@ Si necesitas agregar tablas, columnas o cambiar relaciones, sigue estos pasos:
     *   Actualiza el archivo local `dev.db` con la nueva estructura.
     *   Regenera el "Prisma Client" (la librería que usa el código para hablar con la BD).
     *   Crea un historial de migraciones en la carpeta `prisma/migrations`.
+    
+    *Nota*: Si encuentras errores de inconsistencia de datos o tipos (ej. al cambiar de Decimal a Float), puedes usar `npx prisma db push` para forzar la sincronización del esquema con la base de datos local.
 
 3.  **Reconstruir el Ejecutable**:
     Una vez que la base de datos local (`dev.db`) está actualizada, al correr `npm run dist`, esta nueva versión de la base de datos se empaquetará en el instalador.
@@ -94,6 +93,10 @@ Si necesitas agregar tablas, columnas o cambiar relaciones, sigue estos pasos:
     > *   Opción A: Borrar su carpeta `database` (perdiendo sus datos) para que la app genere la nueva versión.
     > *   Opción B: Usar herramientas manuales para migrar sus datos (avanzado).
     > *   *Recomendación*: Para este proyecto académico, asuman que un cambio de esquema requiere una reinstalación limpia (Opción A).
+
+### Cambios Recientes en el Schema (Diciembre 2025)
+*   **Corrección de Tipos**: Se migraron los campos numéricos de `Decimal` a `Float` en las tablas `Colectas` y `Coordenadas` para resolver errores de lectura (`P2023`) con datos preexistentes en SQLite.
+*   **Nueva Relación**: Se agregó la columna `idHongo` a la tabla `Aislamientos` para permitir una relación directa entre un aislamiento y un hongo, facilitando las consultas.
 
 ### Generación del Ejecutable (Build)
 
@@ -120,7 +123,6 @@ Este comando realizará lo siguiente:
 *   **`frontend/vite.config.js`**: Configurado con `base: './'` para asegurar que las rutas funcionen correctamente dentro de Electron (sistema de archivos local).
 
 ## Equipo de Desarrollo
->>>>>>> Stashed changes
 - Alejandro Solórzano
 - Antony Picado
 - Isaac Vargas

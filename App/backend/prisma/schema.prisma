@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -13,10 +13,7 @@ datasource db {
 // ===============================
 //
 
-enum TipoOrganismo {
-  Planta
-  Hongo
-}
+// SQLite handles enums as strings.
 
 //
 // ===============================
@@ -25,20 +22,20 @@ enum TipoOrganismo {
 //
 
 model Sitios {
-  id                     String       @id @default(uuid()) @db.Char(36)
-  Nombre                 String?      @db.VarChar(100)
-  EsAreaProtegida        Boolean?     @db.TinyInt
-  NombreAreaProtegida    String?      @db.VarChar(100)
-  ReferenciasAdicionales String?      @db.Text
+  id                     String       @id @default(uuid())
+  Nombre                 String?
+  EsAreaProtegida        Boolean?
+  NombreAreaProtegida    String?
+  ReferenciasAdicionales String?
 
   // RELACIONES
   Colectas               Colectas[]
 }
 
 model Coordenadas {
-  id        String       @id @default(uuid()) @db.Char(36)
-  Latitud   Decimal?     @db.Decimal(9, 6)
-  Longitud  Decimal?     @db.Decimal(9, 6)
+  id        String       @id @default(uuid())
+  Latitud   Decimal?
+  Longitud  Decimal?
   Altitud   Int?
 
   // RELACIONES
@@ -46,15 +43,15 @@ model Coordenadas {
 }
 
 model Organismos {
-  id       String          @id @default(uuid()) @db.Char(36)
-  Tipo     TipoOrganismo
-  Reino    String?         @db.VarChar(50)
-  Filo     String?         @db.VarChar(50)
-  Clase    String?         @db.VarChar(50)
-  Orden    String?         @db.VarChar(50)
-  Familia  String?         @db.VarChar(50)
-  Genero   String?         @db.VarChar(50)
-  Especie  String?         @db.VarChar(50)
+  id       String          @id @default(uuid())
+  Tipo     String
+  Reino    String?
+  Filo     String?
+  Clase    String?
+  Orden    String?
+  Familia  String?
+  Genero   String?
+  Especie  String?
 
   // RELACIONES
   Hongo        Hongos?
@@ -63,10 +60,10 @@ model Organismos {
 }
 
 model Hongos {
-  id                        String        @id @db.Char(36)
-  MetodoIdentificacion      String?       @db.Text
-  CodigoAccesoGenBank       String?       @db.VarChar(30)
-  IdentificadorResponsable  String?       @db.VarChar(100)
+  id                        String        @id
+  MetodoIdentificacion      String?
+  CodigoAccesoGenBank       String?
+  IdentificadorResponsable  String?
 
   // RELACIONES
   Organismo   Organismos     @relation(fields: [id], references: [id])
@@ -80,18 +77,18 @@ model Hongos {
 //
 
 model Colectas {
-  id                String        @id @default(uuid()) @db.Char(36)
-  idHeredado        String?       @unique @db.VarChar(100)
-  Colector          String?       @db.VarChar(100)
-  Fecha             DateTime?     @db.Date
-  Temperatura       Decimal?      @db.Decimal(5, 2)
-  Humedad           Decimal?      @db.Decimal(5, 2)
-  pH                Decimal?      @db.Decimal(4, 2)
-  idSitio           String?       @db.Char(36)
-  TieneCoordenadas  Boolean       @db.TinyInt
-  idCoordenadas     String?       @db.Char(36)
-  ContienePlanta    Boolean       @db.TinyInt
-  idPlanta          String?       @db.Char(36)
+  id                String        @id @default(uuid())
+  idHeredado        String?       @unique
+  Colector          String?
+  Fecha             DateTime?
+  Temperatura       Decimal?
+  Humedad           Decimal?
+  pH                Decimal?
+  idSitio           String?
+  TieneCoordenadas  Boolean
+  idCoordenadas     String?
+  ContienePlanta    Boolean
+  idPlanta          String?
 
   // RELACIONES
   Sitio        Sitios?       @relation(fields: [idSitio], references: [id])
@@ -102,27 +99,27 @@ model Colectas {
 }
 
 model Aislamientos {
-  id                 String        @id @default(uuid()) @db.Char(36)
-  idHeredado         String        @unique @db.VarChar(100)
-  AisladoDePlanta    Boolean       @db.TinyInt
-  ParteDePlanta      String?       @db.VarChar(50)
-  FechaAislamiento   DateTime?     @db.Date
-  FechaSalida        DateTime?     @db.Date
-  IdAnalisisMolecular String?      @db.VarChar(100)
-  MedioCultivo       String?       @db.VarChar(100)
-  MetodoSiembra      String?       @db.VarChar(100)
-  Estado             String?       @db.VarChar(50)
-  Comentarios        String?       @db.Text
+  id                 String        @id @default(uuid())
+  idHeredado         String        @unique
+  AisladoDePlanta    Boolean
+  ParteDePlanta      String?
+  FechaAislamiento   DateTime?
+  FechaSalida        DateTime?
+  IdAnalisisMolecular String?
+  MedioCultivo       String?
+  MetodoSiembra      String?
+  Estado             String?
+  Comentarios        String?
   CantidadExistencias Int?
-  EstaEnColeccion     Boolean      @default(false) @db.TinyInt
-  idColecta          String?       @db.Char(36)
-  idOrganismo        String?       @db.Char(36)
+  EstaEnColeccion     Boolean      @default(false)
+  idColecta          String?
+  idOrganismo        String?
 
   // RELACIONES
   Colecta      Colectas?           @relation(fields: [idColecta], references: [id])
   Organismo    Organismos?         @relation(fields: [idOrganismo], references: [id])
 
-  Ensayos      EnsayosBiologicos[]
+  EnsayosBiologicos EnsayosBiologicos[]
   Morfologias  Morfologias[]
 }
 
@@ -133,29 +130,29 @@ model Aislamientos {
 //
 
 model EnsayosBiologicos {
-  id            String     @id @default(uuid()) @db.Char(36)
-  idAislamiento String     @db.Char(36)
-  Tipo          String     @db.VarChar(50)
-  Resultado     String?    @db.Text
+  id            String     @id @default(uuid())
+  idAislamiento String
+  Tipo          String
+  Resultado     String?
 
   // RELACIONES
   Aislamiento   Aislamientos @relation(fields: [idAislamiento], references: [id], onDelete: Cascade)
 }
 
 model Morfologias {
-  id                    String     @id @default(uuid()) @db.Char(36)
-  idAislamiento         String     @db.Char(36)
-  Forma                 String?    @db.VarChar(50)
-  FormaBorde            String?    @db.VarChar(50)
-  ColorAnverso          String?    @db.VarChar(50)
-  ColorReverso          String?    @db.VarChar(50)
-  ColorBorde            String?    @db.VarChar(50)
-  TieneMicelioAereo     Boolean?   @db.TinyInt
-  DensidadMicelioAereo  String?    @db.VarChar(50)
-  TipoCrecimiento       String?    @db.VarChar(50)
-  TipoHifa              String?    @db.VarChar(50)
-  TieneSecreciones      Boolean?   @db.TinyInt
-  Observaciones         String?    @db.Text
+  id                    String     @id @default(uuid())
+  idAislamiento         String
+  Forma                 String?
+  FormaBorde            String?
+  ColorAnverso          String?
+  ColorReverso          String?
+  ColorBorde            String?
+  TieneMicelioAereo     Boolean?
+  DensidadMicelioAereo  String?
+  TipoCrecimiento       String?
+  TipoHifa              String?
+  TieneSecreciones      Boolean?
+  Observaciones         String?
 
   // RELACIONES
   Aislamiento Aislamientos @relation(fields: [idAislamiento], references: [id], onDelete: Cascade)
@@ -168,10 +165,10 @@ model Morfologias {
 //
 
 model Marcadores {
-  id        String     @id @default(uuid()) @db.Char(36)
-  idHongo   String     @db.Char(36)
-  Tipo      String     @db.VarChar(50)
-  Secuencia String?    @db.Text
+  id        String     @id @default(uuid())
+  idHongo   String
+  Tipo      String
+  Secuencia String?
 
   // RELACIONES
   Hongo     Hongos     @relation(fields: [idHongo], references: [id], onDelete: Cascade)

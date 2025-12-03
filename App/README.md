@@ -55,7 +55,7 @@ Para trabajar en el código, puedes correr el frontend y backend por separado, o
     ```bash
     cd App/backend
     npx prisma migrate dev  # Asegura que la DB esté sincronizada
-    npm run dev             # O node server.js
+    npm run start             # O node server.js
     ```
 2.  **Frontend**:
     ```bash

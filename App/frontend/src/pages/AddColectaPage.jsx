@@ -230,6 +230,7 @@ const AddColectaPage = () => {
             open={modalOpen}
             title="Colecta creada"
             message="La colecta se registró exitosamente. ¿Desea registrar un Aislamiento ahora?"
+            cancelLabel="Volver"
             onConfirm={() => {
               setModalOpen(false);
 
@@ -252,7 +253,7 @@ const AddColectaPage = () => {
             }}
             onCancel={() => {
               setModalOpen(false);
-              navigate("/inventario");
+              navigate("/add-menu");
             }}
           />
 

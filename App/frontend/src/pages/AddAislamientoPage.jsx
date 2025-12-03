@@ -375,6 +375,7 @@ const AddAislamientoPage = () => {
           open={modalOpen}
           title="Aislamiento creado"
           message="El aislamiento se registró exitosamente. ¿Desea registrar el hongo para este aislamiento ahora?"
+          cancelLabel="Volver"
           onConfirm={() => {
             setModalOpen(false);
 
@@ -386,7 +387,7 @@ const AddAislamientoPage = () => {
           }}
           onCancel={() => {
             setModalOpen(false);
-            navigate("/inventario");
+            navigate("/add-menu");
           }}
         />
 

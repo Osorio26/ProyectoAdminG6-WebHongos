@@ -81,7 +81,7 @@ model Colectas {
   id                String        @id @default(uuid()) @map("Id")
   idHeredado        String?       @unique @map("IdHeredado")
   Colector          String?       @map("Colector")
-  Fecha             DateTime?     @map("Fecha")
+  Fecha             String?       @map("Fecha")
   Temperatura       Float?        @map("Temperatura")
   Humedad           Float?        @map("Humedad")
   pH                Float?        @map("pH")

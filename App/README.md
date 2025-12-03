@@ -43,7 +43,7 @@ Ejecuta el siguiente comando en la carpeta raíz `App/` para instalar las depend
 ```bash
 cd App
 npm install
-cd frontend && npm install
+cd frontend && npm install && npm install react-confirm-alert
 cd ../backend && npm install
 ```
 

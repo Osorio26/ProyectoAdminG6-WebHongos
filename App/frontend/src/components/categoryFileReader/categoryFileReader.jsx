@@ -1,16 +1,44 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { getCategory, updateCategory, createCategory } from "../../api/CategoryApi";
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import "react-toastify/dist/ReactToastify.css";
 import "./categoryFileReader.css";
 
-const CategoryFileReader = ({ onClose }) => {
+const CategoryFileReader = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newItem, setNewItem] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+
+    const options = {
+    title: 'Title',
+    message: 'Message',
+    buttons: [
+      {
+        label: 'Yes',
+        onClick: () => alert('Click Yes')
+      },
+      {
+        label: 'No',
+        onClick: () => alert('Click No')
+      }
+    ],
+    closeOnEscape: true,
+    closeOnClickOutside: true,
+    keyCodeForClose: [8, 32],
+    willUnmount: () => {},
+    afterClose: () => {},
+    onClickOutside: () => {},
+    onKeypress: () => {},
+    onKeypressEscape: () => {},
+    overlayClassName: "overlay-custom-class-name"
+  };
+
+
 
   useEffect(() => {
     fetchCategories();
@@ -27,7 +55,7 @@ const CategoryFileReader = ({ onClose }) => {
         if (updated) setSelectedCategory(updated);
       }
     } catch (error) {
-      toast.error("Error al cargar categorías");
+      toast.error("Error al cargar categorías.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -43,15 +71,49 @@ const CategoryFileReader = ({ onClose }) => {
     try {
       await updateCategory(selectedCategory.title, updatedCategory);
       setNewItem("");
-      toast.success("Elemento agregado");
+      toast.success("Elemento agregado!");
       fetchCategories(); // Refresh all to be safe
     } catch (error) {
-      toast.error("Error al agregar elemento");
+      toast.error("Error al agregar elemento.");
     }
   };
 
   const handleDeleteItem = async (itemToDelete) => {
+  if (!selectedCategory) return;
+
+  confirmAlert({
+    title: 'Confirmar eliminación',
+    message: `¿Eliminar "${itemToDelete}" de ${selectedCategory.title}?`,
+    buttons: [
+      {
+        label: 'Sí',
+        onClick: async () => {
+          // Proceed with deletion
+          const updatedContent = selectedCategory.content.filter(item => item !== itemToDelete);
+          const updatedCategory = { ...selectedCategory, content: updatedContent };
+
+          try {
+            await updateCategory(selectedCategory.title, updatedCategory);
+            toast.success("Elemento eliminado!");
+            fetchCategories();
+          } catch (error) {
+            toast.error("Error al eliminar elemento.");
+          }
+        }
+      },
+      {
+        label: 'No',
+        onClick: () => {
+          // Nothing happens
+        }
+      }
+    ]
+  });
+  };
+
+  const handleDeleteItems = async (itemToDelete) => {
     if (!selectedCategory) return;
+    confirmAlert(options)
     if (!window.confirm(`¿Eliminar "${itemToDelete}" de ${selectedCategory.title}?`)) return;
 
     const updatedContent = selectedCategory.content.filter(item => item !== itemToDelete);
@@ -59,10 +121,10 @@ const CategoryFileReader = ({ onClose }) => {
 
     try {
       await updateCategory(selectedCategory.title, updatedCategory);
-      toast.success("Elemento eliminado");
+      toast.success("Elemento eliminado!");
       fetchCategories();
     } catch (error) {
-      toast.error("Error al eliminar elemento");
+      toast.error("Error al eliminar elemento.");
     }
   };
 
@@ -73,10 +135,10 @@ const CategoryFileReader = ({ onClose }) => {
       await createCategory({ title: newCategoryName.trim(), content: [] });
       setNewCategoryName("");
       setIsCreatingCategory(false);
-      toast.success("Categoría creada");
+      toast.success("Categoría creada!");
       fetchCategories();
     } catch (error) {
-      toast.error("Error al crear categoría");
+      toast.error("Error al crear categoría.");
     }
   };
 
@@ -150,7 +212,7 @@ const CategoryFileReader = ({ onClose }) => {
                 </li>
               ))}
               {selectedCategory.content.length === 0 && (
-                <li className="empty-msg">No hay elementos en esta categoría</li>
+                <li className="empty-msg">No hay elementos en esta categoría...</li>
               )}
             </ul>
           </>

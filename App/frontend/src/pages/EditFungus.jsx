@@ -384,6 +384,7 @@ const EditFungus = () => {
                         value={ens.Resultado}
                         className="edit-input-field"
                         onChange={handleChange}
+                        placeholder="Ej: Inhibición del 50%..."
                       />
                     </div>
                   </div>

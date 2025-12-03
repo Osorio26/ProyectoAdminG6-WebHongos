@@ -168,15 +168,15 @@ const AddMorfologiaPage = () => {
               </div>
               <div className="form-group">
                 <label>Color Anverso</label>
-                <input type="text" name="colorAnverso" value={formData.colorAnverso} onChange={handleChange} placeholder="Ej: Blanco" />
+                <input type="text" name="colorAnverso" value={formData.colorAnverso} onChange={handleChange} placeholder="Ej: Blanco crema, Verde oliva" />
               </div>
               <div className="form-group">
                 <label>Color Reverso</label>
-                <input type="text" name="colorReverso" value={formData.colorReverso} onChange={handleChange} placeholder="Ej: Amarillo" />
+                <input type="text" name="colorReverso" value={formData.colorReverso} onChange={handleChange} placeholder="Ej: Beige, Marrón claro" />
               </div>
               <div className="form-group">
                 <label>Color del Borde</label>
-                <input type="text" name="colorBorde" value={formData.colorBorde} onChange={handleChange} placeholder="Ej: Rojo" />
+                <input type="text" name="colorBorde" value={formData.colorBorde} onChange={handleChange} placeholder="Ej: Blanco, Sin borde diferenciado" />
               </div>
             </div>
           )}
@@ -193,7 +193,7 @@ const AddMorfologiaPage = () => {
               </div>
               <div className="form-group">
                 <label>Tipo de Hifa</label>
-                <input type="text" name="tipoHifa" value={formData.tipoHifa} onChange={handleChange} placeholder="Ej: Hialina, Septada" />
+                <input type="text" name="tipoHifa" value={formData.tipoHifa} onChange={handleChange} placeholder="Ej: Hialina, Septada, Ramificada" />
               </div>
               <div className="form-group">
                 <label>
@@ -204,7 +204,7 @@ const AddMorfologiaPage = () => {
               {formData.tieneMicelioAereo && (
                 <div className="form-group">
                   <label>Densidad Micelio Aéreo</label>
-                  <input type="text" name="densidadMicelioAereo" value={formData.densidadMicelioAereo} onChange={handleChange} placeholder="Ej: Densa, Escasa" />
+                  <input type="text" name="densidadMicelioAereo" value={formData.densidadMicelioAereo} onChange={handleChange} placeholder="Ej: Algodonosa densa, Rala" />
                 </div>
               )}
               <div className="form-group">
@@ -215,7 +215,7 @@ const AddMorfologiaPage = () => {
               </div>
               <div className="form-group">
                 <label>Observaciones</label>
-                <textarea name="observaciones" value={formData.observaciones} onChange={handleChange} rows="3" placeholder="Ej: Escriba aquí las observaciones correspondientes"/>
+                <textarea name="observaciones" value={formData.observaciones} onChange={handleChange} rows="3" placeholder="Ej: Formación de esclerocios visibles..."/>
               </div>
             </div>
           )}
@@ -227,7 +227,7 @@ const AddMorfologiaPage = () => {
               <div style={{ position: "relative" }}>
                 <input
                   type="text"
-                  placeholder="Escribe o selecciona un aislamiento..."
+                  placeholder="Buscar por código de aislamiento (Ej: AIS-2024-001)..."
                   value={searchValue}
                   onChange={(e) => {
                     setSearchValue(e.target.value);

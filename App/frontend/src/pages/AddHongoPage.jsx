@@ -197,27 +197,27 @@ const AddHongoPage = () => {
               </div>
               <div className="form-group">
                 <label>Filo</label>
-                <input type="text" name="filo" value={formData.filo} onChange={handleChange} placeholder="Ej: Basidiomycota"/>
+                <input type="text" name="filo" value={formData.filo} onChange={handleChange} placeholder="Ej: Ascomycota"/>
               </div>
               <div className="form-group">
                 <label>Clase</label>
-                <input type="text" name="clase" value={formData.clase} onChange={handleChange} placeholder="Ej: Agaricomycetes"/>
+                <input type="text" name="clase" value={formData.clase} onChange={handleChange} placeholder="Ej: Sordariomycetes"/>
               </div>
               <div className="form-group">
                 <label>Orden</label>
-                <input type="text" name="orden" value={formData.orden} onChange={handleChange} placeholder="Ej: Agaricales"/>
+                <input type="text" name="orden" value={formData.orden} onChange={handleChange} placeholder="Ej: Hypocreales"/>
               </div>
               <div className="form-group">
                 <label>Familia</label>
-                <input type="text" name="familia" value={formData.familia} onChange={handleChange} placeholder="Ej: Agaricaceae"/>
+                <input type="text" name="familia" value={formData.familia} onChange={handleChange} placeholder="Ej: Nectriaceae"/>
               </div>
               <div className="form-group">
                 <label>Género *</label>
-                <input type="text" name="genero" value={formData.genero} onChange={handleChange} placeholder="Ej: Agaricus"/>
+                <input type="text" name="genero" value={formData.genero} onChange={handleChange} placeholder="Ej: Fusarium"/>
               </div>
               <div className="form-group">
                 <label>Especie</label>
-                <input type="text" name="especie" value={formData.especie} onChange={handleChange} placeholder="Ej: Agaricus campestris"/>
+                <input type="text" name="especie" value={formData.especie} onChange={handleChange} placeholder="Ej: Fusarium oxysporum"/>
               </div>
             </div>
           )}
@@ -226,15 +226,15 @@ const AddHongoPage = () => {
             <div className="form-section">
               <div className="form-group">
                 <label>Método de Identificación</label>
-                <input type="text" name="metodoIdentificacion" value={formData.metodoIdentificacion} onChange={handleChange} placeholder="Ej: Morfológico, Molecular" />
+                <input type="text" name="metodoIdentificacion" value={formData.metodoIdentificacion} onChange={handleChange} placeholder="Ej: Secuenciación ITS, Morfología microscópica" />
               </div>
               <div className="form-group">
                 <label>Código Acceso GenBank</label>
-                <input type="text" name="codigoAccesoGenBank" value={formData.codigoAccesoGenBank} onChange={handleChange} placeholder="Ej: OR123456"/>
+                <input type="text" name="codigoAccesoGenBank" value={formData.codigoAccesoGenBank} onChange={handleChange} placeholder="Ej: OR123456, KY654321"/>
               </div>
               <div className="form-group">
                 <label>Responsable Identificación</label>
-                <input type="text" name="responsableIdentificacion" value={formData.responsableIdentificacion} onChange={handleChange} placeholder="Ej: Nombre Apellido"/>
+                <input type="text" name="responsableIdentificacion" value={formData.responsableIdentificacion} onChange={handleChange} placeholder="Ej: Dr. Ana Gómez"/>
               </div>
             </div>
           )}
@@ -260,7 +260,7 @@ const AddHongoPage = () => {
                   </div>
                   <div className="form-group">
                     <label>Secuencia (Texto)</label>
-                    <textarea name="marcador.secuenciaTexto" value={formData.marcador.secuenciaTexto} onChange={handleChange} rows="4" placeholder="Ej: Escriba aquí la secuencia del marcador"/>
+                    <textarea name="marcador.secuenciaTexto" value={formData.marcador.secuenciaTexto} onChange={handleChange} rows="4" placeholder="Ej: ATCGGCTA..."/>
                   </div>
                 </div>
               )}
@@ -274,7 +274,7 @@ const AddHongoPage = () => {
               <div style={{ position: "relative" }}>
                 <input
                   type="text"
-                  placeholder="Escribe o selecciona un aislamiento..."
+                  placeholder="Buscar por código de aislamiento (Ej: AIS-2024-001)..."
                   value={searchValue}
                   onChange={(e) => {
                     setSearchValue(e.target.value);

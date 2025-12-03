@@ -122,7 +122,7 @@ const AddColectaPage = () => {
             <div className="form-section">
               <div className="form-group">
                 <label>Código de Colecta *</label>
-                <input type="text" name="codigoColecta" value={formData.codigoColecta} onChange={handleChange} placeholder="Ej: COL-2024-001" />
+                <input type="text" name="codigoColecta" value={formData.codigoColecta} onChange={handleChange} placeholder="Ej: COL-2024-001 (Código único de colecta)" />
               </div>
               <div className="form-group">
                 <label>Fecha de Colecta</label>
@@ -130,15 +130,15 @@ const AddColectaPage = () => {
               </div>
               <div className="form-group">
                 <label>Colector Responsable</label>
-                <input type="text" name="colector" value={formData.colector} onChange={handleChange} placeholder="Nombre del colector" />
+                <input type="text" name="colector" value={formData.colector} onChange={handleChange} placeholder="Ej: Juan Pérez, María Rodríguez" />
               </div>
               <div className="form-group">
                 <label>Temperatura (°C)</label>
-                <input type="number" step="0.1" name="temperatura" value={formData.temperatura} onChange={handleChange} placeholder="Ej: 24.5" />
+                <input type="number" step="0.1" name="temperatura" value={formData.temperatura} onChange={handleChange} placeholder="Ej: 24.5 (°C)" />
               </div>
               <div className="form-group">
                 <label>Humedad (%)</label>
-                <input type="number" step="0.1" name="humedad" value={formData.humedad} onChange={handleChange} placeholder="Ej: 80" />
+                <input type="number" step="0.1" name="humedad" value={formData.humedad} onChange={handleChange} placeholder="Ej: 80 (%)" />
               </div>
               <div className="form-group">
                 <label>pH</label>
@@ -152,7 +152,7 @@ const AddColectaPage = () => {
               <h3>Sitio</h3>
               <div className="form-group">
                 <label>Nombre del Sitio</label>
-                <input type="text" name="sitio.nombre" value={formData.sitio.nombre} onChange={handleChange} placeholder="Ej: Sendero Principal" />
+                <input type="text" name="sitio.nombre" value={formData.sitio.nombre} onChange={handleChange} placeholder="Ej: Sendero Los Quetzales, Finca La Selva" />
               </div>
               <div className="form-group checkbox-row">
                 <label>
@@ -163,12 +163,12 @@ const AddColectaPage = () => {
               {formData.sitio.esAreaProtegida && (
                 <div className="form-group">
                   <label>Nombre Área Protegida</label>
-                  <input type="text" name="sitio.nombreAreaProtegida" value={formData.sitio.nombreAreaProtegida} onChange={handleChange} placeholder="Ej: Reserva Biológica Alberto Manuel Brenes"/>
+                  <input type="text" name="sitio.nombreAreaProtegida" value={formData.sitio.nombreAreaProtegida} onChange={handleChange} placeholder="Ej: Parque Nacional Tapantí"/>
                 </div>
               )}
               <div className="form-group">
                 <label>Referencias Adicionales</label>
-                <textarea name="sitio.referenciasAdicionales" value={formData.sitio.referenciasAdicionales} onChange={handleChange} rows="3" placeholder="Ej: Bosque húmedo premontano; 50 m al oeste del río..." />
+                <textarea name="sitio.referenciasAdicionales" value={formData.sitio.referenciasAdicionales} onChange={handleChange} rows="3" placeholder="Ej: Bosque secundario, cerca del río, bajo sombra..." />
               </div>
 
               <h3>Coordenadas</h3>
@@ -182,7 +182,7 @@ const AddColectaPage = () => {
               </div>
               <div className="form-group">
                 <label>Altitud (msnm)</label>
-                <input type="number" name="coordenadas.altitud" value={formData.coordenadas.altitud} onChange={handleChange} placeholder="Ej: 1275"/>
+                <input type="number" name="coordenadas.altitud" value={formData.coordenadas.altitud} onChange={handleChange} placeholder="Ej: 1200 (msnm)"/>
               </div>
             </div>
           )}
@@ -196,7 +196,7 @@ const AddColectaPage = () => {
               </div>
               <div className="form-group">
                 <label>Filo</label>
-                <input type="text" name="organismo.filo" value={formData.organismo.filo} onChange={handleChange} placeholder="Ej: Magnoliophyta"/>
+                <input type="text" name="organismo.filo" value={formData.organismo.filo} onChange={handleChange} placeholder="Ej: Tracheophyta"/>
               </div>
               <div className="form-group">
                 <label>Clase</label>

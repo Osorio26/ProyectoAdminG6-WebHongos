@@ -162,7 +162,7 @@ const AddEnsayoPage = () => {
                   value={formData.resultadoEnsayo}
                   onChange={handleChange}
                   rows="5"
-                  placeholder="Describa los resultados observados..."
+                  placeholder="Ej: Inhibición del 50% frente a Fusarium oxysporum..."
                 />
               </div>
             </div>
@@ -176,7 +176,7 @@ const AddEnsayoPage = () => {
               <div style={{ position: "relative" }}>
                 <input
                   type="text"
-                  placeholder="Escribe o selecciona un aislamiento..."
+                  placeholder="Buscar por código de aislamiento (Ej: AIS-2024-001)..."
                   value={searchValue}
                   onChange={(e) => {
                     setSearchValue(e.target.value);

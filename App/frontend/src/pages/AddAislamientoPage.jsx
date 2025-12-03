@@ -199,7 +199,7 @@ const AddAislamientoPage = () => {
             <div className="form-section">
               <div className="form-group">
                 <label>Código de Aislamiento *</label>
-                <input type="text" name="idHeredado" value={formData.idHeredado} onChange={handleChange} placeholder="Ej: AIS-2024-001" />
+                <input type="text" name="idHeredado" value={formData.idHeredado} onChange={handleChange} placeholder="Ej: AIS-2024-001 (Código único del aislamiento)" />
               </div>
               <div className="form-group">
                 <label>Fecha de Aislamiento</label>
@@ -214,7 +214,7 @@ const AddAislamientoPage = () => {
               {formData.aisladoDePlanta && (
                 <div className="form-group">
                   <label>Parte del huésped</label>
-                  <input type="text" name="parteDePlanta" value={formData.parteDePlanta} onChange={handleChange} placeholder="Ej: Hoja, Raíz" />
+                  <input type="text" name="parteDePlanta" value={formData.parteDePlanta} onChange={handleChange} placeholder="Ej: Hoja, Raíz, Tallo, Fruto" />
                 </div>
               )}
               <div className="form-group">
@@ -241,7 +241,7 @@ const AddAislamientoPage = () => {
                       const value = Math.max(1, Number(e.target.value));
                       setFormData(prev => ({ ...prev, cantidadExistencias: value }));
                     }}
-                    placeholder="Ej: 1, 2, 5"
+                    placeholder="Ej: 5 (Número de tubos/placas)"
                   />
                 </div>
               )}
@@ -279,7 +279,7 @@ const AddAislamientoPage = () => {
               </div>
               <div className="form-group">
                 <label>Comentarios</label>
-                <textarea name="comentarios" value={formData.comentarios} onChange={handleChange} rows="3" placeholder="Ej: Crecimiento inicial blanco algodonoso..." />
+                <textarea name="comentarios" value={formData.comentarios} onChange={handleChange} rows="3" placeholder="Ej: Crecimiento rápido, micelio blanco, sin esporulación visible..." />
               </div>
             </div>
           )}
@@ -296,7 +296,7 @@ const AddAislamientoPage = () => {
                 <div style={{ position: "relative" }}>
                   <input
                     type="text"
-                    placeholder="Escribe o selecciona una colecta..."
+                    placeholder="Buscar por código de colecta (Ej: COL-2024-001)..."
                     value={searchColecta}
                     onChange={(e) => setSearchColecta(e.target.value)}
                     style={{

@@ -102,7 +102,7 @@ const CategoryFileReader = ({ onClose }) => {
               type="text" 
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
-              placeholder="Nombre categoría..."
+              placeholder="Ej: Medio de Cultivo, Forma..."
               autoFocus
             />
             <div className="mini-actions">
@@ -130,7 +130,7 @@ const CategoryFileReader = ({ onClose }) => {
                 type="text" 
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
-                placeholder="Nuevo elemento..."
+                placeholder="Ej: PDA, Agar Nutritivo..."
                 onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
               />
               <button onClick={handleAddItem} disabled={!newItem.trim()}>Agregar</button>

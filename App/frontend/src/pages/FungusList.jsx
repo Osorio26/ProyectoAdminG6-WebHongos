@@ -185,7 +185,7 @@ const FungusList = () => {
         <div className="search-bar">
           <input
             type="text"
-            placeholder="Ej: BD-2022523226; Agaricales; Cartago"
+            placeholder="Buscar por código, especie, ubicación... Ej: Fusarium; Cartago; BD-2023"
             className="search-input"
             value={search}
             onChange={(e) => {

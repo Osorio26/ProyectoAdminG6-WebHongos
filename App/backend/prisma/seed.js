@@ -53,8 +53,17 @@ async function main() {
   let errorCount = 0;
 
   for (const statement of statements) {
-    const trimmed = statement.trim();
+    let trimmed = statement.trim();
     if (trimmed.toUpperCase().startsWith('INSERT INTO')) {
+      // Fix for Aislamientos table mismatch (15 values in dump vs 16 columns in DB)
+      // The dump is missing 'IdOrganismo', so we explicitly list the other 15 columns.
+      if (trimmed.startsWith('INSERT INTO `Aislamientos` VALUES')) {
+        trimmed = trimmed.replace(
+          'INSERT INTO `Aislamientos` VALUES', 
+          'INSERT INTO `Aislamientos` (Id, IdHeredado, AisladoDePlanta, ParteDePlanta, FechaAislamiento, FechaSalida, IdAnalisisMolecular, MedioCultivo, MetodoSiembra, Estado, Comentarios, CantidadExistencias, EstaEnColeccion, IdColecta, IdHongo) VALUES'
+        );
+      }
+
       try {
         // Execute the raw INSERT statement
         await prisma.$executeRawUnsafe(trimmed);

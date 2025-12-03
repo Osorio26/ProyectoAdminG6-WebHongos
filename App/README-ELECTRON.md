@@ -19,7 +19,7 @@ This project is configured to be packaged as a Windows executable using Electron
 3.  Run the following command to build the frontend, install backend dependencies, and package the application:
 
     ```bash
-    /F /IM node.exe
+    taskkill /F /IM node.exe
     ```
 
     ```bash

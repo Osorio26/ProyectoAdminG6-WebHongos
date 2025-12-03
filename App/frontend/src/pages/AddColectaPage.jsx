@@ -12,6 +12,8 @@ const AddColectaPage = () => {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [createdId, setCreatedId] = useState(null);
+  const [modalErrorOpen, setModalErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   /** 
   const [modalWarningOpen, setModalWarningOpen] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
@@ -59,7 +61,8 @@ const AddColectaPage = () => {
 
   const handleSubmit = async () => {
     if (!formData.codigoColecta) {
-      alert("El código de colecta es obligatorio");
+      setErrorMessage("El código de colecta es obligatorio.");
+      setModalErrorOpen(true);
       return;
     }
     
@@ -72,7 +75,8 @@ const AddColectaPage = () => {
 
     } catch (error) {
       console.error(error);
-      alert("Error al crear la colecta");
+      setErrorMessage("Ocurrió un error al crear la colecta. Por favor intente nuevamente.");
+      setModalErrorOpen(true);
     } finally {
       setLoading(false);
     }
@@ -251,6 +255,14 @@ const AddColectaPage = () => {
               navigate("/inventario");
             }}
           />
+
+      <AppModal
+        open={modalErrorOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={() => setModalErrorOpen(false)}
+        hideCancel={true}
+      />
     </div>
   );
 };

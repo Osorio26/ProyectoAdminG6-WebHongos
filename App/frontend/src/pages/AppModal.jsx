@@ -1,7 +1,7 @@
 import React from "react";
 import "./AppModal.css";
 
-export default function AppModal({ open, title, message, onConfirm, onCancel }) {
+export default function AppModal({ open, title, message, onConfirm, onCancel, hideCancel }) {
   if (!open) return null;
 
   return (
@@ -11,9 +11,11 @@ export default function AppModal({ open, title, message, onConfirm, onCancel }) 
         <p className="appmodal-message">{message}</p>
 
         <div className="appmodal-buttons">
-          <button className="modal-cancel" onClick={onCancel}>
-            Cancelar
-          </button>
+          {!hideCancel && (
+            <button className="modal-cancel" onClick={onCancel}>
+              Cancelar
+            </button>
+          )}
 
           <button className="modal-confirm" onClick={onConfirm}>
             Continuar

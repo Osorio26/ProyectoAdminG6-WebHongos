@@ -158,7 +158,7 @@ router.post("/colecta", async (req, res) => {
 			data: {
 				idHeredado: data.codigoColecta,
 				Colector: data.colector,
-				Fecha: data.fechaColecta ? new Date(data.fechaColecta) : null,
+				Fecha: data.fechaColecta ? String(data.fechaColecta) : null,
 				Temperatura: parseFloat(data.temperatura) || null,
 				Humedad: parseFloat(data.humedad) || null,
 				pH: parseFloat(data.ph) || null,
@@ -181,7 +181,8 @@ router.post("/colecta", async (req, res) => {
 router.post("/aislamiento", async (req, res) => {
 	try {
 		const data = req.body;
-		let idColecta = data.idColectaExistente || data.idColecta;
+		let idColectaInput = data.idColectaExistente || data.idColecta;
+		let finalIdColecta = null;
 
 		// Si es nueva colecta, crearla primero (lógica simplificada, idealmente reutilizar función)
 		if (data.isNewColecta) {
@@ -233,13 +234,31 @@ router.post("/aislamiento", async (req, res) => {
 				data: {
 					idHeredado: data.codigoColecta,
 					Colector: data.colector,
-					Fecha: data.fechaColecta ? new Date(data.fechaColecta) : null,
+					Fecha: data.fechaColecta ? String(data.fechaColecta) : null,
 					idSitio, idCoordenadas, idHospedero,
 					TieneCoordenadas: !!idCoordenadas,
 					ContieneHospedero: !!idHospedero
 				}
 			});
-			idColecta = nuevaColecta.id;
+			finalIdColecta = nuevaColecta.id;
+		} else if (idColectaInput) {
+			// Lógica para resolver ID de colecta existente (UUID o Código)
+			let colecta = await prisma.colectas.findUnique({
+				where: { id: idColectaInput }
+			});
+
+			if (!colecta) {
+				// Si no es UUID válido o no existe, buscar por código (idHeredado)
+				colecta = await prisma.colectas.findUnique({
+					where: { idHeredado: idColectaInput }
+				});
+			}
+
+			if (colecta) {
+				finalIdColecta = colecta.id;
+			} else {
+				return res.status(400).json({ message: `Colecta no encontrada con ID o Código: ${idColectaInput}` });
+			}
 		}
 
 		// Crear Aislamiento
@@ -257,7 +276,7 @@ router.post("/aislamiento", async (req, res) => {
 				Comentarios: data.comentarios,
 				CantidadExistencias: parseInt(data.cantidadExistencias) || 0,
 				EstaEnColeccion: data.enColeccion,
-				idColecta: idColecta
+				idColecta: finalIdColecta
 			}
 		});
 
@@ -528,7 +547,7 @@ router.put("/:code", async (req, res) => {
 				where: { id: existing.idColecta },
 				data: {
 					idHeredado: data.Colecta.idHeredado,
-					Fecha: data.Colecta.Fecha ? new Date(data.Colecta.Fecha) : undefined,
+					Fecha: data.Colecta.Fecha ? String(data.Colecta.Fecha) : undefined,
 					Colector: data.Colecta.Colector,
 					Temperatura: data.Colecta.Temperatura ? parseFloat(data.Colecta.Temperatura) : null,
 					Humedad: data.Colecta.Humedad ? parseFloat(data.Colecta.Humedad) : null,

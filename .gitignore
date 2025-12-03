@@ -31,3 +31,4 @@ App/dist/
 *.sln
 *.sw?
 /App/backend/prisma/migrations
+App/backend/prisma/dev.db

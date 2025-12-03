@@ -5,7 +5,9 @@ import {
   getFungusByCode,
   updateFungus,
   getColectas,
+  deleteEnsayo,
 } from "../api/FungusApi";
+import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 
 const TABS = [
@@ -29,6 +31,22 @@ const EditFungus = () => {
   const [colectas, setColectas] = useState([]);
   const [categories, setCategories] = useState({});
   const [loading, setLoading] = useState(true);
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+    type: "confirm",
+    isDanger: false
+  });
+
+  const showModal = (config) => {
+    setModalConfig({ ...config, isOpen: true });
+  };
+
+  const closeModal = () => {
+    setModalConfig((prev) => ({ ...prev, isOpen: false }));
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -146,25 +164,42 @@ const EditFungus = () => {
     }));
   };
 
-  const handleDeleteEnsayo = async (index) => {
+  const handleDeleteEnsayo = (index) => {
     const ensayo = formData.EnsayosBiologicos[index];
-    if (window.confirm("¿Estás seguro de que deseas eliminar este ensayo?")) {
-      if (!ensayo._isNew && ensayo.id) {
-        try {
-          await deleteEnsayo(ensayo.id);
-        } catch (error) {
-          console.error("Error deleting ensayo:", error);
-          alert("Error al eliminar el ensayo");
-          return;
+    
+    showModal({
+      title: "Eliminar Ensayo",
+      message: "¿Estás seguro de que deseas eliminar este ensayo? Esta acción no se puede deshacer.",
+      isDanger: true,
+      type: "confirm",
+      confirmText: "Eliminar",
+      onConfirm: async () => {
+        if (!ensayo._isNew && ensayo.id) {
+          try {
+            await deleteEnsayo(ensayo.id);
+          } catch (error) {
+            console.error("Error deleting ensayo:", error);
+            // Close the confirm modal first, then show alert
+            closeModal();
+            setTimeout(() => {
+              showModal({
+                title: "Error",
+                message: "Error al eliminar el ensayo",
+                type: "alert"
+              });
+            }, 100);
+            return;
+          }
         }
-      }
 
-      setFormData((prev) => {
-        const newEnsayos = [...prev.EnsayosBiologicos];
-        newEnsayos.splice(index, 1);
-        return { ...prev, EnsayosBiologicos: newEnsayos };
-      });
-    }
+        setFormData((prev) => {
+          const newEnsayos = [...prev.EnsayosBiologicos];
+          newEnsayos.splice(index, 1);
+          return { ...prev, EnsayosBiologicos: newEnsayos };
+        });
+        closeModal();
+      }
+    });
   };
 
   const handleSave = async () => {
@@ -211,7 +246,11 @@ const EditFungus = () => {
 
       navigate(`/detalle/${code}`);
     } catch {
-      alert("Error al guardar");
+      showModal({
+        title: "Error",
+        message: "Ocurrió un error al guardar los cambios. Por favor intente nuevamente.",
+        type: "alert"
+      });
     }
   };
 
@@ -497,6 +536,17 @@ const EditFungus = () => {
           </div>
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        onClose={closeModal}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        confirmText={modalConfig.confirmText}
+        cancelText={modalConfig.cancelText}
+        isDanger={modalConfig.isDanger}
+        type={modalConfig.type}
+      />
     </div>
   );
 };

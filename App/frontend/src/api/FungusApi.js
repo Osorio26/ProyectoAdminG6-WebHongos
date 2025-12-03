@@ -82,6 +82,14 @@ export async function createEnsayo(data) {
 	return res.json();
 }
 
+export async function deleteEnsayo(id) {
+	const res = await fetch(`${API_BASE_URL}/hongos/ensayo/${id}`, {
+		method: "DELETE",
+	});
+	if (!res.ok) throw new Error("Error deleting ensayo");
+	return res.json();
+}
+
 export async function updateFungus(code, updates) {
 	const res = await fetch(`${API_BASE_URL}/hongos/${code}`, {
 		method: "PUT",

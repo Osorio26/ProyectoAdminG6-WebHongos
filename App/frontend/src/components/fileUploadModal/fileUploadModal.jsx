@@ -9,7 +9,7 @@ const FileUploadModal = ({onClose}) => {
           ✕
         </button>
         <div className="modal-title">
-          Archivo de Categorías
+          Gestor de Categorías
         </div>
         <CategoryFileReader onClose={onClose}/>
       </div>

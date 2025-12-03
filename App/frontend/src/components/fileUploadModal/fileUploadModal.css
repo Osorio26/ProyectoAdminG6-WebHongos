@@ -34,23 +34,20 @@
 }
 
 .modal-content {
-  width: 24rem;       
-  height: 18rem;       
-  min-width: 24rem;
-  min-height: 18rem;
+  width: 50rem;       
+  min-height: 40rem;
   user-select: none;
   font-family: "Inter", system-ui, sans-serif;
   background: #fff;
   padding: 25px;
   border-radius: 12px;
-  width: 400px;
-  max-width: 100%;
+  max-width: 90vw;
   position: relative;
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center; Removed to let content fill naturally */
+  align-items: stretch; /* Stretch to fill width */
 
   animation: scaleIn 0.2s ease-out;
 }

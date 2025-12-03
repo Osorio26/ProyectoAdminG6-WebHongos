@@ -1,135 +1,165 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { useDropzone } from "react-dropzone";
-import { createCategory } from "../../api/CategoryApi";
-import upload_file_image from "../../assets/upload_file_image.png";
-import FileFormatModal from "../fileFormatInfomodal/fileFormatModal.jsx";
+import { getCategory, updateCategory, createCategory } from "../../api/CategoryApi";
 import "react-toastify/dist/ReactToastify.css";
 import "./categoryFileReader.css";
 
 const CategoryFileReader = ({ onClose }) => {
-  const category_title_open = "("; 
-  const category_title_close = ")"; 
-  const expected_file_title = "categorias_hongos.txt"; 
-  const category_delimiter = "-----";
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [newItem, setNewItem] = useState("");
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
-  const inputRef = useRef(null);
-  const [showSecondModal, setShowSecondModal] = useState(false);
-
-  const processFile = (file) => {
-    if (!file) return;
-
-    if (file.name !== expected_file_title) {
-      toast.error(`El archivo debe llamarse "${expected_file_title}".`);
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = async (e) => {
-      const content = e.target.result;
-
-      const allLines = content
-        .split("\n")
-        .map((l) => l.trim())
-        .filter((l) => l.length > 0);
-
-      let categories = [];
-      let current = null;
-
-      allLines.forEach((line) => {
-        if (line === category_delimiter) {
-          if (current) {
-            categories.push(current);
-            current = null;
-          }
-        } else if (line.startsWith(category_title_open) && line.endsWith(category_title_close)) {
-          if (current) categories.push(current);
-          current = { title: line.slice(1, -1), content: [] };
-        } else if (current) {
-          current.content.push(line);
-        }
-      });
-
-      if (current) categories.push(current);
-
-      // guardar los cambios detectados al backend
-      for (const cat of categories) {
-        await createCategory(cat);
-      }
-
-      toast.success("Archivo leído y categorías guardadas correctamente!");
-      
-      // Cerrar el modal después de procesar el archivo
-      if (onClose) onClose();
-    };
-
-    reader.readAsText(file);
-  };
-
-  const onDrop = useCallback((acceptedFiles) => {
-    const file = acceptedFiles[0];
-    processFile(file);
+  useEffect(() => {
+    fetchCategories();
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    multiple: false,
-    noClick: true,
-    noKeyboard: true
-  });
-
-  const openFileDialog = () => {
-    if (inputRef.current) inputRef.current.click();
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await getCategory();
+      setCategories(data);
+      if (selectedCategory) {
+        // Update selected category if it exists in new data
+        const updated = data.find(c => c.title === selectedCategory.title);
+        if (updated) setSelectedCategory(updated);
+      }
+    } catch (error) {
+      toast.error("Error al cargar categorías");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    processFile(file);
-    e.target.value = "";
+  const handleAddItem = async () => {
+    if (!newItem.trim() || !selectedCategory) return;
+    
+    const updatedContent = [...selectedCategory.content, newItem.trim()];
+    const updatedCategory = { ...selectedCategory, content: updatedContent };
+
+    try {
+      await updateCategory(selectedCategory.title, updatedCategory);
+      setNewItem("");
+      toast.success("Elemento agregado");
+      fetchCategories(); // Refresh all to be safe
+    } catch (error) {
+      toast.error("Error al agregar elemento");
+    }
+  };
+
+  const handleDeleteItem = async (itemToDelete) => {
+    if (!selectedCategory) return;
+    if (!window.confirm(`¿Eliminar "${itemToDelete}" de ${selectedCategory.title}?`)) return;
+
+    const updatedContent = selectedCategory.content.filter(item => item !== itemToDelete);
+    const updatedCategory = { ...selectedCategory, content: updatedContent };
+
+    try {
+      await updateCategory(selectedCategory.title, updatedCategory);
+      toast.success("Elemento eliminado");
+      fetchCategories();
+    } catch (error) {
+      toast.error("Error al eliminar elemento");
+    }
+  };
+
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) return;
+
+    try {
+      await createCategory({ title: newCategoryName.trim(), content: [] });
+      setNewCategoryName("");
+      setIsCreatingCategory(false);
+      toast.success("Categoría creada");
+      fetchCategories();
+    } catch (error) {
+      toast.error("Error al crear categoría");
+    }
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center text-center gap-4">
-      <div {...getRootProps()} className="dropzone">
+    <div className="category-manager-container">
+      <div className="category-sidebar">
+        <h3>Categorías</h3>
+        <ul className="category-list">
+          {categories.map((cat) => (
+            <li 
+              key={cat.title} 
+              className={selectedCategory?.title === cat.title ? "active" : ""}
+              onClick={() => setSelectedCategory(cat)}
+            >
+              {cat.title}
+            </li>
+          ))}
+        </ul>
         
-        <input
-          {...getInputProps({ refKey: "ref" })}
-          ref={inputRef}
-          onChange={handleFileChange}
-        />
-
-        {isDragActive ? (
-          <p>Suelte el archivo aquí...</p>
-        ) : (
-          <div className="file-browser-container">
-            <div className="file-image-container" onClick={openFileDialog}>
-              <img
-                src={upload_file_image}
-                alt="file-image"
-                className="file-image"
-              />
+        {isCreatingCategory ? (
+          <div className="new-category-form">
+            <input 
+              type="text" 
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="Nombre categoría..."
+              autoFocus
+            />
+            <div className="mini-actions">
+              <button onClick={handleCreateCategory} className="btn-save">✓</button>
+              <button onClick={() => setIsCreatingCategory(false)} className="btn-cancel">✕</button>
             </div>
-
-            <p style={{ margin: 0, fontSize: 14, paddingBottom: "1rem" }}>
-              Presione la imagen para seleccionar un archivo o arrástrelo aquí
-            </p>
           </div>
+        ) : (
+          <button className="btn-add-category" onClick={() => setIsCreatingCategory(true)}>
+            + Nueva Categoría
+          </button>
         )}
       </div>
 
-   
-      <button
-        className={`open-second-modal-button transition-opacity`}
-        onClick={() => setShowSecondModal(true)}
-      >
-        Ayuda
-      </button>
+      <div className="category-details">
+        {selectedCategory ? (
+          <>
+            <div className="details-header">
+              <h4>{selectedCategory.title}</h4>
+              <span className="item-count">{selectedCategory.content.length} elementos</span>
+            </div>
+            
+            <div className="add-item-row">
+              <input 
+                type="text" 
+                value={newItem}
+                onChange={(e) => setNewItem(e.target.value)}
+                placeholder="Nuevo elemento..."
+                onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
+              />
+              <button onClick={handleAddItem} disabled={!newItem.trim()}>Agregar</button>
+            </div>
 
-
-      {showSecondModal && (
-        <FileFormatModal onClose={() => setShowSecondModal(false)} />
-      )}
+            <ul className="items-list">
+              {selectedCategory.content.map((item, idx) => (
+                <li key={idx}>
+                  <span>{item}</span>
+                  <button 
+                    className="btn-delete-item"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(item); }}
+                    title="Eliminar"
+                  >
+                    ✕
+                  </button>
+                </li>
+              ))}
+              {selectedCategory.content.length === 0 && (
+                <li className="empty-msg">No hay elementos en esta categoría</li>
+              )}
+            </ul>
+          </>
+        ) : (
+          <div className="no-selection">
+            <p>Selecciona una categoría para editar sus opciones</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

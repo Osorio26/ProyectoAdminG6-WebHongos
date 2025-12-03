@@ -30,3 +30,4 @@ App/dist/
 *.njsproj
 *.sln
 *.sw?
+/App/backend/prisma/migrations

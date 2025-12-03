@@ -40,6 +40,7 @@ function createWindow() {
 function startBackend() {
   let scriptPath;
   let dbUrl;
+  let categoriesPath;
 
   if (app.isPackaged) {
     // In production, backend is copied to resources/backend
@@ -75,22 +76,53 @@ function startBackend() {
     
     dbUrl = `file:${dbDest}`;
 
+    // Define Categories location: Next to the executable in a 'data' folder
+    const dataDir = path.join(exeDir, 'data');
+    if (!fs.existsSync(dataDir)) {
+      try {
+        fs.mkdirSync(dataDir, { recursive: true });
+      } catch (err) {
+        logToFile(`Failed to create data directory: ${err}`);
+      }
+    }
+
+    categoriesPath = path.join(dataDir, 'categories.json');
+    const categoriesSource = path.join(process.resourcesPath, 'backend', 'data', 'categories.json');
+
+    if (!fs.existsSync(categoriesPath)) {
+      try {
+        if (fs.existsSync(categoriesSource)) {
+          fs.copyFileSync(categoriesSource, categoriesPath);
+          logToFile(`Copied categories.json to ${categoriesPath}`);
+        } else {
+          fs.writeFileSync(categoriesPath, '[]');
+          logToFile(`Created empty categories.json at ${categoriesPath}`);
+        }
+      } catch (err) {
+        logToFile(`Failed to setup categories.json: ${err}`);
+      }
+    }
+
   } else {
     // In development
     scriptPath = path.join(__dirname, '../backend/server.js');
     dbUrl = `file:${path.join(__dirname, '../backend/prisma/dev.db')}`;
+    categoriesPath = path.join(__dirname, '../backend/data/categories.json');
   }
 
   console.log('Starting backend from:', scriptPath);
   console.log('Using DATABASE_URL:', dbUrl);
+  console.log('Using CATEGORIES_FILE_PATH:', categoriesPath);
   logToFile(`Starting backend from: ${scriptPath}`);
   logToFile(`Using DATABASE_URL: ${dbUrl}`);
+  logToFile(`Using CATEGORIES_FILE_PATH: ${categoriesPath}`);
 
   backendProcess = fork(scriptPath, [], {
     env: {
       ...process.env,
       PORT: 3000,
       DATABASE_URL: dbUrl, 
+      CATEGORIES_FILE_PATH: categoriesPath,
     },
     stdio: ['ignore', 'pipe', 'pipe', 'ipc']
   });

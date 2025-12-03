@@ -7,7 +7,7 @@ const router = express.Router();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataPath = path.join(__dirname, "../data/categories.json");
+const dataPath = process.env.CATEGORIES_FILE_PATH || path.join(__dirname, "../data/categories.json");
 
 router.get("/", (req, res) => {
     try {

@@ -146,6 +146,27 @@ const EditFungus = () => {
     }));
   };
 
+  const handleDeleteEnsayo = async (index) => {
+    const ensayo = formData.EnsayosBiologicos[index];
+    if (window.confirm("¿Estás seguro de que deseas eliminar este ensayo?")) {
+      if (!ensayo._isNew && ensayo.id) {
+        try {
+          await deleteEnsayo(ensayo.id);
+        } catch (error) {
+          console.error("Error deleting ensayo:", error);
+          alert("Error al eliminar el ensayo");
+          return;
+        }
+      }
+
+      setFormData((prev) => {
+        const newEnsayos = [...prev.EnsayosBiologicos];
+        newEnsayos.splice(index, 1);
+        return { ...prev, EnsayosBiologicos: newEnsayos };
+      });
+    }
+  };
+
   const handleSave = async () => {
     try {
       await updateFungus(code, formData);
@@ -388,6 +409,22 @@ const EditFungus = () => {
                         placeholder="Ej: Inhibición del 50%..."
                       />
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEnsayo(idx)}
+                      style={{
+                        marginLeft: "10px",
+                        background: "#ff4d4d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                      }}
+                      title="Eliminar ensayo"
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 ))}
 

@@ -214,7 +214,11 @@ const FungusDetails = () => {
               </svg>
             </button>
             <div className="header-info">
-              <h1>{fungus.Organismo?.Especie || "Sin identificación"}</h1>
+              <h1>
+                {fungus.Organismo?.Genero
+                  ? `${fungus.Organismo.Genero} ${fungus.Organismo.Especie || "sp."}`
+                  : fungus.Organismo?.Especie || "Sin identificación"}
+              </h1>
               <p className="subtitle">
                 Detalles de la muestra: <strong>{fungus.idHeredado}</strong>
               </p>

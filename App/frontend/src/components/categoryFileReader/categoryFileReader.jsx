@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { getCategory, updateCategory, createCategory } from "../../api/CategoryApi";
+import { getCategory, updateCategory } from "../../api/CategoryApi";
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import "react-toastify/dist/ReactToastify.css";
@@ -10,9 +10,7 @@ const CategoryFileReader = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newItem, setNewItem] = useState("");
-  const [newCategoryName, setNewCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
-  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
     const options = {
     title: 'Title',
@@ -128,20 +126,6 @@ const CategoryFileReader = () => {
     }
   };
 
-  const handleCreateCategory = async () => {
-    if (!newCategoryName.trim()) return;
-
-    try {
-      await createCategory({ title: newCategoryName.trim(), content: [] });
-      setNewCategoryName("");
-      setIsCreatingCategory(false);
-      toast.success("Categoría creada!");
-      fetchCategories();
-    } catch (error) {
-      toast.error("Error al crear categoría.");
-    }
-  };
-
   return (
     <div className="category-manager-container">
       <div className="category-sidebar">
@@ -157,26 +141,6 @@ const CategoryFileReader = () => {
             </li>
           ))}
         </ul>
-        
-        {isCreatingCategory ? (
-          <div className="new-category-form">
-            <input 
-              type="text" 
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              placeholder="Ej: Medio de Cultivo, Forma..."
-              autoFocus
-            />
-            <div className="mini-actions">
-              <button onClick={handleCreateCategory} className="btn-save">✓</button>
-              <button onClick={() => setIsCreatingCategory(false)} className="btn-cancel">✕</button>
-            </div>
-          </div>
-        ) : (
-          <button className="btn-add-category" onClick={() => setIsCreatingCategory(true)}>
-            + Nueva Categoría
-          </button>
-        )}
       </div>
 
       <div className="category-details">

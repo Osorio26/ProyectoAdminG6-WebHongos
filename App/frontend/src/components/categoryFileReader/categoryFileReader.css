@@ -11,7 +11,7 @@
 
 .category-sidebar {
   width: 35%;
-  background: #f8f9fa;
+  background: #fff;
   border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
@@ -51,51 +51,6 @@
   font-weight: 500;
   border-left: 4px solid #388e3c;
 }
-
-.btn-add-category {
-  padding: 12px;
-  background: #fff;
-  border: none;
-  border-top: 1px solid #e0e0e0;
-  color: #28a745;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-add-category:hover {
-  background: #f0fff4;
-}
-
-.new-category-form {
-  padding: 10px;
-  border-top: 1px solid #e0e0e0;
-  background: #fff;
-  display: flex;
-  gap: 5px;
-}
-
-.new-category-form input {
-  flex: 1;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.mini-actions {
-  display: flex;
-  gap: 2px;
-}
-
-.mini-actions button {
-  padding: 0 8px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-save { background: #d4edda; color: #155724; }
-.btn-cancel { background: #f8d7da; color: #721c24; }
 
 /* Details Area */
 .category-details {

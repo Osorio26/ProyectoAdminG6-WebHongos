@@ -1,188 +1,240 @@
-/* Variables de color para consistencia */
-:root {
-  --color-primary: #388e3c;
-  --color-text-dark: #212529;
-  --color-text-medium: #495057;
-  --color-background-light: #f8f9fa;
-  --color-border-subtle: #dee2e6;
-  --color-surface-white: #ffffff;
-}
+/* FungusList.css */
 
 .fungus-container {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 50px;
-  background-color: var(--color-background-light); 
-  font-family: "Inter", system-ui, sans-serif;
+  padding: 40px 20px;
+  background-color: var(--bg-app);
+}
+
+.fungus-window {
+  background: var(--bg-surface);
+  width: 100%;
+  max-width: 1200px;
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
 }
 
 .fungus-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 35px;
+  margin-bottom: 30px;
 }
 
 .fungus-header h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: var(--color-text-dark);
-}
-
-.fungus-window {
-  background: var(--color-surface-white);
-  width: 90%;
-  max-width: 1200px;
-  padding: 40px 50px;
-  border-radius: 20px;
-  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.5px;
 }
 
 .add-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: white;
-  border: 1px solid var(--color-border-subtle);
-  color: var(--color-text-medium);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .add-button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background-color: #f0f9f0;
+  background-color: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-md);
+  color: white;
+}
+
+.search-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: block;
 }
 
 .search-bar {
-  background-color: #f4f7f3;
-  border-radius: 10px;
-  padding: 12px 20px;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
   margin-bottom: 25px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
 }
 
 .search-bar input {
   width: 100%;
   border: none;
   background: transparent;
-  font-size: 0.95rem;
-  color: #333;
+  font-size: 1rem;
+  color: var(--text-primary);
   outline: none;
+  padding: 8px 0;
+}
+
+.search-bar input::placeholder {
+  color: var(--text-tertiary);
 }
 
 .fungus-table {
   width: 100%;
-  border-collapse: collapse;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 20px;
 }
 
 .fungus-table thead {
-  background-color: #f8f9f7;
-  color: #4a4a4a;
-  font-weight: 600;
+  background-color: var(--bg-app);
 }
 
 .fungus-table th {
   text-align: left;
   padding: 16px;
-  border-bottom: 2px solid #eaeaea;
-  color: #666;
+  color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border-color);
   cursor: pointer;
-  user-select: none;
   transition: background-color 0.2s;
 }
 
-.fungus-table th:hover {
-  background-color: #e9ecef;
+.fungus-table th:first-child {
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
 }
 
 .fungus-table th:last-child {
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
   cursor: default;
 }
 
-.fungus-table th:last-child:hover {
-  background-color: transparent;
-}
-
-.fungus-table th,
-.fungus-table td {
-  text-align: left;
-  padding: 14px 18px;
-  border-bottom: 1px solid #e5e5e5;
-  font-size: 0.95rem;
+.fungus-table th:hover:not(:last-child) {
+  color: var(--primary-color);
 }
 
 .fungus-table td {
   padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
-  color: #333;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.95rem;
   vertical-align: middle;
+}
+
+.fungus-table tr:last-child td {
+  border-bottom: none;
+}
+
+.fungus-table tr {
+  transition: background-color 0.15s ease;
+}
+
+.fungus-table tr:hover td {
+  background-color: var(--primary-light);
 }
 
 .code-cell {
   font-family: 'Roboto Mono', monospace;
-  color: #2c3e50;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .name-cell {
-  color: #2e7d32; /* Greenish for species name */
-  font-weight: 500;
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 .details-button {
-  background: none;
-  border: none;
-  color: #4d704d;
-  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: color 0.2s ease-in-out;
+  transition: all 0.2s ease;
 }
 
 .details-button:hover {
-  text-decoration: underline;
-  color: #3c5f3c;
-}
-
-.fungus-table tr:hover {
-  background-color: #fafafa;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: white;
 }
 
 .pagination {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .pagination button {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid #e5e5e5;
-  background: none;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-secondary);
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination button:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .pagination button.active {
-  background: none;
-  color: #495057;
-  border-color: #e5e5e5;
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 
 .pagination button:disabled {
-  background: #eee;
+  background-color: #f5f5f5;
+  color: #ccc;
   cursor: not-allowed;
+  border-color: #eee;
+}
+
+.dots {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 4px;
+  color: var(--text-tertiary);
+}
+
+.error-message {
+  color: var(--error-color);
+  background-color: #ffebee;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  border: 1px solid #ffcdd2;
 }

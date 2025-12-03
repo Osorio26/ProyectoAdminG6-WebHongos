@@ -1,28 +1,19 @@
-/* Variables de color para fácil mantenimiento y estilo científico/moderno */
-:root {
-  --color-primary: #388e3c; /* Verde profesional */
-  --color-text-dark: #212529; /* Negro para títulos y valores */
-  --color-text-medium: #495057; /* Gris oscuro para texto general y labels */
-  --color-background-light: #f8f9fa; /* Fondo muy claro */
-  --color-border-subtle: #dee2e6; /* Borde sutil */
-  --color-surface-white: #ffffff;
-}
+/* FungusDetails.css */
 
 /* --- Contenedor Principal --- */
 .fungus-details-container {
-  background-color: var(--color-background-light);
+  background-color: var(--bg-app);
   min-height: 100vh;
   width: 100%;
   display: flex;
-  flex-direction: column; /* Cambiado a columna para apilar header y window */
-  align-items: center; /* Centrar horizontalmente */
-  padding: 20px 0 40px;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
   box-sizing: border-box;
-  font-family: "Inter", sans-serif;
 }
 
 .details-header-area {
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
   margin-bottom: 20px;
   padding: 0;
@@ -31,7 +22,7 @@
 .header-row {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Separa los grupos a los extremos */
+  justify-content: space-between;
   gap: 16px;
 }
 
@@ -46,47 +37,48 @@
   align-items: center;
   gap: 8px;
   background-color: white;
-  border: 1px solid var(--color-border-subtle);
-  color: var(--color-text-medium);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .header-edit-button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background-color: #f0f9f0; /* Verde muy suave */
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-md);
 }
 
 .back-icon-button {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: none;
+  border: 1px solid var(--border-color);
   background-color: white;
-  color: var(--color-text-medium);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
   padding: 0;
   flex-shrink: 0;
 }
 
 .back-icon-button:hover {
-  background-color: var(--color-primary);
+  background-color: var(--primary-color);
   color: white;
-  transform: translateX(-2px);
-  box-shadow: 0 4px 12px rgba(56, 142, 60, 0.25);
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .back-icon-button svg {
@@ -96,45 +88,44 @@
 }
 
 .header-info h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: var(--color-text-dark);
+  color: var(--text-primary);
   margin: 0 0 4px 0;
   line-height: 1.2;
 }
 
 .header-info .subtitle {
-  font-size: 1rem;
-  color: var(--color-text-medium);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .header-info .subtitle strong {
-  color: var(--color-primary);
+  color: var(--primary-color);
   font-weight: 600;
 }
 
-/* === REMOVED OLD BUTTON STYLES === */
-
 .fungus-details-window {
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
-  background: var(--color-surface-white);
+  background: var(--bg-surface);
   padding-top: 0;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   display: flex;
-  flex-direction: row; /* Cambiado a fila para sidebar + contenido */
+  flex-direction: row;
   margin: 0 auto;
-  min-height: 600px; /* Altura mínima para que se vea bien */
+  min-height: 600px;
+  border: 1px solid var(--border-color);
 }
 
 /* === SIDEBAR NAVIGATION === */
 .sidebar-nav {
   width: 280px;
-  background-color: #f8f9fa;
-  border-right: 1px solid var(--color-border-subtle);
+  background-color: #fcfdfc;
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   padding: 30px 0;
@@ -144,10 +135,10 @@
 .sidebar-title {
   padding: 0 25px;
   margin-bottom: 20px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--color-text-medium);
+  letter-spacing: 1.2px;
+  color: var(--text-tertiary);
   font-weight: 700;
 }
 
@@ -155,9 +146,9 @@
   background: none;
   border: none;
   text-align: left;
-  padding: 15px 25px;
+  padding: 16px 25px;
   font-size: 0.95rem;
-  color: var(--color-text-medium);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
   border-left: 4px solid transparent;
@@ -165,146 +156,67 @@
 }
 
 .sidebar-button:hover {
-  background-color: #e9ecef;
-  color: var(--color-text-dark);
+  background-color: var(--primary-light);
+  color: var(--primary-color);
 }
 
 .sidebar-button.active {
-  background-color: #e8f5e9; /* Fondo verde muy claro */
-  color: var(--color-primary);
-  border-left-color: var(--color-primary);
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  border-left-color: var(--primary-color);
   font-weight: 600;
 }
 
 .details-content {
-  flex: 1; /* Toma el resto del espacio */
-  padding: 20px 60px 50px; 
+  flex: 1;
+  padding: 50px 60px;
   box-sizing: border-box;
   margin: 0;
-  overflow-y: auto; /* Si el contenido es muy largo */
+  overflow-y: auto;
 }
 
 .section-title {
   font-size: 1.5rem;
-  color: var(--color-primary);
-  margin-bottom: 25px;
-  border-bottom: 2px solid #e9ecef;
-  padding-bottom: 10px;
-}
-
-/* === OLD TABS STYLES REMOVED === */
-
-
-
-/* --- Botones de Tab (Estilo Moderno) --- */
-.tab-button {
-  padding: 14px 20px;
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  cursor: pointer;
-  font-size: 1rem;
-  color: var(--color-text-medium);
-  transition: all 0.2s ease;
-  position: relative;
-  border-radius: 0;
-  flex-shrink: 0; /* No permite que se encojan */
-  margin-right: 1px;
-}
-
-.tab-button.active {
-  background: none;
-  color: var(--color-text-dark);
-  font-weight: 600;
-  border-bottom: 3px solid var(--color-primary);
-  z-index: 2;
-}
-
-.tab-button:hover:not(.active) {
-  color: var(--color-text-dark);
-  background: var(--color-background-light);
-}
-
-/* --- Títulos y Botones Generales --- */
-.edit-back-button.pill {
-  padding: 10px 20px;
-
-  /* MÁS ESPACIO ARRIBA Y ABAJO */
-  margin: 20px 0;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  background: #1e1e1e;
-  border: none;
-  border-radius: 40px;
-
-  color: #f0f0f0;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
-
-  /* Animación suave */
-  transition: 
-    background 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.25s ease;
-}
-
-/* HOVER ANIMADO */
-.edit-back-button.pill:hover {
-  background: #2e7d32;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  transform: translateX(-2px) scale(1.03);
-}
-
-/* CLICK */
-.edit-back-button.pill:active {
-  transform: translateX(-1px) scale(0.98);
-}
-
-h1 {
-  margin: 0;
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: var(--color-text-dark);
-}
-
-.subtitle {
-  color: var(--color-text-medium);
+  color: var(--primary-color);
   margin-bottom: 30px;
-  font-size: 1.1rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 12px;
+  font-weight: 600;
 }
 
 /* --- Contenido de la Pestaña --- */
 .tab-content {
-  background: var(--color-surface-white);
+  background: var(--bg-surface);
   padding: 0 0 25px;
   border-radius: 0;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 0;
 }
 
 .detail-row {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid var(--color-border-subtle);
-  padding-bottom: 12px;
-  padding-top: 12px;
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 0;
 }
 
 .label {
-  color: var(--color-text-medium);
+  color: var(--text-secondary);
   font-weight: 500;
+  font-size: 0.95rem;
 }
 
 .value {
   font-weight: 600;
-  color: var(--color-text-dark);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  text-align: right;
+  max-width: 60%;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
 }
 
 .button-container {
@@ -314,23 +226,20 @@ h1 {
 }
 
 .edit-button {
-  background: var(--color-primary);
-  color: var(--color-surface-white);
+  background: var(--primary-color);
+  color: white;
   border: none;
   padding: 12px 25px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
-  transition: background 0.2s ease, transform 0.1s ease;
-  box-shadow: 0 4px 10px rgba(56, 142, 60, 0.25);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .edit-button:hover {
-  background: #2e7d32;
+  background: var(--primary-hover);
   transform: translateY(-1px);
-}
-
-.detail-row:last-child {
-  border-bottom: none;
+  box-shadow: var(--shadow-md);
 }

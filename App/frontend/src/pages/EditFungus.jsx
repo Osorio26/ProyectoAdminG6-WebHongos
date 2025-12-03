@@ -254,10 +254,10 @@ const EditFungus = () => {
       },
       { label: "Fecha Aislamiento", key: "FechaAislamiento", type: "date" },
       { label: "Fecha Salida", key: "FechaSalida", type: "date" },
-      { label: "Parte de Huésped", key: "ParteDeHuésped", showIf: { key: "aisladoDePlanta", equals: true } },
+      { label: "Parte de Huésped", key: "ParteDeHospedero", showIf: { key: "aisladoDeHospedero", equals: true } },
       { label: "Estado", key: "Estado" },
       { label: "Comentarios", key: "Comentarios" },
-      { label: "¿Aislado de Huésped?", key: "AisladoDeHuésped", type: "checkbox" },
+      { label: "¿Aislado de Huésped?", key: "AisladoDeHospedero", type: "checkbox" },
       { label: "¿En Colección?", key: "EstaEnColeccion", type: "checkbox" },
       { label: "Cantidad de existencias", key: "cantidadExistencias", type: "number", showIf: { key: "enColeccion", equals: true } }
     ],
@@ -309,10 +309,10 @@ const EditFungus = () => {
       { label: "Área Protegida", key: "Colecta.Sitio.NombreAreaProtegida" },
     ],
     Huésped: [
-      { label: "Reino Huésped", key: "Colecta.Huésped.Reino" },
-      { label: "Familia Huésped", key: "Colecta.Huésped.Familia" },
-      { label: "Género Huésped", key: "Colecta.Huésped.Genero" },
-      { label: "Especie Huésped", key: "Colecta.Huésped.Especie" },
+      { label: "Reino Huésped", key: "Colecta.Hospedero.Reino" },
+      { label: "Familia Huésped", key: "Colecta.Hospedero.Familia" },
+      { label: "Género Huésped", key: "Colecta.Hospedero.Genero" },
+      { label: "Especie Huésped", key: "Colecta.Hospedero.Especie" },
     ],
     ENSAYOS: [],
   };
@@ -455,9 +455,7 @@ const EditFungus = () => {
               ))}
 
             {activeTab === 4 && (
-              <button className="add-button" onClick={addNewMorfologia}>
-                Agregar Morfología
-              </button>
+              <></>
             )}
           </div>
         </div>

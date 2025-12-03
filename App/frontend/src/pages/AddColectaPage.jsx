@@ -30,7 +30,7 @@ const AddColectaPage = () => {
     coordenadas: { latitud: "", longitud: "", altitud: "" },
     sitio: { nombre: "", esAreaProtegida: false, nombreAreaProtegida: "", referenciasAdicionales: "" },
     
-    // Planta
+    // Hospedero
     organismo: { reino: "", filo: "", clase: "", orden: "", familia: "", genero: "", especie: "" }
   });
 

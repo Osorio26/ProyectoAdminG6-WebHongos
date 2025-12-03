@@ -19,6 +19,6 @@
     "typescript": "^5.5.0"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed_sql.cjs"
   }
 }

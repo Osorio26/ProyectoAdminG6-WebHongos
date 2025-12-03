@@ -110,9 +110,9 @@ export async function getSitios() {
 	return res.json();
 }
 
-export async function getPlantas() {
-	const res = await fetch(`${API_BASE_URL}/hongos/list/plantas`);
-	if (!res.ok) throw new Error("Error fetching plantas");
+export async function getHospederos() {
+	const res = await fetch(`${API_BASE_URL}/hongos/list/hospederos`);
+	if (!res.ok) throw new Error("Error fetching hospederos");
 	return res.json();
 }
 

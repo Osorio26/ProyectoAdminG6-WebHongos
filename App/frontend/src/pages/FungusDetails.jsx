@@ -81,13 +81,13 @@ const FungusDetails = () => {
     { label: "Tiene Coordenadas", value: fungus.Colecta?.TieneCoordenadas ? "Sí" : "No" },
 
     // Planta asociada (solo indicador)
-    { label: "Contiene Planta", value: fungus.Colecta?.ContienePlanta ? "Sí" : "No" },
+    { label: "Contiene Hospedero", value: fungus.Colecta?.ContieneHospedero ? "Sí" : "No" },
   ];
 
   const AISLAMIENTO = [
     { label: "Código Heredado", value: fungus.idHeredado },
-    { label: "Aislado de Planta", value: fungus.AisladoDePlanta ? "Sí" : "No" },
-    { label: "Parte de Planta", value: fungus.ParteDePlanta },
+    { label: "Aislado de Hospedero", value: fungus.AisladoDeHospedero ? "Sí" : "No" },
+    { label: "Parte de Hospedero", value: fungus.ParteDeHospedero },
     { label: "Fecha de Aislamiento", value: fungus.FechaAislamiento },
     { label: "Fecha de Salida", value: fungus.FechaSalida },
     { label: "Medio de Cultivo", value: fungus.MedioCultivo },
@@ -146,17 +146,17 @@ const FungusDetails = () => {
     { label: "Ubicación", value: fungus.Colecta?.Sitio?.NombreAreaProtegida },
   ];
 
-  const PLANTA = [
-    { label: "Reino", value: fungus.Colecta?.Planta?.Reino },
-    { label: "Filo", value: fungus.Colecta?.Planta?.Filo },
-    { label: "Clase", value: fungus.Colecta?.Planta?.Clase },
-    { label: "Orden", value: fungus.Colecta?.Planta?.Orden },
-    { label: "Familia", value: fungus.Colecta?.Planta?.Familia },
-    { label: "Género", value: fungus.Colecta?.Planta?.Genero },
-    { label: "Especie", value: fungus.Colecta?.Planta?.Especie },
-    { label: "Parte de planta", value: fungus.ParteDePlanta },
-    { label: "Aislado de Planta", value: fungus.AisladoDePlanta ? "Sí" : "No" },
-    { label: "Observaciones Planta", value: fungus.Colecta?.Planta?.Observaciones },
+  const HOSPEDERO = [
+    { label: "Reino", value: fungus.Colecta?.Hospedero?.Reino },
+    { label: "Filo", value: fungus.Colecta?.Hospedero?.Filo },
+    { label: "Clase", value: fungus.Colecta?.Hospedero?.Clase },
+    { label: "Orden", value: fungus.Colecta?.Hospedero?.Orden },
+    { label: "Familia", value: fungus.Colecta?.Hospedero?.Familia },
+    { label: "Género", value: fungus.Colecta?.Hospedero?.Genero },
+    { label: "Especie", value: fungus.Colecta?.Hospedero?.Especie },
+    { label: "Parte de hospedero", value: fungus.ParteDeHospedero },
+    { label: "Aislado de Hospedero", value: fungus.AisladoDeHospedero ? "Sí" : "No" },
+    { label: "Observaciones Hospedero", value: fungus.Colecta?.Hospedero?.Observaciones },
   ];
 
   const ENSAYOS =
@@ -175,7 +175,7 @@ const FungusDetails = () => {
     COLECTA,
     AISLAMIENTO,
     MORFOLOGIA,
-    PLANTA,
+    HOSPEDERO,
     MARCADORES,
     ENSAYOS,
     ALMACENAMIENTO,

@@ -24,8 +24,8 @@ const AddAislamientoPage = () => {
   const [formData, setFormData] = useState({
     // Aislamiento
     idHeredado: "",
-    aisladoDePlanta: false,
-    parteDePlanta: "",
+    aisladoDeHospedero: false,
+    parteDeHospedero: "",
     fechaAislamiento: new Date().toISOString().split("T")[0],
     fechaSalida: "",
     tipoCrecimiento: "",
@@ -207,14 +207,14 @@ const AddAislamientoPage = () => {
               </div>
               <div className="form-group">
                 <label className="checkbox-label-flex">
-                  <input type="checkbox" name="aisladoDePlanta" checked={formData.aisladoDePlanta} onChange={handleChange} className="edit-checkbox" />
+                  <input type="checkbox" name="aisladoDeHospedero" checked={formData.aisladoDeHospedero} onChange={handleChange} className="edit-checkbox" />
                   ¿Aislado de huésped?
                 </label>
               </div>
-              {formData.aisladoDePlanta && (
+              {formData.aisladoDeHospedero && (
                 <div className="form-group">
                   <label>Parte del huésped</label>
-                  <input type="text" name="parteDePlanta" value={formData.parteDePlanta} onChange={handleChange} placeholder="Ej: Hoja, Raíz, Tallo, Fruto" />
+                  <input type="text" name="parteDeHospedero" value={formData.parteDeHospedero} onChange={handleChange} placeholder="Ej: Hoja, Raíz, Tallo, Fruto" />
                 </div>
               )}
               <div className="form-group">

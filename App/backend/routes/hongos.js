@@ -66,7 +66,7 @@ router.get("/:code", async (req, res) => {
 				Colecta: {
 					include: {
 						Sitio: true,
-						Planta: true,
+						Hospedero: true,
 						Coordenadas: true
 					}
 				},
@@ -103,7 +103,7 @@ router.get("/:code", async (req, res) => {
 // CREACIÓN DE REGISTROS (NUEVOS ENDPOINTS)
 // ==========================================
 
-// 1. Crear Colecta (con Sitio, Coordenadas, Planta opcional)
+// 1. Crear Colecta (con Sitio, Coordenadas, Hospedero opcional)
 router.post("/colecta", async (req, res) => {
 	try {
 		const data = req.body;
@@ -135,12 +135,12 @@ router.post("/colecta", async (req, res) => {
 			idSitio = sitio.id;
 		}
 
-		// Crear Planta si existe
-		let idPlanta = null;
-		if (data.organismo && data.organismo.reino) { // Asumiendo que si hay reino, hay planta
-			const planta = await prisma.organismos.create({
+		// Crear Hospedero si existe
+		let idHospedero = null;
+		if (data.organismo && data.organismo.reino) { // Asumiendo que si hay reino, hay hospedero
+			const hospedero = await prisma.organismos.create({
 				data: {
-					Tipo: "Planta",
+					Tipo: "Hospedero",
 					Reino: data.organismo.reino,
 					Filo: data.organismo.filo,
 					Clase: data.organismo.clase,
@@ -150,7 +150,7 @@ router.post("/colecta", async (req, res) => {
 					Especie: data.organismo.especie
 				}
 			});
-			idPlanta = planta.id;
+			idHospedero = hospedero.id;
 		}
 
 		// Crear Colecta
@@ -165,8 +165,8 @@ router.post("/colecta", async (req, res) => {
 				TieneCoordenadas: !!idCoordenadas,
 				idCoordenadas: idCoordenadas,
 				idSitio: idSitio,
-				ContienePlanta: !!idPlanta,
-				idPlanta: idPlanta
+				ContieneHospedero: !!idHospedero,
+				idHospedero: idHospedero
 			}
 		});
 
@@ -212,11 +212,11 @@ router.post("/aislamiento", async (req, res) => {
 				});
 				idSitio = sitio.id;
 			}
-			let idPlanta = null;
+			let idHospedero = null;
 			if (data.organismo && data.organismo.reino) {
-				const planta = await prisma.organismos.create({
+				const hospedero = await prisma.organismos.create({
 					data: {
-						Tipo: "Planta",
+						Tipo: "Hospedero",
 						Reino: data.organismo.reino,
 						Filo: data.organismo.filo,
 						Clase: data.organismo.clase,
@@ -226,7 +226,7 @@ router.post("/aislamiento", async (req, res) => {
 						Especie: data.organismo.especie
 					}
 				});
-				idPlanta = planta.id;
+				idHospedero = hospedero.id;
 			}
 
 			const nuevaColecta = await prisma.colectas.create({
@@ -234,9 +234,9 @@ router.post("/aislamiento", async (req, res) => {
 					idHeredado: data.codigoColecta,
 					Colector: data.colector,
 					Fecha: data.fechaColecta ? new Date(data.fechaColecta) : null,
-					idSitio, idCoordenadas, idPlanta,
+					idSitio, idCoordenadas, idHospedero,
 					TieneCoordenadas: !!idCoordenadas,
-					ContienePlanta: !!idPlanta
+					ContieneHospedero: !!idHospedero
 				}
 			});
 			idColecta = nuevaColecta.id;
@@ -246,8 +246,8 @@ router.post("/aislamiento", async (req, res) => {
 		const aislamiento = await prisma.aislamientos.create({
 			data: {
 				idHeredado: data.idHeredado,
-				AisladoDePlanta: data.aisladoDePlanta,
-				ParteDePlanta: data.parteDePlanta,
+				AisladoDeHospedero: data.aisladoDeHospedero,
+				ParteDeHospedero: data.parteDeHospedero,
 				FechaAislamiento: data.fechaAislamiento ? new Date(data.fechaAislamiento) : null,
 				FechaSalida: data.fechaSalida ? new Date(data.fechaSalida) : null,
 				IdAnalisisMolecular: data.idAnalisisMolecular,
@@ -318,8 +318,7 @@ router.post("/hongo", async (req, res) => {
 				await prisma.aislamientos.update({
 					where: { id: aislamiento.id },
 					data: { 
-						idOrganismo: organismo.id,
-						idHongo: organismo.id // También actualizamos la relación explícita con Hongos
+						idOrganismo: organismo.id
 					} 
 				});
 			} else {
@@ -442,7 +441,7 @@ router.put("/:code", async (req, res) => {
 			where: { idHeredado: code },
 			include: {
 				Organismo: { include: { Hongo: { include: { Marcadores: true } } } },
-				Colecta: { include: { Sitio: true, Planta: true } },
+				Colecta: { include: { Sitio: true, Hospedero: true } },
 				Morfologias: true
 			}
 		});
@@ -451,7 +450,7 @@ router.put("/:code", async (req, res) => {
 			return res.status(404).json({ message: "Fungus not found" });
 		}
 
-		// 2. Actualizar Organismo
+		// 2. Actualizar Organismo (Hongo asociado al Aislamiento)
 		if (data.Organismo && existing.idOrganismo) {
 			await prisma.organismos.update({
 				where: { id: existing.idOrganismo },
@@ -506,6 +505,23 @@ router.put("/:code", async (req, res) => {
 			}
 		}
 
+		// 2.1 Actualizar Organismo (Hospedero de la Colecta)
+		// NOTA: Antes actualizábamos el Organismo del Aislamiento (Hongo). Ahora actualizamos el Hospedero de la Colecta si existe.
+		if (data.Colecta && data.Colecta.Hospedero && existing.Colecta && existing.Colecta.idHospedero) {
+			await prisma.organismos.update({
+				where: { id: existing.Colecta.idHospedero },
+				data: {
+					Reino: data.Colecta.Hospedero.Reino,
+					Filo: data.Colecta.Hospedero.Filo,
+					Clase: data.Colecta.Hospedero.Clase,
+					Orden: data.Colecta.Hospedero.Orden,
+					Familia: data.Colecta.Hospedero.Familia,
+					Genero: data.Colecta.Hospedero.Genero,
+					Especie: data.Colecta.Hospedero.Especie,
+				}
+			});
+		}
+
 		// 3. Actualizar Colecta
 		if (data.Colecta && existing.idColecta) {
 			await prisma.colectas.update({
@@ -533,18 +549,18 @@ router.put("/:code", async (req, res) => {
 				});
 			}
 
-			// Actualizar Planta Asociada
-			if (data.Colecta.Planta && existing.Colecta.idPlanta) {
+			// Actualizar Hospedero Asociada
+			if (data.Colecta.Hospedero && existing.Colecta.idHospedero) {
 				await prisma.organismos.update({
-					where: { id: existing.Colecta.idPlanta },
+					where: { id: existing.Colecta.idHospedero },
 					data: {
-						Reino: data.Colecta.Planta.Reino,
-						Filo: data.Colecta.Planta.Filo,
-						Clase: data.Colecta.Planta.Clase,
-						Orden: data.Colecta.Planta.Orden,
-						Familia: data.Colecta.Planta.Familia,
-						Genero: data.Colecta.Planta.Genero,
-						Especie: data.Colecta.Planta.Especie,
+						Reino: data.Colecta.Hospedero.Reino,
+						Filo: data.Colecta.Hospedero.Filo,
+						Clase: data.Colecta.Hospedero.Clase,
+						Orden: data.Colecta.Hospedero.Orden,
+						Familia: data.Colecta.Hospedero.Familia,
+						Genero: data.Colecta.Hospedero.Genero,
+						Especie: data.Colecta.Hospedero.Especie,
 					}
 				});
 			}
@@ -557,7 +573,7 @@ router.put("/:code", async (req, res) => {
 				MedioCultivo: data.MedioCultivo,
 				MetodoSiembra: data.MetodoSiembra,
 				Estado: data.Estado,
-				ParteDePlanta: data.ParteDePlanta,
+				ParteDeHospedero: data.ParteDeHospedero,
 				FechaAislamiento: data.FechaAislamiento ? new Date(data.FechaAislamiento) : undefined,
 				FechaSalida: data.FechaSalida ? new Date(data.FechaSalida) : undefined,
 				CantidadExistencias: data.CantidadExistencias ? parseInt(data.CantidadExistencias) : undefined,
@@ -614,7 +630,7 @@ router.put("/:code", async (req, res) => {
 			where: { idHeredado: code },
 			include: {
 				Organismo: { include: { Hongo: { include: { Marcadores: true } } } },
-				Colecta: { include: { Sitio: true, Planta: true } },
+				Colecta: { include: { Sitio: true, Hospedero: true } },
 				Morfologias: true
 			}
 		});
@@ -653,22 +669,22 @@ router.get("/list/sitios", async (req, res) => {
 	}
 });
 
-router.get("/list/plantas", async (req, res) => {
+router.get("/list/hospederos", async (req, res) => {
 	try {
-		const plantas = await prisma.organismos.findMany({
-			where: { Tipo: "Planta" },
+		const hospederos = await prisma.organismos.findMany({
+			where: { Tipo: "Hospedero" },
 			select: { id: true, Genero: true, Especie: true, Familia: true }
 		});
-		res.json(plantas);
+		res.json(hospederos);
 	} catch (error) {
-		res.status(500).json({ message: "Error fetching plantas" });
+		res.status(500).json({ message: "Error fetching hospederos" });
 	}
 });
 
 router.get("/list/aislamientos", async (req, res) => {
 	try {
 		const aislamientos = await prisma.aislamientos.findMany({
-			select: { id: true, idHeredado: true, MedioCultivo: true, FechaAislamiento: true, idHongo: true }
+			select: { id: true, idHeredado: true, MedioCultivo: true, FechaAislamiento: true, idOrganismo: true }
 		});
 		res.json(aislamientos);
 	} catch (error) {

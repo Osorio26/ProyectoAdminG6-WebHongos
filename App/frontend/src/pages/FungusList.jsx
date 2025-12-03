@@ -196,9 +196,6 @@ const FungusList = () => {
           />
         </div>
 
-        {loading && <LoadingSpinner text="Cargando inventario..." />}
-        {error && !loading && <p className="error-message">{error}</p>}
-
         <div className="table-container">
           <table className="fungus-table">
             <thead>
@@ -222,25 +219,45 @@ const FungusList = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((fungus, idx) => (
-                <tr key={idx}>
-                  <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
-                  <td className="name-cell">
-                    <i>{fungus.Organismo?.Genero} {fungus.Organismo?.Especie || "sp."}</i>
-                  </td>
-                  <td>{fungus.Colecta?.Colector || "N/A"}</td>
-                  <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
-                  <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
-                  <td>
-                    <button
-                      className="details-button"
-                      onClick={() => navigate(`/detalle/${fungus.idHeredado}`)}
-                    >
-                      Ver detalles
-                    </button>
+              {loading ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center", padding: "50px" }}>
+                    <LoadingSpinner text="Cargando inventario..." />
                   </td>
                 </tr>
-              ))}
+              ) : error ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+                    <p className="error-message">{error}</p>
+                  </td>
+                </tr>
+              ) : currentItems.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center", padding: "30px", color: "var(--text-secondary)" }}>
+                    No se encontraron hongos que coincidan con la búsqueda.
+                  </td>
+                </tr>
+              ) : (
+                currentItems.map((fungus, idx) => (
+                  <tr key={idx}>
+                    <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
+                    <td className="name-cell">
+                      <i>{fungus.Organismo?.Genero} {fungus.Organismo?.Especie || "sp."}</i>
+                    </td>
+                    <td>{fungus.Colecta?.Colector || "N/A"}</td>
+                    <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
+                    <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
+                    <td>
+                      <button
+                        className="details-button"
+                        onClick={() => navigate(`/detalle/${fungus.idHeredado}`)}
+                      >
+                        Ver detalles
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

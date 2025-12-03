@@ -1,16 +1,39 @@
-# React + Vite
+# Frontend - COCMI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este directorio contiene la interfaz de usuario de la aplicación, construida con React y Vite.
 
-Currently, two official plugins are available:
+## 🛠️ Configuración Inicial
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1.  **Instalar dependencias**:
+    ```bash
+    npm install
+    ```
 
-## React Compiler
+2.  **Iniciar en Modo Desarrollo**:
+    ```bash
+    npm run dev
+    ```
+    Esto abrirá la aplicación en tu navegador (usualmente `http://localhost:5173`). Asegúrate de tener el backend corriendo en el puerto 3000.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📂 Estructura del Proyecto
 
-## Expanding the ESLint configuration
+*   `src/`
+    *   `api/`: Funciones para comunicarse con el backend (`FungusApi.js`).
+    *   `components/`: Componentes reutilizables (Modales, Headers, etc.).
+        *   `ConfirmationModal/`: **(Nuevo)** Modal genérico para confirmaciones y alertas.
+    *   `pages/`: Vistas principales de la aplicación.
+        *   `EditFungus.jsx`: Página de edición (incluye lógica de eliminación).
+        *   `FungusList.jsx`: Listado principal.
+    *   `App.jsx`: Configuración de rutas.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📦 Dependencias Clave
+
+*   **React Router DOM**: Para la navegación entre páginas.
+*   **Vite**: Empaquetador y servidor de desarrollo.
+*   **react-confirm-alert**: (Nota: Recientemente reemplazado por un modal personalizado `ConfirmationModal` para mejor consistencia visual).
+
+## 🚀 Características Recientes
+
+*   **Eliminación de Ensayos**: Ahora es posible borrar ensayos biológicos individuales desde la vista de edición.
+*   **Eliminación de Registros**: Se agregó una "Zona de Peligro" en la edición para borrar permanentemente un aislamiento completo.
+*   **Modales Personalizados**: Se reemplazaron las alertas nativas (`window.confirm`) por componentes modales estilizados.

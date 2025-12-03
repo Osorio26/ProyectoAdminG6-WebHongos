@@ -1,100 +1,58 @@
-## Configuración de Base de Datos (Docker)
+# Gestión de Base de Datos (SQLite)
 
-Para facilitar el desarrollo, utilizamos una base de datos MariaDB en un contenedor Docker. Esto permite tener un entorno aislado y fácil de replicar.
+Este proyecto utiliza **SQLite** como motor de base de datos. A diferencia de versiones anteriores (que usaban Docker/MariaDB), ahora la base de datos es un archivo local, lo que simplifica el desarrollo y la distribución.
 
-### Requisitos previos
-- Tener instalado [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+**¡No necesitas Docker para correr el backend!**
 
-### Comandos para gestionar la base de datos
+## 📂 Ubicación del Archivo
+El archivo de base de datos se encuentra en:
+`App/backend/prisma/dev.db`
 
-1.  **Iniciar la base de datos:**
-    Abra una terminal en la carpeta `App/backend` y ejecute:
-    ```bash
-    docker compose up -d
-    ```
-    Esto descargará la imagen de MariaDB (si no la tiene) e iniciará el servidor de base de datos en el puerto 3306.
+## 🛠️ Comandos Comunes
 
-2.  **Detener la base de datos:**
-    ```bash
-    docker compose stop
-    ```
+### 1. Iniciar el Backend (Desarrollo)
+El backend es un servidor Node.js estándar. Solo necesitas correrlo en una terminal:
 
-3.  **Crear las tablas (Migración inicial):**
-    Si es la primera vez que inicia la base de datos (o si la borró), necesita crear las tablas definidas en el esquema de Prisma:
-    ```bash
-    npx prisma migrate dev --name init
-    ```
+```bash
+cd App/backend
+npm start
+```
+*El servidor iniciará en http://localhost:3000 y se conectará automáticamente al archivo `dev.db`.*
 
-4.  **Poblar la base de datos:**
-    Para insertar los datos iniciales de prueba (Sitios, Organismos, Colectas, etc.), utilice el comando estándar de Prisma:
+### 2. Ver/Editar Datos (Interfaz Gráfica)
+Prisma incluye una herramienta visual para explorar la base de datos sin necesidad de instalar programas extra:
 
-    ```bash
-    npx prisma db seed
-    ```
-    *(Esto ejecutará el script `prisma/seed.js` que carga los datos desde `data/hongos.json`).*
+```bash
+cd App/backend
+npx prisma studio
+```
+Esto abrirá una pestaña en tu navegador donde puedes ver y editar los registros manualmente.
 
-### Solución de problemas
-- Si la aplicación no puede conectarse a la base de datos, asegúrate de que el contenedor esté corriendo con `docker ps`.
-- Si la base de datos falla, la aplicación usará automáticamente los archivos JSON locales como respaldo.
+### 3. Aplicar Cambios al Schema (Migración)
+Si modificas el archivo `schema.prisma` (agregas tablas o columnas):
 
-## Integración con Base de Datos del Otro Grupo (Entrega Docker/SQL)
+```bash
+npx prisma migrate dev --name nombre_del_cambio
+```
 
-Si el otro equipo entrega la base de datos para ejecutarla localmente (Docker) o un archivo SQL, sigue estos pasos:
+### 4. Resetear Base de Datos
+Si quieres borrar todo y empezar de cero (útil si hay errores de inconsistencia durante el desarrollo):
 
-### Escenario A: Entregan un archivo SQL (`.sql`)
-Si nos pasan un "dump" o respaldo de la base de datos:
+```bash
+npx prisma migrate reset
+```
 
-1.  **Asegúrate de que tu contenedor esté corriendo:**
-    ```bash
-    docker compose up -d
-    ```
+### 5. Poblar con Datos de Prueba (Seed)
+Para cargar los datos iniciales a la base de datos SQLite usando el script de seed configurado:
 
-2.  **Importar el archivo SQL:**
-    Copia el archivo `.sql` a la carpeta `App/backend` y ejecuta:
+```bash
+npx prisma db seed
+```
 
-    **En Bash / CMD:**
-    ```bash
-    docker exec -i backend-db-1 mariadb -u root -prootpassword hongos_db < archivo_del_otro_grupo.sql
-    ```
+## ❓ Preguntas Frecuentes
 
-    **En PowerShell:**
-    ```powershell
-    Get-Content archivo_del_otro_grupo.sql | docker exec -i backend-db-1 mariadb -u root -prootpassword hongos_db
-    ```
-    *(Nota: `backend-db-1` es el nombre del contenedor, verifica con `docker ps` si es diferente).*
+**¿Por qué cambiamos a SQLite?**
+Al usar SQLite, la base de datos es "portable" (es solo un archivo). Esto facilita enormemente la creación del ejecutable de escritorio (`.exe`), ya que no necesitamos pedirle al usuario final que instale un servidor de base de datos complejo.
 
-### Escenario B: Entregan su propio Docker Compose
-Si nos pasan una carpeta con su propio `docker-compose.yml`:
-
-1.  **Detén nuestra base de datos actual:**
-    ```bash
-    docker compose down
-    ```
-
-2.  **Levanta el entorno de ellos:**
-    Sigue las instrucciones que ellos provean (usualmente `docker compose up -d` en su carpeta).
-
-### Pasos Comunes (Para ambos escenarios)
-
-1.  **Actualizar credenciales (.env):**
-    Si ellos cambiaron el nombre de la BD, usuario o contraseña, actualiza `App/backend/.env`:
-    ```env
-    DATABASE_URL="mysql://NUEVO_USUARIO:NUEVA_PASS@localhost:3306/NUEVA_DB"
-    ```
-
-2.  **Sincronizar Prisma con la nueva estructura:**
-    Es muy probable que su base de datos tenga tablas o columnas diferentes. Para actualizar nuestro código:
-
-    *   **Traer la nueva estructura (Introspección):**
-        ```bash
-        npx prisma db pull
-        ```
-        Esto actualizará automáticamente el archivo `schema.prisma` con las tablas reales que ellos crearon.
-
-    *   **Generar el cliente:**
-        ```bash
-        npx prisma generate
-        ```
-
-    *   **Verificar errores:**
-        Revisa si el código del backend (`routes/hongos.js`, etc.) tiene errores de compilación debido a cambios en los nombres de las tablas o columnas.
+**¿Cómo desarrollo sin Docker?**
+Simplemente corre `npm start` en la carpeta `backend` y `npm run dev` en la carpeta `frontend`. Ambos procesos correrán en tu máquina local y se comunicarán entre sí.

@@ -7,68 +7,51 @@ Esta guía detalla los pasos necesarios para levantar el proyecto en un entorno 
 Asegúrate de tener instalado lo siguiente:
 
 1.  **Node.js** (Versión 18 o superior recomendada)
-2.  **Docker Desktop** (o Docker Engine) corriendo.
-3.  **Git**
-4.  **Prisma** (El proyecto utiliza la versión **5.x**. Se instalará automáticamente con `npm install`, pero tenlo en cuenta si tienes una versión global diferente).
+2.  **Git**
+3.  **Prisma** (Se instalará automáticamente con `npm install`).
+
+*Nota: No se requiere Docker ni instalar MariaDB/MySQL, ya que el proyecto usa SQLite.*
 
 ---
 
-## Paso 1: Configuración de la Base de Datos
-
-El proyecto utiliza **MariaDB** como base de datos, gestionada a través de Docker, y **Prisma** como ORM.
+## Paso 1: Configuración del Backend y Base de Datos
 
 1.  Navega a la carpeta del backend:
     ```bash
     cd App/backend
     ```
 
-2.  Levanta el contenedor de la base de datos:
-    ```bash
-    docker-compose up -d
-    ```
-    *Esto descargará la imagen de MariaDB e iniciará el servicio en el puerto 3306.*
-
-3.  Crea un archivo `.env` en la carpeta `App/backend` con el siguiente contenido (basado en la configuración de `docker-compose.yml`):
+2.  Crea un archivo `.env` en la carpeta `App/backend` con el siguiente contenido:
 
     ```env
     # App/backend/.env
-    DATABASE_URL="mysql://user:password@localhost:3306/hongos_db"
+    DATABASE_URL="file:./dev.db"
     PORT=3000
     ```
 
-4.  Instala las dependencias del backend:
+3.  Instala las dependencias:
     ```bash
     npm install
     ```
 
-5.  Sincroniza la base de datos con el esquema de Prisma:
+4.  Configura la base de datos (Migración y Seed):
     ```bash
-    npx prisma migrate dev
-    ```
-    *Esto creará las tablas necesarias en tu base de datos local.*
+    # Esto crea el archivo dev.db y aplica el esquema
+    npx prisma migrate dev --name init
 
-6.  (Opcional) Poblar la base de datos con datos de prueba:
-    ```bash
+    # (Opcional) Si necesitas resetear y cargar los datos de prueba/backup:
     npx prisma db seed
     ```
-    *Nota: Esto ejecutará `prisma/seed.js`, el cual carga los datos desde `data/hongos.json`.*
 
----
-
-## Paso 2: Levantar el Backend
-
-Una vez configurada la base de datos:
-
-1.  Asegúrate de estar en `App/backend`.
-2.  Inicia el servidor:
+5.  Inicia el servidor backend:
     ```bash
-    npm start
+    npm run dev
     ```
     El servidor debería estar corriendo en `http://localhost:3000`.
 
 ---
 
-## Paso 3: Levantar el Frontend
+## Paso 2: Levantar el Frontend
 
 1.  Abre una nueva terminal y navega a la carpeta del frontend:
     ```bash
@@ -84,12 +67,12 @@ Una vez configurada la base de datos:
     ```bash
     npm run dev
     ```
-    El frontend debería estar disponible en `http://localhost:5173` (o el puerto que indique Vite).
+    El frontend debería estar disponible en `http://localhost:5173`.
 
 ---
 
 ## Solución de Problemas Comunes
 
-*   **Error de conexión a la base de datos:** Asegúrate de que Docker esté corriendo y que el contenedor `db` esté activo (`docker ps`). Verifica que las credenciales en tu archivo `.env` coincidan con las de `docker-compose.yml`.
-*   **Errores de Prisma:** Si modificas el archivo `schema.prisma`, recuerda ejecutar `npx prisma migrate dev` para aplicar los cambios y regenerar el cliente.
-*   **Puertos ocupados:** Si el puerto 3306 (MySQL) o 3000 (Node) están ocupados, tendrás que detener los servicios que los usan o cambiar la configuración en `docker-compose.yml` y `.env`.
+*   **Error P3015 (Migration not found):** Si te sale un error de que falta un archivo de migración, borra la carpeta de esa migración específica dentro de `prisma/migrations` y vuelve a correr `npx prisma migrate dev`.
+*   **Base de datos bloqueada:** SQLite es un archivo local. Si tienes el `DB Browser for SQLite` abierto con el archivo `dev.db` en modo escritura, es posible que Prisma no pueda escribir. Cierra el visor o asegúrate de haber guardado los cambios.
+*   **Cambios en el Schema:** Si modificas `schema.prisma`, ejecuta `npx prisma migrate dev` para aplicar los cambios y regenerar el cliente.

@@ -32,6 +32,8 @@ Para inspeccionar la base de datos fuera de la aplicación, recomendamos usar **
 
 ## 🚀 Guía para Desarrolladores
 
+> Para una guía paso a paso detallada sobre la configuración inicial y solución de problemas comunes, consulta el archivo [SETUP_GUIDE.md](../SETUP_GUIDE.md) en la raíz del repositorio.
+
 ### Prerrequisitos
 *   Node.js (v18 o superior recomendado).
 *   Git.
@@ -95,7 +97,8 @@ Si necesitas agregar tablas, columnas o cambiar relaciones, sigue estos pasos:
     > *   *Recomendación*: Para este proyecto académico, asuman que un cambio de esquema requiere una reinstalación limpia (Opción A).
 
 ### Cambios Recientes en el Schema (Diciembre 2025)
-*   **Corrección de Tipos**: Se migraron los campos numéricos de `Decimal` a `Float` en las tablas `Colectas` y `Coordenadas` para resolver errores de lectura (`P2023`) con datos preexistentes en SQLite.
+*   **Corrección de Tipos (Fecha)**: Se cambió el campo `Fecha` en la tabla `Colectas` de `DateTime` a `String` para soportar formatos de fecha heredados y evitar errores de conversión en tiempo de ejecución.
+*   **Corrección de Tipos (Numéricos)**: Se migraron los campos numéricos de `Decimal` a `Float` en las tablas `Colectas` y `Coordenadas` para resolver errores de lectura (`P2023`) con datos preexistentes en SQLite.
 *   **Nueva Relación**: Se agregó la columna `idHongo` a la tabla `Aislamientos` para permitir una relación directa entre un aislamiento y un hongo, facilitando las consultas.
 
 ### Generación del Ejecutable (Build)
@@ -113,7 +116,7 @@ Este comando realizará lo siguiente:
 
 **Salida**:
 *   Los archivos generados estarán en la carpeta `App/dist/`.
-*   **Instalador**: `COCMI_Inventario_Hongos_Setup_1.0.0.exe`.
+*   **Instalador**: `COCMI_Inventario_Hongos_Setup.exe` (sin número de versión en el nombre para facilitar actualizaciones).
 *   **Versión Descomprimida**: Carpeta `win-unpacked`.
 
 ## ⚠️ Notas Importantes sobre el Código

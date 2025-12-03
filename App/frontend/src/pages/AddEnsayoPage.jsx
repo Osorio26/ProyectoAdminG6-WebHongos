@@ -25,14 +25,6 @@ const AddEnsayoPage = () => {
     resultadoEnsayo: ""
   });
 
-  // Handler para seleccionar tipo de ensayo
-  const handleTipoEnsayoSelect = (selectedOption) => {
-    setFormData(prev => ({
-      ...prev,
-      tipoEnsayo: selectedOption?.value || ""
-    }));
-  };
-
   useEffect(() => {
       const fetchAislamientos = async () => {
         try {
@@ -138,10 +130,12 @@ const AddEnsayoPage = () => {
             <div className="form-section">
               <div className="form-group">
                 <label>Tipo de Ensayo *</label>
-                <CategoryDropdown
-                  categoryName="tipo de ensayo"
-                  placeholder_text="Seleccione Filamentoso, Levaduriforme, etc."
-                  handleOptionSelect={handleTipoEnsayoSelect}
+                <input
+                  type="text"
+                  name="tipoEnsayo"
+                  value={formData.tipoEnsayo}
+                  onChange={handleChange}
+                  placeholder="Ej: Antagonismo, Patogenicidad, etc."
                 />
               </div>
 

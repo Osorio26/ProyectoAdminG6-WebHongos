@@ -6,6 +6,7 @@ import {
   updateFungus,
   getColectas,
   deleteEnsayo,
+  deleteFungus,
 } from "../api/FungusApi";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
@@ -20,6 +21,7 @@ const TABS = [
   "Almacenamiento",
   "Asociación con Huésped",
   "Ensayos Biológicos",
+  "Gestión de Registro",
 ];
 
 const EditFungus = () => {
@@ -202,6 +204,33 @@ const EditFungus = () => {
     });
   };
 
+  const handleDeleteFungus = () => {
+    showModal({
+      title: "Eliminar Registro",
+      message: `¿Estás seguro de que deseas eliminar el registro ${formData.idHeredado}? Esta acción eliminará permanentemente el aislamiento y sus datos asociados.`,
+      isDanger: true,
+      type: "confirm",
+      confirmText: "Eliminar Definitivamente",
+      onConfirm: async () => {
+        try {
+          await deleteFungus(code);
+          closeModal();
+          navigate("/"); 
+        } catch (error) {
+          console.error("Error deleting fungus:", error);
+          closeModal();
+          setTimeout(() => {
+            showModal({
+              title: "Error",
+              message: "Error al eliminar el registro",
+              type: "alert"
+            });
+          }, 100);
+        }
+      }
+    });
+  };
+
   const handleSave = async () => {
     try {
       await updateFungus(code, formData);
@@ -375,6 +404,7 @@ const EditFungus = () => {
       { label: "Especie Huésped", key: "Colecta.Hospedero.Especie" },
     ],
     ENSAYOS: [],
+    PELIGRO: [],
   };
 
   return (
@@ -393,9 +423,11 @@ const EditFungus = () => {
             </div>
           </div>
 
-          <button className="header-save-button" onClick={handleSave}>
-            Guardar Cambios
-          </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button className="header-save-button" onClick={handleSave}>
+              Guardar Cambios
+            </button>
+          </div>
         </div>
       </div>
 
@@ -473,7 +505,45 @@ const EditFungus = () => {
               </>
             )}
 
-            {activeTab !== 8 &&
+            {activeTab === 9 && (
+              <div style={{ padding: '20px 0' }}>
+                <div style={{ 
+                  border: '1px solid #e0e0e0', 
+                  backgroundColor: '#f9f9f9', 
+                  borderRadius: '8px', 
+                  padding: '24px' 
+                }}>
+                  <h3 style={{ color: '#333', marginTop: 0 }}>Eliminar Registro</h3>
+                  <p style={{ color: '#666', marginBottom: '20px' }}>
+                    Si eliminas este registro, se perderán todos los datos asociados.
+                  </p>
+                  <button 
+                    onClick={handleDeleteFungus}
+                    style={{
+                      backgroundColor: 'white',
+                      color: '#d32f2f',
+                      border: '1px solid #d32f2f',
+                      padding: '10px 20px',
+                      borderRadius: '6px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = '#ffebee';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = 'white';
+                    }}
+                  >
+                    Eliminar este registro
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab !== 8 && activeTab !== 9 &&
               (
                 Object.values(SECTION_CONFIG)[activeTab]
               ).map((item, i) => (

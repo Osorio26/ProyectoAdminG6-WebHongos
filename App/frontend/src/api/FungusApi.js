@@ -90,6 +90,14 @@ export async function deleteEnsayo(id) {
 	return res.json();
 }
 
+export async function deleteFungus(code) {
+	const res = await fetch(`${API_BASE_URL}/hongos/${code}`, {
+		method: "DELETE",
+	});
+	if (!res.ok) throw new Error("Error deleting fungus");
+	return res.json();
+}
+
 export async function updateFungus(code, updates) {
 	const res = await fetch(`${API_BASE_URL}/hongos/${code}`, {
 		method: "PUT",

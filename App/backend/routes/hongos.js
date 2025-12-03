@@ -643,6 +643,46 @@ router.put("/:code", async (req, res) => {
 	}
 });
 
+router.delete("/:code", async (req, res) => {
+	const { code } = req.params;
+	try {
+		const aislamiento = await prisma.aislamientos.findUnique({
+			where: { idHeredado: code }
+		});
+
+		if (!aislamiento) {
+			return res.status(404).json({ message: "Fungus not found" });
+		}
+
+		// Delete Aislamiento (Cascades to Morfologias, Ensayos)
+		await prisma.aislamientos.delete({
+			where: { id: aislamiento.id }
+		});
+
+		// Clean up Organismo if it was specific to this isolation
+		if (aislamiento.idOrganismo) {
+			const others = await prisma.aislamientos.count({
+				where: { idOrganismo: aislamiento.idOrganismo }
+			});
+			if (others === 0) {
+				try {
+					// Delete Hongo first (if exists)
+					await prisma.hongos.delete({ where: { id: aislamiento.idOrganismo } }).catch(() => {});
+					// Delete Organismo
+					await prisma.organismos.delete({ where: { id: aislamiento.idOrganismo } }).catch(() => {});
+				} catch (e) {
+					console.warn("Could not cleanup organism", e);
+				}
+			}
+		}
+
+		res.json({ message: "Fungus deleted successfully" });
+	} catch (error) {
+		console.error("Error deleting fungus:", error);
+		res.status(500).json({ message: "Error deleting fungus" });
+	}
+});
+
 // ==========================================
 // LISTAS PARA DROPDOWNS (HELPER ENDPOINTS)
 // ==========================================

@@ -37,7 +37,7 @@
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "${productName}_Setup_${version}.${ext}"
+      "artifactName": "${productName}_Setup.${ext}"
     },
     "win": {
       "target": "nsis",

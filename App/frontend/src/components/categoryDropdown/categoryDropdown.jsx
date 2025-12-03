@@ -1,6 +1,7 @@
 import Select from 'react-select';
 import { useState, useEffect } from 'react';
 import { getCategoryByTitle } from '../../api/CategoryApi';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 const CategoryDropdown = ({
   categoryName,
@@ -39,7 +40,7 @@ const CategoryDropdown = ({
     }
 
     if (loading) {
-        return <div>Cargando opciones...</div>;
+        return <LoadingSpinner text="Cargando opciones..." />;
     }
 
     if (options.length === 0) {

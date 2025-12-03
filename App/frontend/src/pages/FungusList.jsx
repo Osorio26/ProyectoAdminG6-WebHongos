@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FungusList.css";
 import { getFungi } from "../api/FungusApi";
+import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 
 const FungusList = () => {
   const navigate = useNavigate();
@@ -195,7 +196,7 @@ const FungusList = () => {
           />
         </div>
 
-        {loading && <p>Cargando inventario...</p>}
+        {loading && <LoadingSpinner text="Cargando inventario..." />}
         {error && !loading && <p className="error-message">{error}</p>}
 
         <table className="fungus-table">

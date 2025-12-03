@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./FungusDetails.css";
 import { getFungusByCode } from "../api/FungusApi";
+import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 
 // Tabs fijos, reordenados para mostrar datos más relevantes primero
 const TABS = [
@@ -38,7 +39,7 @@ const FungusDetails = () => {
     })();
   }, [code]);
 
-  if (loading) return <p className="fungus-details-loading">Cargando...</p>;
+  if (loading) return <LoadingSpinner text="Cargando..." />;
   if (error) return <p className="fungus-details-error">{error}</p>;
   if (!fungus) return <p>No encontrado.</p>;
 

@@ -6,6 +6,7 @@ import {
   updateFungus,
   getColectas,
 } from "../api/FungusApi";
+import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 
 const TABS = [
   "Clasificación Taxonómica",
@@ -193,7 +194,7 @@ const EditFungus = () => {
     }
   };
 
-  if (loading) return <p>Cargando...</p>;
+  if (loading) return <LoadingSpinner text="Cargando..." />;
 
   const SECTION_CONFIG = {
     TAXONOMIA: [

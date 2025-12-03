@@ -206,9 +206,9 @@ const AddAislamientoPage = () => {
                 <input type="date" name="fechaAislamiento" value={formData.fechaAislamiento} onChange={handleChange} />
               </div>
               <div className="form-group">
-                <label>
-                  <input type="checkbox" name="aisladoDePlanta" checked={formData.aisladoDePlanta} onChange={handleChange} />
-                  {' '}¿Aislado de huésped?
+                <label className="checkbox-label-flex">
+                  <input type="checkbox" name="aisladoDePlanta" checked={formData.aisladoDePlanta} onChange={handleChange} className="edit-checkbox" />
+                  ¿Aislado de huésped?
                 </label>
               </div>
               {formData.aisladoDePlanta && (
@@ -218,13 +218,14 @@ const AddAislamientoPage = () => {
                 </div>
               )}
               <div className="form-group">
-                <label>
+                <label className="checkbox-label-flex">
                   <input
                     type="checkbox"
                     name="enColeccion"
                     checked={formData.enColeccion}
                     onChange={handleChange}
-                  />{" "}
+                    className="edit-checkbox"
+                  />
                   ¿Está en colección?
                 </label>
               </div>

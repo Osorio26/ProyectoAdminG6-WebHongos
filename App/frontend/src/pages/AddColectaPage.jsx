@@ -154,10 +154,10 @@ const AddColectaPage = () => {
                 <label>Nombre del Sitio</label>
                 <input type="text" name="sitio.nombre" value={formData.sitio.nombre} onChange={handleChange} placeholder="Ej: Sendero Los Quetzales, Finca La Selva" />
               </div>
-              <div className="form-group checkbox-row">
-                <label>
-                  <input type="checkbox" name="sitio.esAreaProtegida" checked={formData.sitio.esAreaProtegida} onChange={handleChange} />
-                  {' '}¿Es Área Protegida?
+              <div className="form-group">
+                <label className="checkbox-label-flex">
+                  <input type="checkbox" name="sitio.esAreaProtegida" checked={formData.sitio.esAreaProtegida} onChange={handleChange} className="edit-checkbox" />
+                  ¿Es Área Protegida?
                 </label>
               </div>
               {formData.sitio.esAreaProtegida && (

@@ -242,9 +242,9 @@ const AddHongoPage = () => {
           {activeTab === 2 && (
             <div className="form-section">
               <div className="form-group">
-                <label>
-                  <input type="checkbox" name="tieneMarcadores" checked={formData.tieneMarcadores} onChange={handleChange} />
-                  {' '}¿Tiene Marcadores Moleculares?
+                <label className="checkbox-label-flex">
+                  <input type="checkbox" name="tieneMarcadores" checked={formData.tieneMarcadores} onChange={handleChange} className="edit-checkbox" />
+                  ¿Tiene Marcadores Moleculares?
                 </label>
               </div>
               

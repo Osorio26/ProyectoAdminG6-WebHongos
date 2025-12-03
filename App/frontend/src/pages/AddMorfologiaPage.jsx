@@ -196,9 +196,9 @@ const AddMorfologiaPage = () => {
                 <input type="text" name="tipoHifa" value={formData.tipoHifa} onChange={handleChange} placeholder="Ej: Hialina, Septada, Ramificada" />
               </div>
               <div className="form-group">
-                <label>
-                  <input type="checkbox" name="tieneMicelioAereo" checked={formData.tieneMicelioAereo} onChange={handleChange} />
-                  {' '}¿Tiene Micelio Aéreo?
+                <label className="checkbox-label-flex">
+                  <input type="checkbox" name="tieneMicelioAereo" checked={formData.tieneMicelioAereo} onChange={handleChange} className="edit-checkbox" />
+                  ¿Tiene Micelio Aéreo?
                 </label>
               </div>
               {formData.tieneMicelioAereo && (
@@ -208,9 +208,9 @@ const AddMorfologiaPage = () => {
                 </div>
               )}
               <div className="form-group">
-                <label>
-                  <input type="checkbox" name="tieneSecreciones" checked={formData.tieneSecreciones} onChange={handleChange} />
-                  {' '}¿Tiene Secreciones?
+                <label className="checkbox-label-flex">
+                  <input type="checkbox" name="tieneSecreciones" checked={formData.tieneSecreciones} onChange={handleChange} className="edit-checkbox" />
+                  ¿Tiene Secreciones?
                 </label>
               </div>
               <div className="form-group">

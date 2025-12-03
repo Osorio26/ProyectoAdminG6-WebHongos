@@ -55,8 +55,8 @@ model Organismos {
 
   // RELACIONES
   Hongo        Hongos?
-  Colectas     Colectas[]     @relation("PlantaFromOrganismo")
-  Aislamientos Aislamientos[]
+  Colectas     Colectas[]     @relation("HospederoFromOrganismo")
+  Aislamientos Aislamientos[] @relation("HongoFromAislamiento")
 }
 
 model Hongos {
@@ -68,7 +68,6 @@ model Hongos {
   // RELACIONES
   Organismo   Organismos     @relation(fields: [id], references: [id])
   Marcadores  Marcadores[]
-  Aislamientos Aislamientos[]
 }
 
 //
@@ -88,13 +87,13 @@ model Colectas {
   idSitio           String?       @map("IdSitio")
   TieneCoordenadas  Boolean       @map("TieneCoordenadas")
   idCoordenadas     String?       @map("IdCoordenadas")
-  ContienePlanta    Boolean       @map("ContienePlanta")
-  idPlanta          String?       @map("IdPlanta")
+  ContieneHospedero Boolean       @map("ContieneHospedero")
+  idHospedero       String?       @map("IdHospedero")
 
   // RELACIONES
   Sitio        Sitios?       @relation(fields: [idSitio], references: [id])
   Coordenadas  Coordenadas?  @relation(fields: [idCoordenadas], references: [id])
-  Planta       Organismos?   @relation("PlantaFromOrganismo", fields: [idPlanta], references: [id])
+  Hospedero    Organismos?   @relation("HospederoFromOrganismo", fields: [idHospedero], references: [id])
 
   Aislamientos Aislamientos[]
 }
@@ -102,8 +101,8 @@ model Colectas {
 model Aislamientos {
   id                 String        @id @default(uuid()) @map("Id")
   idHeredado         String        @unique @map("IdHeredado")
-  AisladoDePlanta    Boolean       @map("AisladoDePlanta")
-  ParteDePlanta      String?       @map("ParteDePlanta")
+  AisladoDeHospedero Boolean       @map("AisladoDeHospedero")
+  ParteDeHospedero   String?       @map("ParteDeHospedero")
   FechaAislamiento   DateTime?     @map("FechaAislamiento")
   FechaSalida        DateTime?     @map("FechaSalida")
   IdAnalisisMolecular String?      @map("IdAnalisisMolecular")
@@ -115,12 +114,10 @@ model Aislamientos {
   EstaEnColeccion     Boolean      @default(false) @map("EstaEnColeccion")
   idColecta          String?       @map("IdColecta")
   idOrganismo        String?       @map("IdOrganismo")
-  idHongo            String?       @map("IdHongo")
 
   // RELACIONES
   Colecta      Colectas?           @relation(fields: [idColecta], references: [id])
-  Organismo    Organismos?         @relation(fields: [idOrganismo], references: [id])
-  Hongo        Hongos?             @relation(fields: [idHongo], references: [id])
+  Organismo    Organismos?         @relation("HongoFromAislamiento", fields: [idOrganismo], references: [id])
 
   EnsayosBiologicos EnsayosBiologicos[]
   Morfologias  Morfologias[]

@@ -30,7 +30,7 @@ const AddFungusMenu = () => {
           <div className="menu-grid">
             <button className="menu-item" onClick={() => navigate("/add-colecta")}>
               <h3 className="menu-item-title">Nueva Colecta</h3>
-              <p className="menu-item-description">Registrar datos de campo, ubicación y planta asociada.</p>
+              <p className="menu-item-description">Registrar datos de campo, ubicación y hospedero asociado.</p>
             </button>
           </div>
         </div>

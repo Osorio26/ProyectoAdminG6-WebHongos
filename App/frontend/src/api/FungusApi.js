@@ -82,6 +82,22 @@ export async function createEnsayo(data) {
 	return res.json();
 }
 
+export async function deleteEnsayo(id) {
+	const res = await fetch(`${API_BASE_URL}/hongos/ensayo/${id}`, {
+		method: "DELETE",
+	});
+	if (!res.ok) throw new Error("Error deleting ensayo");
+	return res.json();
+}
+
+export async function deleteFungus(code) {
+	const res = await fetch(`${API_BASE_URL}/hongos/${code}`, {
+		method: "DELETE",
+	});
+	if (!res.ok) throw new Error("Error deleting fungus");
+	return res.json();
+}
+
 export async function updateFungus(code, updates) {
 	const res = await fetch(`${API_BASE_URL}/hongos/${code}`, {
 		method: "PUT",
@@ -110,9 +126,9 @@ export async function getSitios() {
 	return res.json();
 }
 
-export async function getPlantas() {
-	const res = await fetch(`${API_BASE_URL}/hongos/list/plantas`);
-	if (!res.ok) throw new Error("Error fetching plantas");
+export async function getHospederos() {
+	const res = await fetch(`${API_BASE_URL}/hongos/list/hospederos`);
+	if (!res.ok) throw new Error("Error fetching hospederos");
 	return res.json();
 }
 

@@ -16,6 +16,10 @@ const AddHongoPage = () => {
   const [searchValue, setSearchValue] = useState("");
   const [prefillModalOpen, setPrefillModalOpen] = useState(false);
   const [prefillMessage, setPrefillMessage] = useState("");
+  const [modalErrorOpen, setModalErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [modalSuccessOpen, setModalSuccessOpen] = useState(false);
+  const [AislamientosOptions, setAislamientosOptions] = useState([]);
 
   const [formData, setFormData] = useState({
     // Vinculación
@@ -52,6 +56,7 @@ const AddHongoPage = () => {
         ...prev,
         idAislamiento: id
       }));
+      setSearchValue(id); // Actualizar el input visual
 
       setPrefillMessage(
         `Se ha cargado automáticamente el código de la colecta recién creada (ID: ${id}).`
@@ -112,11 +117,13 @@ const AddHongoPage = () => {
 
   const handleSubmit = async () => {
     if (!formData.idAislamiento) {
-      alert("Debe vincular el hongo a un aislamiento");
+      setErrorMessage("Debe vincular el hongo a un aislamiento existente.");
+      setModalErrorOpen(true);
       return;
     }
     if (!formData.genero) {
-      alert("El género es obligatorio");
+      setErrorMessage("El campo 'Género' es obligatorio.");
+      setModalErrorOpen(true);
       return;
     }
     
@@ -128,11 +135,11 @@ const AddHongoPage = () => {
         idRelacionado: formData.idAislamiento
       };
       await createHongo(payload);
-      alert("Hongo registrado exitosamente");
-      navigate("/inventario");
+      setModalSuccessOpen(true);
     } catch (error) {
       console.error(error);
-      alert("Error al registrar el hongo");
+      setErrorMessage("Ocurrió un error al registrar el hongo. Por favor intente nuevamente.");
+      setModalErrorOpen(true);
     } finally {
       setLoading(false);
     }
@@ -346,7 +353,26 @@ const AddHongoPage = () => {
         title="Aislamiento precargada"
         message={prefillMessage}
         onConfirm={() => setPrefillModalOpen(false)}
-        onCancel={() => setPrefillModalOpen(false)}
+        hideCancel={true}
+      />
+
+      <AppModal
+        open={modalErrorOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={() => setModalErrorOpen(false)}
+        hideCancel={true}
+      />
+
+      <AppModal
+        open={modalSuccessOpen}
+        title="Hongo Registrado"
+        message="El hongo se ha registrado exitosamente."
+        onConfirm={() => {
+          setModalSuccessOpen(false);
+          navigate("/inventario");
+        }}
+        hideCancel={true}
       />
 
     </div>

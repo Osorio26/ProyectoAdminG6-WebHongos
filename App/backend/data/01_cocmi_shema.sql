@@ -6,7 +6,7 @@ SET NAMES utf8mb4;
 SET sql_mode = 'STRICT_ALL_TABLES';
 
 -- Crea la base de datos (opcional)
-CREATE DATABASE IF NOT EXISTS cocmi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- CREATE DATABASE IF NOT EXISTS cocmi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE cocmi;
 
 -- ===================================================================
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS Coordenadas (
 -- 3) Organismos (genérico para Planta u Hongo)
 CREATE TABLE IF NOT EXISTS Organismos (
   Id       CHAR(36) NOT NULL DEFAULT (UUID()),
-  Tipo     ENUM('Planta','Hongo') NOT NULL,
+  Tipo     ENUM('Hospedero','Hongo') NOT NULL,
   Reino    VARCHAR(50),
   Filo     VARCHAR(50),
   Clase    VARCHAR(50),
@@ -74,21 +74,21 @@ CREATE TABLE IF NOT EXISTS Colectas (
   IdSitio            CHAR(36),
   TieneCoordenadas   TINYINT(1) NOT NULL,
   IdCoordenadas      CHAR(36),
-  ContienePlanta     TINYINT(1) NOT NULL,
-  IdPlanta           CHAR(36),
+  ContieneHospedero     TINYINT(1) NOT NULL,
+  IdHospedero           CHAR(36),
   PRIMARY KEY (Id),
   UNIQUE KEY uq_colectas_idHeredado (IdHeredado),
   KEY idx_colectas_sitio (IdSitio),
   KEY idx_colectas_coord (IdCoordenadas),
-  KEY idx_colectas_planta (IdPlanta),
+  KEY idx_colectas_hospederos (IdHospedero),
   CONSTRAINT fk_colectas_sitio
     FOREIGN KEY (IdSitio) REFERENCES Sitios(Id)
     ON UPDATE CASCADE ON DELETE SET NULL,
   CONSTRAINT fk_colectas_coord
     FOREIGN KEY (IdCoordenadas) REFERENCES Coordenadas(Id)
     ON UPDATE CASCADE ON DELETE SET NULL,
-  CONSTRAINT fk_colectas_planta
-    FOREIGN KEY (IdPlanta) REFERENCES Organismos(Id)
+  CONSTRAINT fk_colectas_hospederos
+    FOREIGN KEY (IdHospedero) REFERENCES Organismos(Id)
     ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -96,8 +96,8 @@ CREATE TABLE IF NOT EXISTS Colectas (
 CREATE TABLE IF NOT EXISTS Aislamientos (
   Id                      CHAR(36) NOT NULL DEFAULT (UUID()),
   IdHeredado              VARCHAR(100) NOT NULL,
-  AisladoDePlanta         TINYINT(1) NOT NULL,
-  ParteDePlanta           VARCHAR(50),
+  AisladoDeHospedero      TINYINT(1) NOT NULL,
+  ParteDeHospedero        VARCHAR(50),
   FechaAislamiento        DATE,
   FechaSalida             DATE,
   IdAnalisisMolecular     VARCHAR(100),
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS Aislamientos (
   MetodoSiembra           VARCHAR(100),
   Estado                  VARCHAR(50),
   Comentarios             TEXT,
-  CantidadExistencias     INT,
+  CantidadExistencias     INT DEFAULT 1,
   EstaEnColeccion         TINYINT(1) NOT NULL DEFAULT(0),
   IdColecta               CHAR(36),
   PRIMARY KEY (Id),
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS Aislamientos (
 CREATE TABLE IF NOT EXISTS EnsayosBiologicos (
   Id             CHAR(36) NOT NULL DEFAULT (UUID()),
   IdAislamiento  CHAR(36) NOT NULL,
-  Tipo           VARCHAR(50) NOT NULL,
+  Tipo           TEXT NOT NULL,
   Resultado      TEXT,
   PRIMARY KEY (Id),
   KEY idx_ensayos_aislamiento (IdAislamiento),

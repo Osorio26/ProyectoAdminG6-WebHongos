@@ -21,11 +21,14 @@ const AddAislamientoPage = () => {
   const [searchColecta, setSearchColecta] = useState("");
 
 
+  const [modalErrorOpen, setModalErrorOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [formData, setFormData] = useState({
     // Aislamiento
     idHeredado: "",
-    aisladoDePlanta: false,
-    parteDePlanta: "",
+    aisladoDeHospedero: false,
+    parteDeHospedero: "",
     fechaAislamiento: new Date().toISOString().split("T")[0],
     fechaSalida: "",
     tipoCrecimiento: "",
@@ -47,6 +50,7 @@ const AddAislamientoPage = () => {
         ...prev,
         idColectaExistente: location.state.prefilledColecta
       }));
+      setSearchColecta(location.state.prefilledColecta); // Actualizar el input visual
       setModalInfoMessage(
         `Se ha preseleccionado la colecta recién creada (ID: ${location.state.prefilledColecta}). Complete los datos del aislamiento.`
       );
@@ -60,7 +64,7 @@ const AddAislamientoPage = () => {
         const data = await getColectas(); // [{ idHeredado: "COL-2024-001" }, ...]
         const options = data.map(c => ({ 
           value: c.idHeredado, 
-          label: `${c.idHeredado} | ${c.Colector || 'Sin colector'} | ${c.Fecha ? new Date(c.Fecha).toLocaleDateString() : 'Sin fecha'}` 
+          label: c.idHeredado 
         }));
         setColectasOptions(options);
       } catch (error) {
@@ -129,7 +133,8 @@ const AddAislamientoPage = () => {
 
   const handleSubmit = async () => {
   if (!formData.idHeredado) {
-    alert("El código de aislamiento es obligatorio");
+    setErrorMessage("El código de aislamiento es obligatorio.");
+    setModalErrorOpen(true);
     return;
   }
   
@@ -148,8 +153,9 @@ const AddAislamientoPage = () => {
       setModalOpen(true);
 
     } catch (error) {
-      console.error("Error al crear el aislamiento:", error); // Usar un mensaje más informativo en console.error
-      alert("Error al crear el aislamiento. Revise la consola para detalles o verifique que el ID de Colecta exista.");
+      console.error("Error al crear el aislamiento:", error);
+      setErrorMessage("Ocurrió un error al crear el aislamiento. Verifique que el ID de Colecta exista o revise la consola.");
+      setModalErrorOpen(true);
     } finally {
       setLoading(false);
     }
@@ -207,14 +213,14 @@ const AddAislamientoPage = () => {
               </div>
               <div className="form-group">
                 <label className="checkbox-label-flex">
-                  <input type="checkbox" name="aisladoDePlanta" checked={formData.aisladoDePlanta} onChange={handleChange} className="edit-checkbox" />
+                  <input type="checkbox" name="aisladoDeHospedero" checked={formData.aisladoDeHospedero} onChange={handleChange} className="edit-checkbox" />
                   ¿Aislado de huésped?
                 </label>
               </div>
-              {formData.aisladoDePlanta && (
+              {formData.aisladoDeHospedero && (
                 <div className="form-group">
                   <label>Parte del huésped</label>
-                  <input type="text" name="parteDePlanta" value={formData.parteDePlanta} onChange={handleChange} placeholder="Ej: Hoja, Raíz, Tallo, Fruto" />
+                  <input type="text" name="parteDeHospedero" value={formData.parteDeHospedero} onChange={handleChange} placeholder="Ej: Hoja, Raíz, Tallo, Fruto" />
                 </div>
               )}
               <div className="form-group">
@@ -390,6 +396,14 @@ const AddAislamientoPage = () => {
         message={modalInfoMessage}
         onConfirm={() => setModalInfoOpen(false)}  
         hideCancel={true}                          
+      />
+
+      <AppModal
+        open={modalErrorOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={() => setModalErrorOpen(false)}
+        hideCancel={true}
       />
     </div>
   );

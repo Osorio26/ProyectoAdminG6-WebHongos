@@ -44,5 +44,5 @@ This project is configured to be packaged as a Windows executable using Electron
 
 ## Troubleshooting
 
-- **Database**: The backend expects a database connection. Ensure your database is running or configured correctly. If using SQLite, the file will be created in the backend folder. If using MySQL/MariaDB (as per setup), ensure the database is accessible.
+- **Database**: The backend uses a local SQLite database (`dev.db`). This file is automatically managed by the application within the backend folder. No external database server is required.
 - **Ports**: The backend tries to listen on port 3000.

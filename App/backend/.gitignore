@@ -1,2 +1,5 @@
 /generated/prisma
 .env
+*.db
+prisma/dev.db
+node_modules

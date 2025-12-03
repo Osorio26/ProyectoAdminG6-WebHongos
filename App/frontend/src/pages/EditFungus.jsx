@@ -5,7 +5,10 @@ import {
   getFungusByCode,
   updateFungus,
   getColectas,
+  deleteEnsayo,
+  deleteFungus,
 } from "../api/FungusApi";
+import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 
 const TABS = [
@@ -18,6 +21,7 @@ const TABS = [
   "Almacenamiento",
   "Asociación con Huésped",
   "Ensayos Biológicos",
+  "Gestión de Registro",
 ];
 
 const EditFungus = () => {
@@ -29,6 +33,22 @@ const EditFungus = () => {
   const [colectas, setColectas] = useState([]);
   const [categories, setCategories] = useState({});
   const [loading, setLoading] = useState(true);
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+    type: "confirm",
+    isDanger: false
+  });
+
+  const showModal = (config) => {
+    setModalConfig({ ...config, isOpen: true });
+  };
+
+  const closeModal = () => {
+    setModalConfig((prev) => ({ ...prev, isOpen: false }));
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -146,6 +166,71 @@ const EditFungus = () => {
     }));
   };
 
+  const handleDeleteEnsayo = (index) => {
+    const ensayo = formData.EnsayosBiologicos[index];
+    
+    showModal({
+      title: "Eliminar Ensayo",
+      message: "¿Estás seguro de que deseas eliminar este ensayo? Esta acción no se puede deshacer.",
+      isDanger: true,
+      type: "confirm",
+      confirmText: "Eliminar",
+      onConfirm: async () => {
+        if (!ensayo._isNew && ensayo.id) {
+          try {
+            await deleteEnsayo(ensayo.id);
+          } catch (error) {
+            console.error("Error deleting ensayo:", error);
+            // Close the confirm modal first, then show alert
+            closeModal();
+            setTimeout(() => {
+              showModal({
+                title: "Error",
+                message: "Error al eliminar el ensayo",
+                type: "alert"
+              });
+            }, 100);
+            return;
+          }
+        }
+
+        setFormData((prev) => {
+          const newEnsayos = [...prev.EnsayosBiologicos];
+          newEnsayos.splice(index, 1);
+          return { ...prev, EnsayosBiologicos: newEnsayos };
+        });
+        closeModal();
+      }
+    });
+  };
+
+  const handleDeleteFungus = () => {
+    showModal({
+      title: "Eliminar Registro",
+      message: `¿Estás seguro de que deseas eliminar el registro ${formData.idHeredado}? Esta acción eliminará permanentemente el aislamiento y sus datos asociados.`,
+      isDanger: true,
+      type: "confirm",
+      confirmText: "Eliminar Definitivamente",
+      onConfirm: async () => {
+        try {
+          await deleteFungus(code);
+          closeModal();
+          navigate("/"); 
+        } catch (error) {
+          console.error("Error deleting fungus:", error);
+          closeModal();
+          setTimeout(() => {
+            showModal({
+              title: "Error",
+              message: "Error al eliminar el registro",
+              type: "alert"
+            });
+          }, 100);
+        }
+      }
+    });
+  };
+
   const handleSave = async () => {
     try {
       await updateFungus(code, formData);
@@ -190,7 +275,11 @@ const EditFungus = () => {
 
       navigate(`/detalle/${code}`);
     } catch {
-      alert("Error al guardar");
+      showModal({
+        title: "Error",
+        message: "Ocurrió un error al guardar los cambios. Por favor intente nuevamente.",
+        type: "alert"
+      });
     }
   };
 
@@ -254,10 +343,10 @@ const EditFungus = () => {
       },
       { label: "Fecha Aislamiento", key: "FechaAislamiento", type: "date" },
       { label: "Fecha Salida", key: "FechaSalida", type: "date" },
-      { label: "Parte de Huésped", key: "ParteDeHuésped", showIf: { key: "aisladoDePlanta", equals: true } },
+      { label: "Parte de Huésped", key: "ParteDeHospedero", showIf: { key: "aisladoDeHospedero", equals: true } },
       { label: "Estado", key: "Estado" },
       { label: "Comentarios", key: "Comentarios" },
-      { label: "¿Aislado de Huésped?", key: "AisladoDeHuésped", type: "checkbox" },
+      { label: "¿Aislado de Huésped?", key: "AisladoDeHospedero", type: "checkbox" },
       { label: "¿En Colección?", key: "EstaEnColeccion", type: "checkbox" },
       { label: "Cantidad de existencias", key: "cantidadExistencias", type: "number", showIf: { key: "enColeccion", equals: true } }
     ],
@@ -309,12 +398,13 @@ const EditFungus = () => {
       { label: "Área Protegida", key: "Colecta.Sitio.NombreAreaProtegida" },
     ],
     Huésped: [
-      { label: "Reino Huésped", key: "Colecta.Huésped.Reino" },
-      { label: "Familia Huésped", key: "Colecta.Huésped.Familia" },
-      { label: "Género Huésped", key: "Colecta.Huésped.Genero" },
-      { label: "Especie Huésped", key: "Colecta.Huésped.Especie" },
+      { label: "Reino Huésped", key: "Colecta.Hospedero.Reino" },
+      { label: "Familia Huésped", key: "Colecta.Hospedero.Familia" },
+      { label: "Género Huésped", key: "Colecta.Hospedero.Genero" },
+      { label: "Especie Huésped", key: "Colecta.Hospedero.Especie" },
     ],
     ENSAYOS: [],
+    PELIGRO: [],
   };
 
   return (
@@ -333,9 +423,11 @@ const EditFungus = () => {
             </div>
           </div>
 
-          <button className="header-save-button" onClick={handleSave}>
-            Guardar Cambios
-          </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button className="header-save-button" onClick={handleSave}>
+              Guardar Cambios
+            </button>
+          </div>
         </div>
       </div>
 
@@ -388,6 +480,22 @@ const EditFungus = () => {
                         placeholder="Ej: Inhibición del 50%..."
                       />
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEnsayo(idx)}
+                      style={{
+                        marginLeft: "10px",
+                        background: "#ff4d4d",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                      }}
+                      title="Eliminar ensayo"
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 ))}
 
@@ -397,7 +505,45 @@ const EditFungus = () => {
               </>
             )}
 
-            {activeTab !== 8 &&
+            {activeTab === 9 && (
+              <div style={{ padding: '20px 0' }}>
+                <div style={{ 
+                  border: '1px solid #e0e0e0', 
+                  backgroundColor: '#f9f9f9', 
+                  borderRadius: '8px', 
+                  padding: '24px' 
+                }}>
+                  <h3 style={{ color: '#333', marginTop: 0 }}>Eliminar Registro</h3>
+                  <p style={{ color: '#666', marginBottom: '20px' }}>
+                    Si eliminas este registro, se perderán todos los datos asociados.
+                  </p>
+                  <button 
+                    onClick={handleDeleteFungus}
+                    style={{
+                      backgroundColor: 'white',
+                      color: '#d32f2f',
+                      border: '1px solid #d32f2f',
+                      padding: '10px 20px',
+                      borderRadius: '6px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.backgroundColor = '#ffebee';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = 'white';
+                    }}
+                  >
+                    Eliminar este registro
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab !== 8 && activeTab !== 9 &&
               (
                 Object.values(SECTION_CONFIG)[activeTab]
               ).map((item, i) => (
@@ -455,13 +601,22 @@ const EditFungus = () => {
               ))}
 
             {activeTab === 4 && (
-              <button className="add-button" onClick={addNewMorfologia}>
-                Agregar Morfología
-              </button>
+              <></>
             )}
           </div>
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        onClose={closeModal}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        confirmText={modalConfig.confirmText}
+        cancelText={modalConfig.cancelText}
+        isDanger={modalConfig.isDanger}
+        type={modalConfig.type}
+      />
     </div>
   );
 };

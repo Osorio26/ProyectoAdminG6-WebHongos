@@ -1,19 +1,23 @@
 /* FungusList.css */
 
 .fungus-container {
-  min-height: 100vh;
+  height: calc(100vh - 94px); /* Subtract header height (approx 94px) */
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 40px 20px;
+  align-items: center;
+  padding: 20px;
   background-color: var(--bg-app);
+  overflow: hidden;
 }
 
 .fungus-window {
   background: var(--bg-surface);
   width: 100%;
   max-width: 1200px;
-  padding: 40px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border-color);
@@ -94,15 +98,27 @@
   color: var(--text-tertiary);
 }
 
+.table-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
 .fungus-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .fungus-table thead {
   background-color: var(--bg-app);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .fungus-table th {
@@ -116,16 +132,17 @@
   border-bottom: 2px solid var(--border-color);
   cursor: pointer;
   transition: background-color 0.2s;
+  background-color: var(--bg-app); /* Ensure background is opaque for sticky */
 }
 
 .fungus-table th:first-child {
-  border-top-left-radius: var(--radius-md);
-  border-bottom-left-radius: var(--radius-md);
+  /* border-top-left-radius: var(--radius-md); Removed radius for sticky header inside container */
+  /* border-bottom-left-radius: var(--radius-md); */
 }
 
 .fungus-table th:last-child {
-  border-top-right-radius: var(--radius-md);
-  border-bottom-right-radius: var(--radius-md);
+  /* border-top-right-radius: var(--radius-md); */
+  /* border-bottom-right-radius: var(--radius-md); */
   cursor: default;
 }
 
@@ -186,7 +203,8 @@
   display: flex;
   gap: 6px;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 0;
+  flex-shrink: 0;
 }
 
 .pagination button {

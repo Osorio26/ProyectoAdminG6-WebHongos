@@ -199,49 +199,51 @@ const FungusList = () => {
         {loading && <LoadingSpinner text="Cargando inventario..." />}
         {error && !loading && <p className="error-message">{error}</p>}
 
-        <table className="fungus-table">
-          <thead>
-            <tr>
-              <th onClick={() => requestSort('idHeredado')} className={sortConfig.key === 'idHeredado' ? sortConfig.direction : ''}>
-                Código {sortConfig.key === 'idHeredado' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => requestSort('Identificacion')} className={sortConfig.key === 'Identificacion' ? sortConfig.direction : ''}>
-                Identificación {sortConfig.key === 'Identificacion' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => requestSort('Colecta.Colector')} className={sortConfig.key === 'Colecta.Colector' ? sortConfig.direction : ''}>
-                Colector {sortConfig.key === 'Colecta.Colector' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => requestSort('Colecta.Sitio.Nombre')} className={sortConfig.key === 'Colecta.Sitio.Nombre' ? sortConfig.direction : ''}>
-                Ubicación {sortConfig.key === 'Colecta.Sitio.Nombre' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
-              </th>
-              <th onClick={() => requestSort('Colecta.Fecha')} className={sortConfig.key === 'Colecta.Fecha' ? sortConfig.direction : ''}>
-                Fecha Colecta {sortConfig.key === 'Colecta.Fecha' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
-              </th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((fungus, idx) => (
-              <tr key={idx}>
-                <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
-                <td className="name-cell">
-                  <i>{fungus.Organismo?.Genero} {fungus.Organismo?.Especie || "sp."}</i>
-                </td>
-                <td>{fungus.Colecta?.Colector || "N/A"}</td>
-                <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
-                <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
-                <td>
-                  <button
-                    className="details-button"
-                    onClick={() => navigate(`/detalle/${fungus.idHeredado}`)}
-                  >
-                    Ver detalles
-                  </button>
-                </td>
+        <div className="table-container">
+          <table className="fungus-table">
+            <thead>
+              <tr>
+                <th onClick={() => requestSort('idHeredado')} className={sortConfig.key === 'idHeredado' ? sortConfig.direction : ''}>
+                  Código {sortConfig.key === 'idHeredado' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+                </th>
+                <th onClick={() => requestSort('Identificacion')} className={sortConfig.key === 'Identificacion' ? sortConfig.direction : ''}>
+                  Identificación {sortConfig.key === 'Identificacion' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+                </th>
+                <th onClick={() => requestSort('Colecta.Colector')} className={sortConfig.key === 'Colecta.Colector' ? sortConfig.direction : ''}>
+                  Colector {sortConfig.key === 'Colecta.Colector' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+                </th>
+                <th onClick={() => requestSort('Colecta.Sitio.Nombre')} className={sortConfig.key === 'Colecta.Sitio.Nombre' ? sortConfig.direction : ''}>
+                  Ubicación {sortConfig.key === 'Colecta.Sitio.Nombre' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+                </th>
+                <th onClick={() => requestSort('Colecta.Fecha')} className={sortConfig.key === 'Colecta.Fecha' ? sortConfig.direction : ''}>
+                  Fecha Colecta {sortConfig.key === 'Colecta.Fecha' ? (sortConfig.direction === 'ascending' ? '▲' : '▼') : ''}
+                </th>
+                <th>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentItems.map((fungus, idx) => (
+                <tr key={idx}>
+                  <td className="code-cell"><strong>{fungus.idHeredado}</strong></td>
+                  <td className="name-cell">
+                    <i>{fungus.Organismo?.Genero} {fungus.Organismo?.Especie || "sp."}</i>
+                  </td>
+                  <td>{fungus.Colecta?.Colector || "N/A"}</td>
+                  <td>{fungus.Colecta?.Sitio?.Nombre || "N/A"}</td>
+                  <td>{fungus.Colecta?.Fecha ? new Date(fungus.Colecta.Fecha).toLocaleDateString() : "N/A"}</td>
+                  <td>
+                    <button
+                      className="details-button"
+                      onClick={() => navigate(`/detalle/${fungus.idHeredado}`)}
+                    >
+                      Ver detalles
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {/* ---- CONTROLES DE PAGINACIÓN ---- */}
         <div className="pagination">

@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import prisma from "../prismaClient.js";
+import { exportAllTablesToCSV } from "../utils/csvExporter.js";
 
 const router = express.Router();
 
@@ -171,6 +172,8 @@ router.post("/colecta", async (req, res) => {
 		});
 
 		res.status(201).json(colecta);
+		// Update CSVs in background
+		exportAllTablesToCSV().catch(err => console.error("Background CSV export failed:", err));
 	} catch (error) {
 		console.error("Error creating colecta:", error);
 		res.status(500).json({ message: "Error creating colecta", error: error.message });
@@ -281,6 +284,8 @@ router.post("/aislamiento", async (req, res) => {
 		});
 
 		res.status(201).json(aislamiento);
+		// Update CSVs in background
+		exportAllTablesToCSV().catch(err => console.error("Background CSV export failed:", err));
 	} catch (error) {
 		console.error("Error creating aislamiento:", error);
 		res.status(500).json({ message: "Error creating aislamiento", error: error.message });
@@ -350,6 +355,9 @@ router.post("/hongo", async (req, res) => {
 			idOrganismo: organismo.id
 		});
 
+		// Update CSVs in background
+		exportAllTablesToCSV().catch(err => console.error("Background CSV export failed:", err));
+
 	} catch (error) {
 		console.error("Error creating hongo:", error);
 		res.status(500).json({
@@ -391,6 +399,8 @@ router.post("/morfologia", async (req, res) => {
 		});
 
 		res.status(201).json(morfologia);
+		// Update CSVs in background
+		exportAllTablesToCSV().catch(err => console.error("Background CSV export failed:", err));
 	} catch (error) {
 		console.error("Error creating morfologia:", error);
 		res.status(500).json({ message: "Error creating morfologia", error: error.message });
@@ -419,6 +429,8 @@ router.post("/ensayo", async (req, res) => {
 		});
 
 		res.status(201).json(ensayo);
+		// Update CSVs in background
+		exportAllTablesToCSV().catch(err => console.error("Background CSV export failed:", err));
 	} catch (error) {
 		console.error("Error creating ensayo:", error);
 		res.status(500).json({ message: "Error creating ensayo", error: error.message });
@@ -655,6 +667,8 @@ router.put("/:code", async (req, res) => {
 		});
 
 		res.json(updatedFungus);
+		// Update CSVs in background
+		exportAllTablesToCSV().catch(err => console.error("Background CSV export failed:", err));
 
 	} catch (err) {
 		console.error("Error updating fungus in DB:", err);
@@ -696,6 +710,8 @@ router.delete("/:code", async (req, res) => {
 		}
 
 		res.json({ message: "Fungus deleted successfully" });
+		// Update CSVs in background
+		exportAllTablesToCSV().catch(err => console.error("Background CSV export failed:", err));
 	} catch (error) {
 		console.error("Error deleting fungus:", error);
 		res.status(500).json({ message: "Error deleting fungus" });

@@ -453,21 +453,16 @@ const EditFungus = () => {
               <>
                 {formData.EnsayosBiologicos?.map((ens, idx) => (
                   <div key={idx} className="edit-row">
-                    <span className="edit-label">Tipo Ensayo</span>
+                    <span>Tipo de Ensayo *</span>
                     <div className="edit-input-wrapper">
-                      <select
-                        name={`EnsayosBiologicos[${idx}].Tipo`}
-                        className="edit-input-field"
-                        value={ens.Tipo}
-                        onChange={handleChange}
-                      >
-                        <option value="">Seleccione</option>
-                        {(categories["tipo de ensayo"] || []).map((o) => (
-                          <option key={o} value={o}>
-                            {o}
-                          </option>
-                        ))}
-                      </select>
+                        <input
+                          type="text"
+                          name={`EnsayosBiologicos[${idx}].Tipo`}
+                          value={ens.Tipo}
+                          className="edit-input-field"
+                          onChange={handleChange}
+                          placeholder="Escribe el tipo de ensayo"
+                        />
                     </div>
 
                     <span className="edit-label">Resultado</span>

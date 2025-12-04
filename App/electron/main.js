@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { fork } from 'child_process';
+import http from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,6 +11,24 @@ const __dirname = path.dirname(__filename);
 function logToFile(message) {
   const logPath = path.join(app.getPath('userData'), 'app.log');
   fs.appendFileSync(logPath, `${new Date().toISOString()} - ${message}\n`);
+}
+
+
+function waitForBackend(url, timeout = 15000) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+
+    function check() {
+      http.get(url, () => resolve(true)).on('error', () => {
+        if (Date.now() - start > timeout) {
+          return reject(new Error('Backend timeout'));
+        }
+        setTimeout(check, 300);
+      });
+    }
+
+    check();
+  });
 }
 
 let mainWindow;
@@ -138,14 +157,19 @@ function startBackend() {
   });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   startBackend();
-  createWindow();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+  try {
+    await waitForBackend('http://localhost:3000');
+    console.log('Backend is ready!');
+  } catch (err) {
+    console.error('Backend did not start in time', err);
+  }
+
+  createWindow();
 });
+
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

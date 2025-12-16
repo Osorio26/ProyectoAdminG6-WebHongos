@@ -254,6 +254,13 @@ Al usar SQLite, la base de datos es "portable" (es solo un archivo). Esto facili
 **¿Cómo desarrollo sin Docker?**
 Simplemente corre `npm start` en la carpeta `backend` y `npm run dev` en la carpeta `frontend`. Ambos procesos correrán en tu máquina local y se comunicarán entre sí.
 
+**¿Qué pasa si quiero usar el sistema en otro equipo? ¿Cómo migro los datos?**
+Sencillo. Primero, instala el sistema en el nuevo equipo siguiendo los pasos descritos anteriormente. Para conservar la información existente de la base de datos, copia el archivo dev.db, ubicado en la carpeta que contiene el ejecutable de la aplicación:
+```bash
+..\win-unpacked\database\dev.db
+```
+Posteriormente, pega este archivo en la misma ruta dentro de la carpeta del ejecutable en la nueva computadora. Dado que dicha carpeta ya contendrá un archivo dev.db generado por defecto, será necesario reemplazarlo para mantener los datos originales.
+
 ## Solución de Problemas (Troubleshooting)
 - **Base de Datos:**
 El backend utiliza una base de datos SQLite local (dev.db). Este archivo es manejado automáticamente por la aplicación dentro de la carpeta del backend. No se requiere instalar un servidor externo.

@@ -325,14 +325,14 @@ router.post("/hongo", async (req, res) => {
 		if (data.tieneMarcadores && data.marcador?.tipoMarcador) {
 			await prisma.marcadores.create({
 				data: {
-					idHongo: organismo.id,
+					idOrganismo: organismo.id,
 					Tipo: data.marcador.tipoMarcador,
 					Secuencia: data.marcador.secuenciaTexto
 				}
 			});
 		}
 
-		// 🔥 Vincular al Aislamiento usando idHeredado
+		// Vincular al Aislamiento usando idHeredado
 		if (data.idRelacionado) {
 			const aislamiento = await prisma.aislamientos.findFirst({
 				where: { idHeredado: data.idRelacionado }
@@ -342,7 +342,7 @@ router.post("/hongo", async (req, res) => {
 				await prisma.aislamientos.update({
 					where: { id: aislamiento.id },
 					data: { 
-						idHongo: organismo.id
+						idOrganismo: organismo.id
 					} 
 				});
 			} else {
@@ -352,7 +352,7 @@ router.post("/hongo", async (req, res) => {
 
 		res.status(201).json({
 			message: "Hongo registrado y vínculo creado correctamente",
-			idHongo: organismo.id
+			idOrganismo: organismo.id
 		});
 
 		// Update CSVs in background
@@ -482,9 +482,9 @@ router.put("/:code", async (req, res) => {
 		}
 
 		// 2. Actualizar Organismo (Hongo asociado al Aislamiento)
-		if (data.Organismo && existing.idHongo) {
+		if (data.Organismo && existing.idOrganismo) {
 			await prisma.organismos.update({
-				where: { id: existing.idHongo },
+				where: { id: existing.idOrganismo },
 				data: {
 					Reino: data.Organismo.Reino,
 					Filo: data.Organismo.Filo,
@@ -498,10 +498,10 @@ router.put("/:code", async (req, res) => {
 
 			// Actualizar Hongo (si aplica)
 			if (existing.Organismo.Tipo === 'Hongo' && data.Organismo.Hongo) {
-				const hongoExists = await prisma.hongos.findUnique({ where: { id: existing.idHongo } });
+				const hongoExists = await prisma.hongos.findUnique({ where: { id: existing.idOrganismo } });
 				if (hongoExists) {
 					await prisma.hongos.update({
-						where: { id: existing.idHongo },
+						where: { id: existing.idOrganismo },
 						data: {
 							MetodoIdentificacion: data.Organismo.Hongo.MetodoIdentificacion,
 							CodigoAccesoGenBank: data.Organismo.Hongo.CodigoAccesoGenBank,
@@ -525,7 +525,7 @@ router.put("/:code", async (req, res) => {
 							// Si no existe, crearlo
 							await prisma.marcadores.create({
 								data: {
-									idHongo: existing.idHongo,
+									idOrganismo: existing.idOrganismo,
 									Tipo: m.Tipo,
 									Secuencia: m.Secuencia
 								}
@@ -693,16 +693,16 @@ router.delete("/:code", async (req, res) => {
 		});
 
 		// Clean up Organismo if it was specific to this isolation
-		if (aislamiento.idHongo) {
+		if (aislamiento.idOrganismo) {
 			const others = await prisma.aislamientos.count({
-				where: { idHongo: aislamiento.idHongo }
+				where: { idOrganismo: aislamiento.idOrganismo }
 			});
 			if (others === 0) {
 				try {
 					// Delete Hongo first (if exists)
-					await prisma.hongos.delete({ where: { id: aislamiento.idHongo } }).catch(() => {});
+					await prisma.hongos.delete({ where: { id: aislamiento.idOrganismo } }).catch(() => {});
 					// Delete Organismo
-					await prisma.organismos.delete({ where: { id: aislamiento.idHongo } }).catch(() => {});
+					await prisma.organismos.delete({ where: { id: aislamiento.idOrganismo } }).catch(() => {});
 				} catch (e) {
 					console.warn("Could not cleanup organism", e);
 				}
@@ -759,7 +759,7 @@ router.get("/list/hospederos", async (req, res) => {
 router.get("/list/aislamientos", async (req, res) => {
 	try {
 		const aislamientos = await prisma.aislamientos.findMany({
-			select: { id: true, idHeredado: true, MedioCultivo: true, FechaAislamiento: true, idHongo: true }
+			select: { id: true, idHeredado: true, MedioCultivo: true, FechaAislamiento: true, idOrganismo: true }
 		});
 		res.json(aislamientos);
 	} catch (error) {

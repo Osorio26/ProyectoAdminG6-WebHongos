@@ -30,7 +30,6 @@ const AddEnsayoPage = () => {
         try {
           const data = await getAislamientos();
           const options = data
-            .filter(c => !c.idHongo) // Solo mostrar aislamientos SIN hongo asociado
             .map(c => ({ 
               value: c.idHeredado, 
               label: c.idHeredado 

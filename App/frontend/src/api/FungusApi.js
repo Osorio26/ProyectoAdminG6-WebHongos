@@ -138,3 +138,29 @@ export async function getAislamientos() {
 	return res.json();
 }
 
+export async function exportAllTablesToZip() {
+	try {
+
+		const res = await fetch(`${API_BASE_URL}/hongos/export-csv-zip`);
+
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => null);
+			throw new Error(errorData?.message || "Error exporting CSV ZIP");
+		}
+
+		const blob = await res.blob();
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = `hongos_export_${new Date().toISOString().slice(0, 10)}.zip`;
+		link.style.display = "none";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	} catch (error) {
+		console.error("Error exporting CSV ZIP:", error);
+		alert("Error exporting CSV ZIP: " + error.message);
+	}
+}
+

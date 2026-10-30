@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import prisma from "../prismaClient.js";
-import { exportAllTablesToCSV } from "../utils/csvExporter.js";
+import { exportAllTablesToCSV, exportAllTablesToZip } from "../utils/csvExporter.js";
 
 const router = express.Router();
 
@@ -46,6 +46,17 @@ router.get("/", async (req, res) => {
 			res.status(500).json({ message: "Error reading data" });
 		}
 		*/
+	}
+});
+
+router.get("/export-csv-zip", async (req, res) => {
+	try {
+		await exportAllTablesToZip(res);
+	} catch (error) {
+		console.error("Error exporting CSVs via ZIP API:", error);
+		if (!res.headersSent) {
+			res.status(500).json({ message: "Error exporting CSVs", error: error.message });
+		}
 	}
 });
 

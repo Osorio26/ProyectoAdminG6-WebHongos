@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import archiver from 'archiver';
 import { fileURLToPath } from 'url';
 import prisma from '../prismaClient.js';
 
@@ -108,5 +109,39 @@ export async function exportAllTablesToCSV() {
     console.log('CSV export completed successfully.');
   } catch (error) {
     console.error('Error exporting CSVs:', error);
+  }
+}
+
+export async function exportAllTablesToZip(res) {
+  try {
+
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename="hongos_export.zip"');
+
+    archive.on('error', (err) => {
+      throw err;
+    });
+
+    archive.pipe(res);
+
+    for (const modelName of models) {
+      const clientModelName = modelName.charAt(0).toLowerCase() + modelName.slice(1);
+
+      if (!prisma[clientModelName]) {
+        console.warn(`Model ${clientModelName} not found in prisma client.`);
+        continue;
+      }
+
+      const data = await prisma[clientModelName].findMany();
+      const csvContent = convertToCSV(data);
+      archive.append(csvContent, { name: `${modelName}.csv` });
+    }
+
+    await archive.finalize();
+  } catch (error) {
+    console.error('Error exporting CSV ZIP:', error);
+    res.status(500).json({ message: 'Error exporting CSV ZIP', error: error.message });
   }
 }

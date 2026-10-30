@@ -88,7 +88,7 @@ async function main() {
         data: {
           idHeredado: item.code,
           idColecta: colecta.id,
-          idHongo: organismo.id,
+          idOrganismo: organismo.id,
           AisladoDeHospedero: false,
           CantidadExistencias: 1, // Default
           Comentarios: `Cantidad original: ${item.quantity}`,

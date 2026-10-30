@@ -336,7 +336,7 @@ router.post("/hongo", async (req, res) => {
 		if (data.tieneMarcadores && data.marcador?.tipoMarcador) {
 			await prisma.marcadores.create({
 				data: {
-					idOrganismo: organismo.id,
+					idHongo: organismo.id,
 					Tipo: data.marcador.tipoMarcador,
 					Secuencia: data.marcador.secuenciaTexto
 				}
@@ -536,7 +536,7 @@ router.put("/:code", async (req, res) => {
 							// Si no existe, crearlo
 							await prisma.marcadores.create({
 								data: {
-									idOrganismo: existing.idOrganismo,
+									idHongo: existing.idOrganismo,
 									Tipo: m.Tipo,
 									Secuencia: m.Secuencia
 								}

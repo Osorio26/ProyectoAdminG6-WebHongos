@@ -1,0 +1,2 @@
+# Las migraciones de Prisma se guardan byte a byte: su checksum depende de los fines de linea.
+*.sql -text

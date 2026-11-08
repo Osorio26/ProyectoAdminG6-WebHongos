@@ -65,7 +65,7 @@ function convertToCSV(data) {
       if (typeof value === 'string') {
         // Escape quotes and wrap in quotes if necessary
         const stringValue = value.replace(/"/g, '""');
-        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r')) {
           return `"${stringValue}"`;
         }
         return stringValue;
@@ -112,6 +112,14 @@ export async function exportAllTablesToCSV() {
   }
 }
 
+/**
+ * Exportación por tablas (GET /hongos/export-csv-zip): un ZIP con un CSV por
+ * tabla, con las columnas tal como están en la base (Id UUID, llaves foráneas,
+ * booleanos true/false, fechas ISO), sin unir las tablas entre sí.
+ *
+ * El botón "Descargar CSV" ya no la usa: usa exportCombinedCSV() (más abajo).
+ * Se conserva mientras se coordina con el equipo que la creó si se elimina.
+ */
 export async function exportAllTablesToZip(res) {
   try {
 
@@ -143,5 +151,55 @@ export async function exportAllTablesToZip(res) {
   } catch (error) {
     console.error('Error exporting CSV ZIP:', error);
     res.status(500).json({ message: 'Error exporting CSV ZIP', error: error.message });
+  }
+}
+
+// Consulta de la exportación combinada (un solo CSV). Vive en un archivo .sql
+// aparte para poder leerla y probarla directamente en un cliente SQLite.
+const COMBINED_EXPORT_SQL_PATH = path.join(__dirname, 'consultaExportacion.sql');
+
+/**
+ * Exportación combinada (GET /hongos/export-csv): un solo archivo CSV con una
+ * fila por aislamiento. Es la que usa el botón "Descargar CSV".
+ *
+ * Diferencias con exportAllTablesToZip():
+ *   - Un solo .csv en vez de un ZIP con un CSV por tabla.
+ *   - Las tablas vienen unidas: cada fila trae el aislamiento con la taxonomía
+ *     de su hongo, su colecta, el hospedero, el sitio y las coordenadas.
+ *   - Morfologías, ensayos biológicos y marcadores se agregan en una sola celda
+ *     cada uno (separados por " | "), así que no se duplican filas.
+ *   - No incluye los Id internos (UUID) ni las llaves foráneas: usa los códigos
+ *     heredados (IdHeredado) de aislamientos y colectas.
+ *   - Booleanos como "Sí"/"No" y fechas de aislamiento como AAAA-MM-DD.
+ *   - Empieza con BOM UTF-8 para que Excel muestre bien las tildes.
+ *
+ * Las columnas y su formato se definen en utils/consultaExportacion.sql.
+ */
+export async function exportCombinedCSV(res) {
+  try {
+    const sql = fs.readFileSync(COMBINED_EXPORT_SQL_PATH, 'utf8');
+    const rows = await prisma.$queryRawUnsafe(sql);
+
+    // Prisma 5 devuelve los enteros de SQLite como BigInt en las consultas
+    // crudas; se pasan a Number para poder escribirlos en el CSV.
+    const data = rows.map(row => {
+      const clean = {};
+      for (const [key, value] of Object.entries(row)) {
+        clean[key] = typeof value === 'bigint' ? Number(value) : value;
+      }
+      return clean;
+    });
+
+    const csvContent = '\uFEFF' + convertToCSV(data);
+    const fecha = new Date().toISOString().slice(0, 10);
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="cocmi_export_${fecha}.csv"`);
+    res.send(csvContent);
+  } catch (error) {
+    console.error('Error al exportar el CSV combinado:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Error al exportar el CSV', error: error.message });
+    }
   }
 }

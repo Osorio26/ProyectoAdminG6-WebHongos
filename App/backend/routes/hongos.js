@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import prisma from "../prismaClient.js";
-import { exportAllTablesToCSV, exportAllTablesToZip } from "../utils/csvExporter.js";
+import { exportAllTablesToCSV, exportAllTablesToZip, exportCombinedCSV } from "../utils/csvExporter.js";
 
 const router = express.Router();
 
@@ -49,6 +49,8 @@ router.get("/", async (req, res) => {
 	}
 });
 
+// Exportación por tablas: ZIP con un CSV por tabla. El botón "Descargar CSV"
+// ya no la usa (usa /export-csv); se conserva mientras se coordina su retiro.
 router.get("/export-csv-zip", async (req, res) => {
 	try {
 		await exportAllTablesToZip(res);
@@ -58,6 +60,13 @@ router.get("/export-csv-zip", async (req, res) => {
 			res.status(500).json({ message: "Error exporting CSVs", error: error.message });
 		}
 	}
+});
+
+// Exportación combinada: un solo CSV, una fila por aislamiento con todas las
+// tablas unidas (ver exportCombinedCSV en utils/csvExporter.js).
+// Debe ir antes de "/:code"; si no, Express tomaría "export-csv" como un código.
+router.get("/export-csv", async (req, res) => {
+	await exportCombinedCSV(res);
 });
 
 router.get("/:code", async (req, res) => {

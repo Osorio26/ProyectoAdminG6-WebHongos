@@ -138,6 +138,8 @@ export async function getAislamientos() {
 	return res.json();
 }
 
+// Descarga un ZIP con un CSV por tabla (GET /hongos/export-csv-zip).
+// El botón "Descargar CSV" ya no la usa: usa exportCombinedCSV() (más abajo).
 export async function exportAllTablesToZip() {
 	try {
 
@@ -161,6 +163,33 @@ export async function exportAllTablesToZip() {
 	} catch (error) {
 		console.error("Error exporting CSV ZIP:", error);
 		alert("Error exporting CSV ZIP: " + error.message);
+	}
+}
+
+// Descarga un solo CSV con una fila por aislamiento y todas las tablas unidas
+// (GET /hongos/export-csv). Es la que usa el botón "Descargar CSV".
+export async function exportCombinedCSV() {
+	try {
+		const res = await fetch(`${API_BASE_URL}/hongos/export-csv`);
+
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => null);
+			throw new Error(errorData?.message || "Error al exportar el CSV");
+		}
+
+		const blob = await res.blob();
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = `cocmi_export_${new Date().toISOString().slice(0, 10)}.csv`;
+		link.style.display = "none";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	} catch (error) {
+		console.error("Error al exportar el CSV:", error);
+		alert("Error al exportar el CSV: " + error.message);
 	}
 }
 

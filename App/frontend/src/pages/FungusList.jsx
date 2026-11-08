@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FungusList.css";
-import { getFungi, exportAllTablesToZip } from "../api/FungusApi";
+import { getFungi, exportCombinedCSV } from "../api/FungusApi";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 
 const FungusList = () => {
@@ -180,8 +180,8 @@ const FungusList = () => {
             </button>
             <button
               className="export-button"
-              onClick={async () => { await exportAllTablesToZip(); }}
-              title="Descargar todas las tablas de datos en un archivo ZIP"
+              onClick={async () => { await exportCombinedCSV(); }}
+              title="Descargar todos los aislamientos en un solo archivo CSV"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

@@ -63,9 +63,12 @@ function convertToCSV(data) {
         return '';
       }
       if (typeof value === 'string') {
-        // Escape quotes and wrap in quotes if necessary
+        // Escape quotes and wrap in quotes if necessary.
+        // También se entrecomillan los valores con ";": Excel con configuración
+        // regional en español usa ";" como separador y, sin comillas, partiría
+        // la celda en varias columnas.
         const stringValue = value.replace(/"/g, '""');
-        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r')) {
+        if (/[,;"\r\n]/.test(stringValue)) {
           return `"${stringValue}"`;
         }
         return stringValue;

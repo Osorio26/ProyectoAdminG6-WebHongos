@@ -79,23 +79,27 @@ SELECT
     coord.Longitud            AS "Longitud (Coordenadas)",
     coord.Altitud             AS "Altitud (Coordenadas)",
 
-    -- Morfologías: "Campo: valor; Campo: valor" (se omiten los campos vacíos)
+    -- Morfologías: "Campo: valor / Campo: valor" (se omiten los campos vacíos).
+    -- Los campos se separan con " / " y no con ";", porque Excel con
+    -- configuración regional en español usa ";" como separador de columnas
+    -- y partiría la celda. Cada campo empieza con " / " y substr(..., 4)
+    -- quita el primero.
     (SELECT GROUP_CONCAT(
-                rtrim(
-                    COALESCE('Forma: '            || m.Forma                || '; ', '') ||
-                    COALESCE('Forma del borde: '  || m.FormaBorde           || '; ', '') ||
-                    COALESCE('Color anverso: '    || m.ColorAnverso         || '; ', '') ||
-                    COALESCE('Color reverso: '    || m.ColorReverso         || '; ', '') ||
-                    COALESCE('Color del borde: '  || m.ColorBorde           || '; ', '') ||
-                    COALESCE('Micelio aéreo: '    ||
-                        CASE m.TieneMicelioAereo WHEN 1 THEN 'Sí' WHEN 0 THEN 'No' END || '; ', '') ||
-                    COALESCE('Densidad micelio: ' || m.DensidadMicelioAereo || '; ', '') ||
-                    COALESCE('Tipo de crecimiento: ' || m.TipoCrecimiento   || '; ', '') ||
-                    COALESCE('Tipo de hifa: '     || m.TipoHifa             || '; ', '') ||
-                    COALESCE('Secreciones: '      ||
-                        CASE m.TieneSecreciones WHEN 1 THEN 'Sí' WHEN 0 THEN 'No' END || '; ', '') ||
-                    COALESCE('Observaciones: '    || m.Observaciones        || '; ', ''),
-                    '; '),
+                NULLIF(substr(
+                    COALESCE(' / Forma: '            || m.Forma,                '') ||
+                    COALESCE(' / Forma del borde: '  || m.FormaBorde,           '') ||
+                    COALESCE(' / Color anverso: '    || m.ColorAnverso,         '') ||
+                    COALESCE(' / Color reverso: '    || m.ColorReverso,         '') ||
+                    COALESCE(' / Color del borde: '  || m.ColorBorde,           '') ||
+                    COALESCE(' / Micelio aéreo: '    ||
+                        CASE m.TieneMicelioAereo WHEN 1 THEN 'Sí' WHEN 0 THEN 'No' END, '') ||
+                    COALESCE(' / Densidad micelio: ' || m.DensidadMicelioAereo, '') ||
+                    COALESCE(' / Tipo de crecimiento: ' || m.TipoCrecimiento,   '') ||
+                    COALESCE(' / Tipo de hifa: '     || m.TipoHifa,             '') ||
+                    COALESCE(' / Secreciones: '      ||
+                        CASE m.TieneSecreciones WHEN 1 THEN 'Sí' WHEN 0 THEN 'No' END, '') ||
+                    COALESCE(' / Observaciones: '    || m.Observaciones,        ''),
+                    4), ''),
                 ' | ')
        FROM Morfologias m
       WHERE m.IdAislamiento = a.Id)

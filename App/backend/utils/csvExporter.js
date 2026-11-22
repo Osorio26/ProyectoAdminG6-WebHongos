@@ -168,9 +168,10 @@ const COMBINED_EXPORT_SQL_PATH = path.join(__dirname, 'consultaExportacion.sql')
  * Diferencias con exportAllTablesToZip():
  *   - Un solo .csv en vez de un ZIP con un CSV por tabla.
  *   - Las tablas vienen unidas: cada fila trae el aislamiento con la taxonomía
- *     de su hongo, su colecta, el hospedero, el sitio y las coordenadas.
- *   - Morfologías, ensayos biológicos y marcadores se agregan en una sola celda
- *     cada uno (separados por " | "), así que no se duplican filas.
+ *     de su hongo, su colecta, el hospedero, el sitio, las coordenadas, su
+ *     morfología y su ensayo biológico (estos dos en columnas propias).
+ *   - Columnas nombradas "Campo (Tabla)" con los nombres originales de la base.
+ *   - Los marcadores se agregan en una sola celda (separados por " | ").
  *   - No incluye los Id internos (UUID) ni las llaves foráneas: usa los códigos
  *     heredados (IdHeredado) de aislamientos y colectas.
  *   - Booleanos como "Sí"/"No" y fechas de aislamiento como AAAA-MM-DD.

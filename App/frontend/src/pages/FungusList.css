@@ -282,3 +282,42 @@
   margin-bottom: 20px;
   border: 1px solid #ffcdd2;
 }
+
+/* Header Buttons Container */
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Export Button */
+.export-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--secondary-color, #1976d2);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.export-button:hover:not(:disabled) {
+  background-color: var(--secondary-hover, #1565c0);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  color: white;
+}
+
+.export-button:disabled {
+  background-color: #e0e0e0;
+  color: #bdbdbd;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}

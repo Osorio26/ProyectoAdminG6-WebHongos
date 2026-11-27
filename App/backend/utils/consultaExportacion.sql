@@ -26,10 +26,13 @@
 --
 -- Notas sobre el formato:
 --   * Los booleanos salen como 'Sí' / 'No' (en SQLite se guardan como 0/1).
---   * Prisma guarda los DateTime de SQLite como milisegundos desde 1970
---     (entero). FechaAislamiento y FechaSalida se convierten a AAAA-MM-DD.
---   * Colectas.Fecha es texto y se exporta tal como está guardada (hoy mezcla
---     AAAA-MM-DD y M/D/AAAA; ver RECOMENDACIONES 4.10).
+--   * Todas las fechas salen como DD/MM/AAAA (pedido del COCMI).
+--     - FechaAislamiento y FechaSalida: Prisma guarda los DateTime de SQLite
+--       como milisegundos desde 1970 (entero); se convierten con strftime.
+--     - Colectas.Fecha es texto y en la base mezcla AAAA-MM-DD y M/D/AAAA
+--       (las importadas, formato estadounidense; ver RECOMENDACIONES 4.10).
+--       La CTE fecha_colecta convierte las dos al exportar, sin tocar la
+--       base. Cualquier otro formato se exporta tal como está.
 --   * Los Id internos (UUID) y las llaves foráneas no se exportan: los Id solo
 --     sirven para unir las tablas. Se identifican las filas con los códigos
 --     heredados (IdHeredado) de aislamientos y colectas.
@@ -41,15 +44,32 @@
 --     aislamientos, así que se agrega en una sola celda ("Tipo: Secuencia",
 --     varios separados por " | ") para no multiplicar filas. Hoy está vacía.
 -- =====================================================================
+WITH fecha_colecta AS (
+    SELECT Id,
+           CASE
+               -- AAAA-MM-DD
+               WHEN Fecha GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+                   THEN strftime('%d/%m/%Y', Fecha)
+               -- M/D/AAAA: Fecha = "M/resto", resto = "D/AAAA"
+               WHEN Fecha LIKE '%/%/%'
+                   THEN printf('%02d/%02d/%s',
+                               CAST(substr(resto, 1, instr(resto, '/') - 1) AS INTEGER),
+                               CAST(substr(Fecha, 1, instr(Fecha, '/') - 1) AS INTEGER),
+                               substr(resto, instr(resto, '/') + 1))
+               ELSE Fecha
+           END AS Fecha
+      FROM (SELECT Id, Fecha, substr(Fecha, instr(Fecha, '/') + 1) AS resto
+              FROM Colectas)
+)
 SELECT
     -- Aislamientos
     a.IdHeredado              AS "IdHeredado (Aislamientos)",
     CASE a.AisladoDeHospedero WHEN 1 THEN 'Sí' WHEN 0 THEN 'No' END
                               AS "AisladoDeHospedero (Aislamientos)",
     a.ParteDeHospedero        AS "ParteDeHospedero (Aislamientos)",
-    strftime('%Y-%m-%d', a.FechaAislamiento / 1000, 'unixepoch')
+    strftime('%d/%m/%Y', a.FechaAislamiento / 1000, 'unixepoch')
                               AS "FechaAislamiento (Aislamientos)",
-    strftime('%Y-%m-%d', a.FechaSalida / 1000, 'unixepoch')
+    strftime('%d/%m/%Y', a.FechaSalida / 1000, 'unixepoch')
                               AS "FechaSalida (Aislamientos)",
     a.IdAnalisisMolecular     AS "IdAnalisisMolecular (Aislamientos)",
     a.MedioCultivo            AS "MedioCultivo (Aislamientos)",
@@ -77,7 +97,7 @@ SELECT
     -- Colectas
     c.IdHeredado              AS "IdHeredado (Colectas)",
     c.Colector                AS "Colector (Colectas)",
-    c.Fecha                   AS "Fecha (Colectas)",
+    fc.Fecha                  AS "Fecha (Colectas)",
     c.Temperatura             AS "Temperatura (Colectas)",
     c.Humedad                 AS "Humedad (Colectas)",
     c.pH                      AS "pH (Colectas)",
@@ -138,6 +158,7 @@ FROM Aislamientos AS a
 LEFT JOIN Organismos        AS ho    ON a.IdOrganismo   = ho.Id
 LEFT JOIN Hongos            AS h     ON a.IdOrganismo   = h.Id
 LEFT JOIN Colectas          AS c     ON a.IdColecta     = c.Id
+LEFT JOIN fecha_colecta     AS fc    ON c.Id            = fc.Id
 LEFT JOIN Organismos        AS po    ON c.IdHospedero   = po.Id
 LEFT JOIN Sitios            AS s     ON c.IdSitio       = s.Id
 LEFT JOIN Coordenadas       AS coord ON c.IdCoordenadas = coord.Id
